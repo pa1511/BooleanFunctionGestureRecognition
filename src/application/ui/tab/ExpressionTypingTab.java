@@ -9,7 +9,10 @@ import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
+import application.parse.BooleanParser;
+import application.parse.node.IBooleanExpression;
 import application.ui.AbstractApplicationTab;
+import log.Log;
 
 public class ExpressionTypingTab extends AbstractApplicationTab{
 
@@ -29,6 +32,10 @@ public class ExpressionTypingTab extends AbstractApplicationTab{
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				// TODO Auto-generated method stub
+				
+				String expression = expressionInputField.getText();
+				Log.addMessage("Attemting to parse: " + expression, Log.Type.Plain);
+				IBooleanExpression booleanExpression = BooleanParser.parse(expression);
 				
 			}
 		});
