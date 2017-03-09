@@ -7,14 +7,14 @@ import java.util.Properties;
 
 import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
-import javax.swing.JFrame;
 import javax.swing.JTabbedPane;
 import javax.swing.WindowConstants;
 
+import application.AApplicationFrame;
 import application.Application;
 import utilities.PPrimitives;
 
-public class ApplicationFrame extends JFrame{
+public class ApplicationFrame extends AApplicationFrame{
 	
 	private final static @Nonnegative double screenFactor = 0.8;
 

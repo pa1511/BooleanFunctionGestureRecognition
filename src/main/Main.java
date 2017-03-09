@@ -1,11 +1,11 @@
 package main;
 
 import javax.annotation.Nonnull;
-import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
 import application.AApplication;
+import application.AApplicationFrame;
 import application.Application;
 import application.ui.ApplicationFrame;
 import log.Log;
@@ -22,9 +22,10 @@ public class Main {
 		AApplication.setApplicationImplementationClassName(Application.class.getName());
 		
 		SwingUtilities.invokeLater(()->{
-			JFrame frame;
+			AApplicationFrame frame;
 			try {
 				frame = new ApplicationFrame();
+				AApplication.getInstance().registerApplicationFrame(frame);
 				frame.setVisible(true);
 			} catch (Exception e) {
 				Log.addError(e);
