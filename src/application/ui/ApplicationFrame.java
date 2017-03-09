@@ -16,7 +16,7 @@ import utilities.PPrimitives;
 
 public class ApplicationFrame extends AApplicationFrame{
 	
-	private final static @Nonnegative double screenFactor = 0.8;
+	private final static @Nonnegative double screenFactor = 0.45;
 
 	public ApplicationFrame() throws Exception{
 				
