@@ -8,12 +8,10 @@ import utilities.function.BooleanUnaryOperation;
 public class UnaryOperationNode extends ABooleanExpressionNode{
 
 	private final @Nonnull BooleanUnaryOperation operation;
-	private final @Nonnull String symbol;
 
 	public UnaryOperationNode(@Nonnull BooleanUnaryOperation operation, @Nonnull String symbol) {
-		super(1);
+		super(1, symbol);
 		this.operation = operation;
-		this.symbol = symbol;
 	}
 	
 	@Override
@@ -21,4 +19,8 @@ public class UnaryOperationNode extends ABooleanExpressionNode{
 		return operation.apply(children[0].evaluate(variableValueProvider));
 	}
 
+	@Override
+	public String toString() {
+		return symbol + children[0];
+	}
 }

@@ -34,6 +34,7 @@ public final class Application extends AApplication{
 			
 	public Application() throws Exception {
 		super();
+		Log.addMessage("Application setup completed successfully", Log.Type.Plain);
 	}
 
 	@Override

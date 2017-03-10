@@ -4,13 +4,10 @@ import javax.annotation.Nonnull;
 
 import application.parse.VariableValueProvider;
 
-public class ConstantNode extends ABooleanExpressionNode{
-
-	private final @Nonnull String symbol;
+public final class ConstantNode extends ABooleanExpressionNode{
 
 	public ConstantNode(@Nonnull String symbol) {
-		super(0);
-		this.symbol = symbol;
+		super(0,symbol);
 	}
 	
 	@Override
