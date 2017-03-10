@@ -1,0 +1,2 @@
+Development decisions: 
+	- all lexical tokens are single character (for now)
