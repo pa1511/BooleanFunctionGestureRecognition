@@ -11,6 +11,25 @@ import javax.swing.UIManager;
 
 import log.Log;
 
+/**
+ * Implementation of {@link AApplication}. <br>
+ * Takes care of the general application setup. <br> 
+ * This setup includes the following: <br>
+ * <ul>
+ * <li>
+ * Application properties loading 
+ * </li>
+ * <li>
+ * Log file location setup
+ * </li>
+ * <li>
+ * Application LAF setup
+ * </li>
+ * </ul>
+ * 
+ * @author paf
+ *
+ */
 public final class Application extends AApplication{
 			
 	public Application() throws Exception {

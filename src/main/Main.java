@@ -10,12 +10,16 @@ import application.Application;
 import application.ui.ApplicationFrame;
 import log.Log;
 
+/**
+ * Main class for the boolean function gesture recognition application <br>
+ * @author paf
+ *
+ */
 public class Main {
 
 	
 	/**
 	 * Application entry point. <br>
-	 * @param args
 	 */
 	public static void main(@Nonnull String[] args) {
 		
