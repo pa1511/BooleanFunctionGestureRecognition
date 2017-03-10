@@ -6,9 +6,11 @@ import javax.annotation.Nonnull;
 
 import application.parse.exception.BooleanExpressionSyntacticExceptiona;
 import application.parse.lexic.token.LexicalToken;
+import application.parse.lexic.token.LexicalToken.Type;
 import application.parse.node.AOperationNode;
 import application.parse.node.IBooleanExpression;
 import application.parse.node.leaf.AndNode;
+import application.parse.node.leaf.BracketsNode;
 import application.parse.node.leaf.ConstantNode;
 import application.parse.node.leaf.NotNode;
 import application.parse.node.leaf.OrNode;
@@ -25,28 +27,40 @@ public class SyntacticAnalyzer implements ISyntacticAnalyzer {
 		for(int i=0; i<tokens.length; i++){
 			
 			LexicalToken token = tokens[i];
-			IBooleanExpression node = getNodeFor(token);
+			IBooleanExpression node;
 			
-			if(node instanceof VariableNode || node instanceof ConstantNode){
-				operandStack.push(node);
+			if(token.getType()==Type.BRACKET_RIGHT){
+				
+				while(!(operationStack.peek() instanceof BracketsNode)){
+					reduceSyntacticTree(operandStack, operationStack);
+				}
+				reduceSyntacticTree(operandStack, operationStack);
+				
 			}
 			else{
-				
-				boolean currentNodeIncorporated = false;
-				do{
-					AOperationNode current = (AOperationNode)node;
-					
-					if(operationStack.isEmpty() || operationStack.peek().getPriority().value<current.getPriority().value){
-						operationStack.push(current);
-						currentNodeIncorporated = true;
-					}
-					else{
-						reduceSyntacticTree(operandStack, operationStack);
-					}
-				} while(!currentNodeIncorporated);
-				
-			}
 			
+				node = getNodeFor(token);
+				
+				if(node instanceof VariableNode || node instanceof ConstantNode){
+					operandStack.push(node);
+				}
+				else{
+					
+					boolean currentNodeIncorporated = false;
+					do{
+						AOperationNode current = (AOperationNode)node;
+						
+						if(operationStack.isEmpty() || operationStack.peek().getPriority().value<current.getPriority().value || operationStack.peek() instanceof BracketsNode){
+							operationStack.push(current);
+							currentNodeIncorporated = true;
+						}
+						else{
+							reduceSyntacticTree(operandStack, operationStack);
+						}
+					} while(!currentNodeIncorporated);
+					
+				}
+			}
 		}
 		
 		while(!operationStack.isEmpty()){
@@ -83,11 +97,11 @@ public class SyntacticAnalyzer implements ISyntacticAnalyzer {
 		case VARIABLE:
 			node = new VariableNode(token.getSymbolAsString());
 			break;
-			
 		case BRACKET_LEFT:
-			//TODO
+			node = new BracketsNode();
+			break;
 		case BRACKET_RIGHT:
-			//TODO
+			throw new InternalError("Should never be asked for the right bracket node.");
 			
 		default:
 			throw new BooleanExpressionSyntacticExceptiona("Unknown syntactic node requested: " + token);
