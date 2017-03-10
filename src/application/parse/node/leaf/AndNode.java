@@ -1,8 +1,9 @@
-package application.parse.node;
+package application.parse.node.leaf;
 
 import javax.annotation.Nonnull;
 
 import application.parse.VariableValueProvider;
+import application.parse.node.BinaryOperationNode;
 
 public final class AndNode extends BinaryOperationNode{
 
