@@ -1,9 +1,9 @@
 package application.parse;
 
 import java.util.ArrayDeque;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Queue;
+import java.util.TreeMap;
 
 import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
@@ -14,9 +14,10 @@ import application.parse.node.leaf.VariableNode;
 public class VariableValueProvider {
 	
 	private final @Nonnull Map<String, Boolean> variableValueMap;
+	private final @Nonnull String[] variables;
 	
 	public VariableValueProvider(@Nonnull IBooleanExpression expression) {
-		variableValueMap = new HashMap<>();
+		variableValueMap = new TreeMap<>();
 		
 		//TODO: not sure if this should be here!
 		Queue<IBooleanExpression> nodeQueue = new ArrayDeque<>(64);
@@ -36,6 +37,9 @@ public class VariableValueProvider {
 			}
 			
 		}
+		
+		variables = new String[variableValueMap.size()];
+		variableValueMap.keySet().toArray(variables);
 	}
 		
 	public @Nonnegative int getVariableCount(){
@@ -53,7 +57,7 @@ public class VariableValueProvider {
 	}
 	
 	public @Nonnull String[] getVariables(){
-		return variableValueMap.keySet().toArray(new String[getVariableCount()]);
+		return variables;
 	}
 
 }

@@ -9,6 +9,8 @@ import javax.swing.AbstractAction;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
 import javax.swing.JTextField;
 
 import application.parse.BooleanParser;
@@ -16,12 +18,15 @@ import application.parse.VariableValueProvider;
 import application.parse.exception.BooleanExpressionParseException;
 import application.parse.node.IBooleanExpression;
 import application.ui.AbstractApplicationTab;
+import application.ui.table.ExpressionTableModel;
 import log.Log;
 
 public class ExpressionTypingTab extends AbstractApplicationTab{
 
 	private @Nonnull JTextField expressionInputField;
 	private @Nonnull JButton evaluateButton;
+	
+	private @Nonnull JTable truthTable;
 	
 	private @CheckForNull IBooleanExpression expression;
 	private @CheckForNull VariableValueProvider variableValueProvider;
@@ -41,7 +46,10 @@ public class ExpressionTypingTab extends AbstractApplicationTab{
 		upperPanel.add(expressionInputField, BorderLayout.CENTER);
 		upperPanel.add(evaluateButton,BorderLayout.EAST);
 		add(upperPanel,BorderLayout.NORTH);
-		
+
+		//Main panel content
+		truthTable = new JTable();
+		add(new JScrollPane(truthTable),BorderLayout.CENTER);
 	}
 	
 	public void setExpression(IBooleanExpression expression) {
@@ -53,8 +61,8 @@ public class ExpressionTypingTab extends AbstractApplicationTab{
 
 	
 	private void updateExpressionUI() {
-		// TODO Auto-generated method stub
-		
+		if(variableValueProvider!=null && expression!=null)
+			truthTable.setModel(new ExpressionTableModel(variableValueProvider, expression));
 	}
 
 
