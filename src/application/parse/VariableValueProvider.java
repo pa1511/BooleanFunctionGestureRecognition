@@ -9,7 +9,6 @@ import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
 
 import application.parse.node.IBooleanExpression;
-import application.parse.node.leaf.ConstantNode;
 import application.parse.node.leaf.VariableNode;
 
 public class VariableValueProvider {
@@ -26,13 +25,7 @@ public class VariableValueProvider {
 		while(!nodeQueue.isEmpty()){
 			IBooleanExpression node = nodeQueue.poll();
 			
-			if(node instanceof ConstantNode){
-				//TODO: not a very nice way to determine the constant value!!!
-				String nodeId = node.toString();
-				if(!variableValueMap.containsKey(nodeId))
-					variableValueMap.put(nodeId, Boolean.valueOf(nodeId=="1"));
-			}
-			else if(node instanceof VariableNode){
+			if(node instanceof VariableNode){
 				String nodeId = node.toString();
 				if(!variableValueMap.containsKey(nodeId))
 					variableValueMap.put(nodeId, Boolean.FALSE);

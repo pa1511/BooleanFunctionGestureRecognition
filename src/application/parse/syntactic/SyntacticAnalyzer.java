@@ -11,9 +11,10 @@ import application.parse.node.AOperationNode;
 import application.parse.node.IBooleanExpression;
 import application.parse.node.leaf.AndNode;
 import application.parse.node.leaf.BracketsNode;
-import application.parse.node.leaf.ConstantNode;
+import application.parse.node.leaf.FalseNode;
 import application.parse.node.leaf.NotNode;
 import application.parse.node.leaf.OrNode;
+import application.parse.node.leaf.TrueNode;
 import application.parse.node.leaf.VariableNode;
 
 public class SyntacticAnalyzer implements ISyntacticAnalyzer {
@@ -41,7 +42,7 @@ public class SyntacticAnalyzer implements ISyntacticAnalyzer {
 			
 				node = getNodeFor(token);
 				
-				if(node instanceof VariableNode || node instanceof ConstantNode){
+				if(node instanceof VariableNode || node instanceof TrueNode || node instanceof FalseNode){
 					operandStack.push(node);
 				}
 				else{
@@ -88,8 +89,11 @@ public class SyntacticAnalyzer implements ISyntacticAnalyzer {
 		
 		switch (token.getType()) {
 
-		case CONSTANT:
-			node = new ConstantNode(token.getSymbolAsString());
+		case TRUE:
+			node = new TrueNode();
+			break;
+		case FALSE:
+			node = new FalseNode();
 			break;
 		case OPERATION:
 			node = getOperationNodeFor(token.getSymbol());

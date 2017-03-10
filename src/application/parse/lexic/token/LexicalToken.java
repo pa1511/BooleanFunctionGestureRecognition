@@ -7,7 +7,8 @@ import utilities.function.CharacterPredicate;
 public class LexicalToken {
 
 	public static enum Type{
-		CONSTANT(c->c=='0' || c=='1'),
+		TRUE(c->c=='1'),
+		FALSE(c->c=='0'),
 		VARIABLE(c->Character.isUpperCase(c)),
 		OPERATION(c->c=='+' || c=='*' || c=='!'),
 		BRACKET_LEFT(c->c=='('),
