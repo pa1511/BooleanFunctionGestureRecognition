@@ -1,7 +1,9 @@
 package application.ui.tab;
 
 import java.awt.BorderLayout;
+import java.awt.Desktop;
 import java.awt.event.ActionEvent;
+import java.io.IOException;
 
 import javax.annotation.Nonnull;
 import javax.swing.AbstractAction;
@@ -35,7 +37,7 @@ public class ExpressionTypingTab extends AbstractApplicationTab{
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
+				// TODO: fully implement
 				
 				String expression = expressionInputField.getText();
 				Log.addMessage("Attemting to parse: " + expression, Log.Type.Plain);

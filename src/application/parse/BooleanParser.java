@@ -35,9 +35,12 @@ public class BooleanParser {
 		
 		LexicalToken[] tokens = lexicalAnalyzer.analyze(expression);
 		Log.addMessage("Lexical analysis result: " + Arrays.toString(tokens), Log.Type.Plain);
-		//TODO
 		
-		return null;
+		IBooleanExpression syntacticTopNode = syntacticAnalyzer.analyze(tokens);
+		Log.addMessage("Syntactic analysis result: " + syntacticTopNode, Log.Type.Plain);
+		//TODO: implement
+		
+		return syntacticTopNode;
 	}
 
 	/**

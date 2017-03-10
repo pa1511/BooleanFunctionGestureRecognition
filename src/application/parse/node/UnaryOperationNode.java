@@ -2,10 +2,10 @@ package application.parse.node;
 
 import javax.annotation.Nonnull;
 
-public abstract class UnaryOperationNode extends ABooleanExpressionNode{
+public abstract class UnaryOperationNode extends AOperationNode{
 
-	public UnaryOperationNode(@Nonnull String symbol) {
-		super(1, symbol);
+	public UnaryOperationNode(@Nonnull String symbol, @Nonnull OperationPriority priority) {
+		super(1, symbol, priority);
 	}
 	
 	@Override

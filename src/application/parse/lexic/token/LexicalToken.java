@@ -36,9 +36,12 @@ public class LexicalToken {
 		this.type = type;
 	}
 	
-	
-	public @Nonnull char getSymbol() {
+	public char getSymbol() {
 		return symbol;
+	}
+	
+	public @Nonnull String getSymbolAsString() {
+		return Character.toString(symbol);
 	}
 	
 	public @Nonnull Type getType() {

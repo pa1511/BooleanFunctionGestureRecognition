@@ -3,12 +3,13 @@ package application.parse.node.leaf;
 import javax.annotation.Nonnull;
 
 import application.parse.VariableValueProvider;
+import application.parse.node.OperationPriority;
 import application.parse.node.UnaryOperationNode;
 
 public final class NotNode extends UnaryOperationNode{
 
 	public NotNode() {
-		super("!");
+		super("!",OperationPriority.LVL2);
 	}
 	
 	@Override

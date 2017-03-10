@@ -4,11 +4,12 @@ import javax.annotation.Nonnull;
 
 import application.parse.VariableValueProvider;
 import application.parse.node.BinaryOperationNode;
+import application.parse.node.OperationPriority;
 
 public final class OrNode extends BinaryOperationNode{
 
 	public OrNode() {
-		super("+");
+		super("+",OperationPriority.LVL0);
 	}
 	
 	@Override

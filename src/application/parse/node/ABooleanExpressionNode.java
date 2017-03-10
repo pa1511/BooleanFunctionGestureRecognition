@@ -23,5 +23,11 @@ public abstract class ABooleanExpressionNode implements IBooleanExpression{
 	public final @Nonnull IBooleanExpression[] getChildren() {
 		return children;
 	}
+	
+	@Override
+	public void addChild(@Nonnull IBooleanExpression child, int j) {
+		children[j] = child;
+	}
+
 
 }
