@@ -5,15 +5,15 @@ import javax.annotation.Nonnull;
 
 import application.parse.VariableValueProvider;
 
-public interface IBooleanExpression {
+public interface IBooleanExpressionNode {
 	
 	public boolean evaluate(@Nonnull VariableValueProvider variableValueProvider);
 	
 	public @Nonnegative int getChildCount();
 	
-	public @Nonnull IBooleanExpression[] getChildren();
+	public @Nonnull IBooleanExpressionNode[] getChildren();
 	
-	public void addChild(IBooleanExpression pop, int j);
+	public void addChild(IBooleanExpressionNode pop, int j);
 	
 	@Override
 	public @Nonnull String toString();

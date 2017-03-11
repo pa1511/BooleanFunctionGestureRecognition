@@ -8,7 +8,7 @@ import application.parse.exception.BooleanExpressionParseException;
 import application.parse.lexic.ILexicalAnalyzer;
 import application.parse.lexic.LexicalAnalyzer;
 import application.parse.lexic.token.LexicalToken;
-import application.parse.node.IBooleanExpression;
+import application.parse.node.IBooleanExpressionNode;
 import application.parse.syntactic.ISyntacticAnalyzer;
 import application.parse.syntactic.SyntacticAnalyzer;
 import log.Log;
@@ -28,7 +28,7 @@ public class BooleanParser {
 		
 	}
 	
-	public static @Nonnull IBooleanExpression parse(@Nonnull String expression) throws BooleanExpressionParseException {
+	public static @Nonnull IBooleanExpressionNode parse(@Nonnull String expression) throws BooleanExpressionParseException {
 
 		expression = expressionPreprocessing(expression);
 		Log.addMessage("Expression after preprocessing: " + expression, Log.Type.Plain);
@@ -38,7 +38,7 @@ public class BooleanParser {
 		
 		//TODO: token order check
 		
-		IBooleanExpression syntacticTopNode = syntacticAnalyzer.analyze(tokens);
+		IBooleanExpressionNode syntacticTopNode = syntacticAnalyzer.analyze(tokens);
 		Log.addMessage("Syntactic analysis result: " + syntacticTopNode, Log.Type.Plain);
 				
 		return syntacticTopNode;

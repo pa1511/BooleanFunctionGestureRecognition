@@ -16,7 +16,7 @@ import javax.swing.JTextField;
 import application.parse.BooleanParser;
 import application.parse.VariableValueProvider;
 import application.parse.exception.BooleanExpressionParseException;
-import application.parse.node.IBooleanExpression;
+import application.parse.node.IBooleanExpressionNode;
 import application.ui.AbstractApplicationTab;
 import application.ui.table.ExpressionTableModel;
 import log.Log;
@@ -28,7 +28,7 @@ public class ExpressionTypingTab extends AbstractApplicationTab{
 	
 	private @Nonnull JTable truthTable;
 	
-	private @CheckForNull IBooleanExpression expression;
+	private @CheckForNull IBooleanExpressionNode expression;
 	private @CheckForNull VariableValueProvider variableValueProvider;
 	
 	public ExpressionTypingTab() {
@@ -52,7 +52,7 @@ public class ExpressionTypingTab extends AbstractApplicationTab{
 		add(new JScrollPane(truthTable),BorderLayout.CENTER);
 	}
 	
-	public void setExpression(IBooleanExpression expression) {
+	public void setExpression(IBooleanExpressionNode expression) {
 		this.expression = expression;
 		this.variableValueProvider = new VariableValueProvider(expression);
 		

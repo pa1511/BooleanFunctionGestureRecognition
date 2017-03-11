@@ -8,11 +8,11 @@ import java.util.TreeMap;
 import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
 
-import application.parse.node.IBooleanExpression;
+import application.parse.node.IBooleanExpressionNode;
 import application.parse.node.leaf.VariableNode;
 
 /**
- * Provides variable values to {@link IBooleanExpression}. <br>
+ * Provides variable values to {@link IBooleanExpressionNode}. <br>
  * This allows external variable value adjustment. <br>
  * @author paf
  *
@@ -22,17 +22,17 @@ public class VariableValueProvider {
 	private final @Nonnull Map<String, Boolean> variableValueMap;
 	private final @Nonnull String[] variables;
 	
-	public VariableValueProvider(@Nonnull IBooleanExpression expression) {
+	public VariableValueProvider(@Nonnull IBooleanExpressionNode expression) {
 		variableValueMap = new TreeMap<>();
 		
 		//TODO: not sure if this should be here!
 		
 		//Node tree iteration
-		Queue<IBooleanExpression> nodeQueue = new ArrayDeque<>(64);
+		Queue<IBooleanExpressionNode> nodeQueue = new ArrayDeque<>(64);
 		nodeQueue.add(expression);
 		
 		while(!nodeQueue.isEmpty()){
-			IBooleanExpression node = nodeQueue.poll();
+			IBooleanExpressionNode node = nodeQueue.poll();
 			
 			if(node instanceof VariableNode){
 				String nodeId = node.toString();
@@ -40,7 +40,7 @@ public class VariableValueProvider {
 					variableValueMap.put(nodeId, Boolean.FALSE);
 			}
 			
-			for(IBooleanExpression child:node.getChildren()){
+			for(IBooleanExpressionNode child:node.getChildren()){
 				nodeQueue.add(child);
 			}
 			

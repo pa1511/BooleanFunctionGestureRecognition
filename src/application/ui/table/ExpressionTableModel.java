@@ -5,7 +5,7 @@ import javax.annotation.Nonnull;
 import javax.swing.table.AbstractTableModel;
 
 import application.parse.VariableValueProvider;
-import application.parse.node.IBooleanExpression;
+import application.parse.node.IBooleanExpressionNode;
 
 /**
  * This table model can be used to present a boolean expression in table form. <br>
@@ -17,7 +17,7 @@ public class ExpressionTableModel extends AbstractTableModel{
 
 	private final @Nonnull String[] variables;
 	private final @Nonnull VariableValueProvider variableValueProvider;
-	private final @Nonnull IBooleanExpression expression;
+	private final @Nonnull IBooleanExpressionNode expression;
 
 	private final @Nonnegative int rowCount;
 
@@ -26,7 +26,7 @@ public class ExpressionTableModel extends AbstractTableModel{
 	 * @param variableValueProvider
 	 * @param expression
 	 */
-	public ExpressionTableModel(@Nonnull VariableValueProvider variableValueProvider, @Nonnull IBooleanExpression expression) {
+	public ExpressionTableModel(@Nonnull VariableValueProvider variableValueProvider, @Nonnull IBooleanExpressionNode expression) {
 		this.variableValueProvider = variableValueProvider;
 		this.expression = expression;
 		

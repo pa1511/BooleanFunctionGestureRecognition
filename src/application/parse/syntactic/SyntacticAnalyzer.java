@@ -8,7 +8,7 @@ import application.parse.exception.BooleanExpressionSyntacticExceptiona;
 import application.parse.lexic.token.LexicalToken;
 import application.parse.lexic.token.LexicalToken.Type;
 import application.parse.node.AOperationNode;
-import application.parse.node.IBooleanExpression;
+import application.parse.node.IBooleanExpressionNode;
 import application.parse.node.leaf.AndNode;
 import application.parse.node.leaf.BracketsNode;
 import application.parse.node.leaf.FalseNode;
@@ -17,18 +17,24 @@ import application.parse.node.leaf.OrNode;
 import application.parse.node.leaf.TrueNode;
 import application.parse.node.leaf.VariableNode;
 
+/**
+ * Implementation of the {@link ISyntacticAnalyzer} interface. <br>
+ * 
+ * @author paf
+ *
+ */
 public class SyntacticAnalyzer implements ISyntacticAnalyzer {
 
 	@Override
-	public IBooleanExpression analyze(LexicalToken[] tokens) throws BooleanExpressionSyntacticExceptiona {
+	public IBooleanExpressionNode analyze(LexicalToken[] tokens) throws BooleanExpressionSyntacticExceptiona {
 		
-		Stack<IBooleanExpression> operandStack = new Stack<>();
+		Stack<IBooleanExpressionNode> operandStack = new Stack<>();
 		Stack<AOperationNode> operationStack = new Stack<>();
 		
 		for(int i=0; i<tokens.length; i++){
 			
 			LexicalToken token = tokens[i];
-			IBooleanExpression node;
+			IBooleanExpressionNode node;
 			
 			if(token.getType()==Type.BRACKET_RIGHT){
 				
@@ -72,7 +78,7 @@ public class SyntacticAnalyzer implements ISyntacticAnalyzer {
 		return operandStack.pop();
 	}
 
-	private void reduceSyntacticTree(Stack<IBooleanExpression> operandStack, Stack<AOperationNode> operationStack) {
+	private void reduceSyntacticTree(Stack<IBooleanExpressionNode> operandStack, Stack<AOperationNode> operationStack) {
 		AOperationNode previousOperationNode = operationStack.pop();
 		for(int j=previousOperationNode.getChildCount()-1; j>=0;j--){
 			previousOperationNode.addChild(operandStack.pop(),j);
@@ -83,9 +89,9 @@ public class SyntacticAnalyzer implements ISyntacticAnalyzer {
 	/**
 	 * TODO: better implementation
 	 */
-	private IBooleanExpression getNodeFor(@Nonnull LexicalToken token) {
+	private IBooleanExpressionNode getNodeFor(@Nonnull LexicalToken token) {
 		
-		IBooleanExpression node;
+		IBooleanExpressionNode node;
 		String symbolAsString = token.getSymbolAsString();
 		
 		switch (token.getType()) {

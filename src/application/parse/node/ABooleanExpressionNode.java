@@ -3,14 +3,14 @@ package application.parse.node;
 import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
 
-public abstract class ABooleanExpressionNode implements IBooleanExpression{
+public abstract class ABooleanExpressionNode implements IBooleanExpressionNode{
 
-	protected final @Nonnull IBooleanExpression[] children;
+	protected final @Nonnull IBooleanExpressionNode[] children;
 	protected final @Nonnull String symbol;
 
 
 	public ABooleanExpressionNode(@Nonnegative int childCount, @Nonnull String symbol) {
-		children = new IBooleanExpression[childCount];
+		children = new IBooleanExpressionNode[childCount];
 		this.symbol = symbol;
 	}
 	
@@ -20,12 +20,12 @@ public abstract class ABooleanExpressionNode implements IBooleanExpression{
 	}
 
 	@Override
-	public final @Nonnull IBooleanExpression[] getChildren() {
+	public final @Nonnull IBooleanExpressionNode[] getChildren() {
 		return children;
 	}
 	
 	@Override
-	public void addChild(@Nonnull IBooleanExpression child, int j) {
+	public void addChild(@Nonnull IBooleanExpressionNode child, int j) {
 		children[j] = child;
 	}
 
