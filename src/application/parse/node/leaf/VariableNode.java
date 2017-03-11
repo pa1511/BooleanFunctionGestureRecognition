@@ -13,7 +13,7 @@ public final class VariableNode extends ABooleanExpressionNode {
 	
 	@Override
 	public boolean evaluate(@Nonnull VariableValueProvider variableValueProvider) {
-		return variableValueProvider.getVariableValue(symbol);
+		return variableValueProvider.getVariableValue(symbol).booleanValue();
 	}
 
 	@Override

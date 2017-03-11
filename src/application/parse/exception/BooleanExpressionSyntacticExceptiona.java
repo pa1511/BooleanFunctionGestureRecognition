@@ -2,6 +2,12 @@ package application.parse.exception;
 
 import javax.annotation.Nonnull;
 
+/**
+ * This exception should be thrown if there are problems during syntactic analysis. <br>
+ * 
+ * @author paf
+ *
+ */
 public class BooleanExpressionSyntacticExceptiona extends BooleanExpressionParseException{
 
 	/**

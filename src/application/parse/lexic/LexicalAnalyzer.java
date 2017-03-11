@@ -5,7 +5,16 @@ import javax.annotation.Nonnull;
 import application.parse.exception.BooleanExpressionLexicalException;
 import application.parse.lexic.token.LexicalToken;
 
+/**
+ * Implementation of the {@link ILexicalAnalyzer} interface. <br>
+ * @author paf
+ *
+ */
 public class LexicalAnalyzer implements ILexicalAnalyzer {
+	
+	/*
+	 * SEE DeveloperNotes.txt!!! 
+	 */
 	
 	
 	@Override

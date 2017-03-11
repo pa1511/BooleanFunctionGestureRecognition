@@ -11,6 +11,12 @@ import javax.annotation.Nonnull;
 import application.parse.node.IBooleanExpression;
 import application.parse.node.leaf.VariableNode;
 
+/**
+ * Provides variable values to {@link IBooleanExpression}. <br>
+ * This allows external variable value adjustment. <br>
+ * @author paf
+ *
+ */
 public class VariableValueProvider {
 	
 	private final @Nonnull Map<String, Boolean> variableValueMap;
@@ -20,6 +26,8 @@ public class VariableValueProvider {
 		variableValueMap = new TreeMap<>();
 		
 		//TODO: not sure if this should be here!
+		
+		//Node tree iteration
 		Queue<IBooleanExpression> nodeQueue = new ArrayDeque<>(64);
 		nodeQueue.add(expression);
 		
@@ -46,16 +54,21 @@ public class VariableValueProvider {
 		return variableValueMap.size();
 	}
 	
-	public void setVariableValue(@Nonnull String variable,boolean value){
+	public void setVariableValue(@Nonnull String variable, boolean value){
 		if(variableValueMap.containsKey(variable))
 			variableValueMap.put(variable, Boolean.valueOf(value));
 	}
 	
-	public boolean getVariableValue(@Nonnull String variable){
-		//TODO: could break if a non-existing variable is requested!!!
-		return variableValueMap.get(variable).booleanValue();
+	public @Nonnull Boolean getVariableValue(@Nonnull String variable){
+		Boolean value = variableValueMap.get(variable);
+		if(value!=null)
+			return value;
+		throw new IllegalArgumentException("Value of non-existing variable requested: " + variable);
 	}
 	
+	/**
+	 * Variable names are returned in alphabetic order. <br>
+	 */
 	public @Nonnull String[] getVariables(){
 		return variables;
 	}

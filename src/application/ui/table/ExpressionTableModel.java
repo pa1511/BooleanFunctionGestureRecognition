@@ -30,6 +30,7 @@ public class ExpressionTableModel extends AbstractTableModel{
 		this.variableValueProvider = variableValueProvider;
 		this.expression = expression;
 		
+		//Information caching in order to reduce number of function calls 
 		variables = variableValueProvider.getVariables();
 		rowCount = 0x1 << variables.length;
 		
@@ -37,6 +38,7 @@ public class ExpressionTableModel extends AbstractTableModel{
 	
 	@Override
 	public int getColumnCount() {
+		//Variables + expression value
 		return variables.length+1;
 	}
 
@@ -61,10 +63,11 @@ public class ExpressionTableModel extends AbstractTableModel{
 		boolean value;
 		
 		if(col!=variables.length){
+			//variable value
 			value = getVariableValueAt(row, col);
 		}
 		else{
-			
+			//expression value for given row
 			for(int i=0; i<variables.length;i++){
 				variableValueProvider.setVariableValue(variables[i], getVariableValueAt(row, i));
 			}
