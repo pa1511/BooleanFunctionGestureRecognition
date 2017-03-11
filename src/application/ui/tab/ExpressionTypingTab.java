@@ -16,7 +16,7 @@ import javax.swing.JTextField;
 import application.parse.BooleanParser;
 import application.parse.VariableValueProvider;
 import application.parse.exception.BooleanExpressionParseException;
-import application.parse.node.IBooleanExpressionNode;
+import application.parse.syntactic.node.IBooleanExpressionNode;
 import application.ui.AbstractApplicationTab;
 import application.ui.table.ExpressionTableModel;
 import log.Log;

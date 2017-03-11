@@ -1,4 +1,4 @@
-package application.parse.node;
+package application.parse.syntactic.node;
 
 import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
@@ -13,7 +13,7 @@ public interface IBooleanExpressionNode {
 	
 	public @Nonnull IBooleanExpressionNode[] getChildren();
 	
-	public void addChild(IBooleanExpressionNode pop, int j);
+	public void addChild(@Nonnull IBooleanExpressionNode child, @Nonnegative int index);
 	
 	@Override
 	public @Nonnull String toString();

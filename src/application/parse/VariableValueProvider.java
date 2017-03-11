@@ -8,8 +8,8 @@ import java.util.TreeMap;
 import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
 
-import application.parse.node.IBooleanExpressionNode;
-import application.parse.node.leaf.VariableNode;
+import application.parse.syntactic.node.IBooleanExpressionNode;
+import application.parse.syntactic.node.leaf.VariableNode;
 
 /**
  * Provides variable values to {@link IBooleanExpressionNode}. <br>

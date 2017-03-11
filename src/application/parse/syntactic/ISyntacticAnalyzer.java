@@ -4,7 +4,7 @@ import javax.annotation.Nonnull;
 
 import application.parse.exception.BooleanExpressionSyntacticExceptiona;
 import application.parse.lexic.token.LexicalToken;
-import application.parse.node.IBooleanExpressionNode;
+import application.parse.syntactic.node.IBooleanExpressionNode;
 
 /**
  * Interface representing a syntactic analyzer machine. <br>

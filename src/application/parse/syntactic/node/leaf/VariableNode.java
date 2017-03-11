@@ -1,9 +1,9 @@
-package application.parse.node.leaf;
+package application.parse.syntactic.node.leaf;
 
 import javax.annotation.Nonnull;
 
 import application.parse.VariableValueProvider;
-import application.parse.node.ABooleanExpressionNode;
+import application.parse.syntactic.node.ABooleanExpressionNode;
 
 public final class VariableNode extends ABooleanExpressionNode {
 

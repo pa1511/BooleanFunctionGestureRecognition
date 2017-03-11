@@ -1,10 +1,10 @@
-package application.parse.node.leaf;
+package application.parse.syntactic.node.leaf;
 
 import javax.annotation.Nonnull;
 
 import application.parse.VariableValueProvider;
-import application.parse.node.OperationPriority;
-import application.parse.node.UnaryOperationNode;
+import application.parse.syntactic.node.OperationPriority;
+import application.parse.syntactic.node.UnaryOperationNode;
 
 public final class NotNode extends UnaryOperationNode{
 

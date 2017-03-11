@@ -5,7 +5,7 @@ import javax.annotation.Nonnull;
 import javax.swing.table.AbstractTableModel;
 
 import application.parse.VariableValueProvider;
-import application.parse.node.IBooleanExpressionNode;
+import application.parse.syntactic.node.IBooleanExpressionNode;
 
 /**
  * This table model can be used to present a boolean expression in table form. <br>

@@ -8,9 +8,9 @@ import application.parse.exception.BooleanExpressionParseException;
 import application.parse.lexic.ILexicalAnalyzer;
 import application.parse.lexic.LexicalAnalyzer;
 import application.parse.lexic.token.LexicalToken;
-import application.parse.node.IBooleanExpressionNode;
 import application.parse.syntactic.ISyntacticAnalyzer;
 import application.parse.syntactic.SyntacticAnalyzer;
+import application.parse.syntactic.node.IBooleanExpressionNode;
 import log.Log;
 
 public class BooleanParser {

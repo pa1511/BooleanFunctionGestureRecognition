@@ -1,4 +1,4 @@
-package application.parse.node;
+package application.parse.syntactic.node;
 
 import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
