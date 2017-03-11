@@ -1,12 +1,14 @@
 package application.parse.node.leaf;
 
+import javax.annotation.Nonnull;
+
 import application.parse.VariableValueProvider;
 import application.parse.node.ABooleanExpressionNode;
 
 public class FalseNode extends ABooleanExpressionNode{
 
-	public FalseNode() {
-		super(0,"0");
+	public FalseNode(@Nonnull String symbol) {
+		super(0,symbol);
 	}
 	
 	@Override

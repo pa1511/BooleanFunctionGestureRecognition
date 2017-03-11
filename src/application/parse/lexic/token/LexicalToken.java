@@ -21,27 +21,41 @@ public class LexicalToken {
 	 */
 	public static enum Type{
 		
-		//TODO: think should these symbols be hard-coded here!
-		
-		TRUE(c->c=='1'),
-		FALSE(c->c=='0'),
-		VARIABLE(c->Character.isUpperCase(c)),
-		//TODO: should these be separate enumerations ??
-		OPERATION(c->c=='+' || c=='*' || c=='!'),
-		BRACKET_LEFT(c->c=='('),
-		BRACKET_RIGHT(c->c==')');
+		TRUE('1'),
+		FALSE('0'),
+		VARIABLE(c->Character.isUpperCase(c),'\0'),
+		NOT('!'),
+		AND('*'),
+		OR('+'),
+		BRACKET_LEFT('('),
+		BRACKET_RIGHT(')');
 		
 
 		private final @Nonnull CharacterPredicate matcher;
-
-		private Type(@Nonnull CharacterPredicate matcher) {
+		private final char symbol;
+		
+		private Type(char c) {
+			this(ch->ch==c,c);
+		}
+		
+		private Type(@Nonnull CharacterPredicate matcher,char c){
 			this.matcher = matcher;
+			symbol = c;
 		}
 
+		
 		public boolean matches(char c){
 			return matcher.test(c);
 		}
 		
+		public char getSymbol() {
+			return symbol;
+		}
+		
+		public @Nonnull String getSymbolAsString() {
+			return Character.toString(symbol);
+		}
+
 	}
 
 	//==============================================================================================================

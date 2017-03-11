@@ -8,8 +8,8 @@ import application.parse.node.UnaryOperationNode;
 
 public final class NotNode extends UnaryOperationNode{
 
-	public NotNode() {
-		super("!",OperationPriority.LVL2);
+	public NotNode(@Nonnull String symbol) {
+		super(symbol,OperationPriority.LVL2);
 	}
 	
 	@Override

@@ -8,8 +8,8 @@ import application.parse.node.OperationPriority;
 
 public final class AndNode extends BinaryOperationNode{
 
-	public AndNode() {
-		super("*",OperationPriority.LVL1);
+	public AndNode(@Nonnull String symbol) {
+		super(symbol,OperationPriority.LVL1);
 	}
 	
 	@Override

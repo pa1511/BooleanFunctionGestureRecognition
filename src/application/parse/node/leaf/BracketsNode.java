@@ -8,8 +8,13 @@ import application.parse.node.UnaryOperationNode;
 
 public class BracketsNode extends UnaryOperationNode{
 
-	public BracketsNode() {
-		super("()",OperationPriority.LVL2);
+	private final @Nonnull String symbol1;
+	private final @Nonnull String symbol2;
+
+	public BracketsNode(@Nonnull String symbol1, @Nonnull String symbol2) {
+		super(symbol1 + symbol2,OperationPriority.LVL2);
+		this.symbol1 = symbol1;
+		this.symbol2 = symbol2;
 	}
 	
 	@Override
@@ -19,7 +24,7 @@ public class BracketsNode extends UnaryOperationNode{
 	
 	@Override
 	public String toString() {
-		return "(" + children[0] +")";
+		return symbol1 + children[0] + symbol2;
 	}
 
 }

@@ -86,51 +86,36 @@ public class SyntacticAnalyzer implements ISyntacticAnalyzer {
 	private IBooleanExpression getNodeFor(@Nonnull LexicalToken token) {
 		
 		IBooleanExpression node;
+		String symbolAsString = token.getSymbolAsString();
 		
 		switch (token.getType()) {
 
 		case TRUE:
-			node = new TrueNode();
+			node = new TrueNode(symbolAsString);
 			break;
 		case FALSE:
-			node = new FalseNode();
+			node = new FalseNode(symbolAsString);
 			break;
-		case OPERATION:
-			node = getOperationNodeFor(token.getSymbol());
+		case NOT:
+			node = new NotNode(symbolAsString);
+			break;
+		case AND:
+			node = new AndNode(symbolAsString);
+			break;
+		case OR:
+			node = new OrNode(symbolAsString);
 			break;
 		case VARIABLE:
-			node = new VariableNode(token.getSymbolAsString());
+			node = new VariableNode(symbolAsString);
 			break;
 		case BRACKET_LEFT:
-			node = new BracketsNode();
+			node = new BracketsNode(LexicalToken.Type.BRACKET_LEFT.getSymbolAsString(), LexicalToken.Type.BRACKET_RIGHT.getSymbolAsString());
 			break;
 		case BRACKET_RIGHT:
 			throw new InternalError("Should never be asked for the right bracket node.");
 			
 		default:
 			throw new BooleanExpressionSyntacticExceptiona("Unknown syntactic node requested: " + token);
-		}
-		
-		return node;
-	}
-
-	private IBooleanExpression getOperationNodeFor(char symbol) {
-		
-		AOperationNode node;
-		
-		switch (symbol) {
-		case '!':
-			node = new NotNode();
-			break;
-		case '*':
-			node = new AndNode();
-			break;
-		case '+':
-			node = new OrNode();
-			break;
-
-		default:
-			throw new BooleanExpressionSyntacticExceptiona("Unknown syntactic operation node requested: " + symbol);
 		}
 		
 		return node;

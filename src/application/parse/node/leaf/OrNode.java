@@ -8,8 +8,8 @@ import application.parse.node.OperationPriority;
 
 public final class OrNode extends BinaryOperationNode{
 
-	public OrNode() {
-		super("+",OperationPriority.LVL0);
+	public OrNode(@Nonnull String symbol) {
+		super(symbol,OperationPriority.LVL0);
 	}
 	
 	@Override
