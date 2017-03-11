@@ -48,7 +48,7 @@ public class BooleanParser {
 	 * Does initial expression preparation for further analysis. <br>
 	 */
 	private static String expressionPreprocessing(String expression) {
-		return expression.toUpperCase().replaceAll("\\s", "");
+		return expression.toUpperCase().replaceAll("\\s", "").replaceAll("[A-Z](?=[A-Z])", "$0\\*");
 	}
 	
 }

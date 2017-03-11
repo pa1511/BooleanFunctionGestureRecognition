@@ -1,29 +1,25 @@
 package application.ui.tab;
 
 import java.awt.BorderLayout;
-import java.awt.event.ActionEvent;
 
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
-import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.JButton;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 
-import application.parse.BooleanParser;
 import application.parse.VariableValueProvider;
-import application.parse.exception.BooleanExpressionParseException;
 import application.parse.syntactic.node.IBooleanExpressionNode;
 import application.ui.AbstractApplicationTab;
+import application.ui.action.EvaluateAction;
 import application.ui.table.ExpressionTableModel;
-import log.Log;
 
 public class ExpressionTypingTab extends AbstractApplicationTab{
 
-	private @Nonnull JTextField expressionInputField;
+	@Nonnull JTextField expressionInputField;
 	private @Nonnull JButton evaluateButton;
 	
 	private @Nonnull JTable truthTable;
@@ -39,7 +35,10 @@ public class ExpressionTypingTab extends AbstractApplicationTab{
 		
 		//initializing tab UI
 		expressionInputField = new JTextField();
-		evaluateButton = new JButton(new EvaluateAction());
+		Action evaluateAction = new EvaluateAction(()->expressionInputField.getText(),node->setExpression(node));
+		
+		expressionInputField.addActionListener(evaluateAction);
+		evaluateButton = new JButton(evaluateAction);
 		
 		//Upper panel content
 		JPanel upperPanel = new JPanel(new BorderLayout());
@@ -52,40 +51,16 @@ public class ExpressionTypingTab extends AbstractApplicationTab{
 		add(new JScrollPane(truthTable),BorderLayout.CENTER);
 	}
 	
-	public void setExpression(IBooleanExpressionNode expression) {
+	private void setExpression(@Nonnull IBooleanExpressionNode expression) {
 		this.expression = expression;
 		this.variableValueProvider = new VariableValueProvider(expression);
 		
 		updateExpressionUI();
 	}
 
-	
 	private void updateExpressionUI() {
 		if(variableValueProvider!=null && expression!=null)
 			truthTable.setModel(new ExpressionTableModel(variableValueProvider, expression));
-	}
-
-
-	//=======================================================================================================
-	private final class EvaluateAction extends AbstractAction {
-		
-		private EvaluateAction() {
-			super("Evaluate");
-		}
-
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			//TODO: all of this work should probably be outside the EDT thread!!!
-			String expression = expressionInputField.getText();
-			Log.addMessage("Attemting to parse: " + expression, Log.Type.Plain);
-			try{
-				ExpressionTypingTab.this.setExpression(BooleanParser.parse(expression));
-			}
-			catch (BooleanExpressionParseException exception) {
-				Log.addError(exception);
-				JOptionPane.showMessageDialog(null, "Could not parse the given expression.\nReason: " + exception.getMessage(), "Parse exception", JOptionPane.WARNING_MESSAGE);
-			}
-		}
 	}
 
 }
