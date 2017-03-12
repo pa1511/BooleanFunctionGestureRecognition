@@ -12,6 +12,7 @@ import javax.swing.WindowConstants;
 
 import application.AApplicationFrame;
 import application.Application;
+import generalfactory.Factory;
 
 public class ApplicationFrame extends AApplicationFrame{
 	
@@ -39,14 +40,13 @@ public class ApplicationFrame extends AApplicationFrame{
 		
 		Properties properties = Application.getInstance().getProperties();
 		
-		String tabsPath = properties.getProperty("tab.path");
-		String[] tabNames = properties.getProperty("tab.names").split(";");
+		String tabsPath = properties.getProperty(Application.UI_TAB_PATH_KEY);
+		String[] tabNames = properties.getProperty(Application.UI_TAB_NAMES_KEY).split(";");
 
 		AbstractApplicationTab[] tabs = new AbstractApplicationTab[tabNames.length];
 
 		for(int i=0; i<tabNames.length; i++){
-			String className = tabNames[i];
-			tabs[i] = (AbstractApplicationTab) this.getClass().getClassLoader().loadClass(tabsPath+"."+className).newInstance();
+			tabs[i] = Factory.getInstance(tabNames[i], tabsPath); 
 		}
 		
 		return tabs;

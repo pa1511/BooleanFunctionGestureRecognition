@@ -9,16 +9,16 @@ import javax.annotation.Nonnull;
 import log.Log;
 import utilities.lazy.Lazy;
 
-public class Database implements IDataSource{
+public class Database extends ADataSource{
 	
     private static final String DB_DRIVER = "org.h2.Driver";
-    private static final String DB_CONNECTION = "jdbc:h2:~/boolean_gesture_recognition";
-    private static final String DB_USER = "admin";
-    private static final String DB_PASSWORD = "admin_password";
 
     private final @Nonnull Lazy<Connection> dbConnection;
     
-    public Database() {
+    public Database(@Nonnull String user, @Nonnull String password, @Nonnull String dbLocation) {
+    	super(user,password,dbLocation);
+    	
+    	String dbConnectionString = "jdbc:h2:" + dbLocation;
     	
     	dbConnection = new Lazy<>(()->{
 		        Connection dbConnection = null;
@@ -28,8 +28,8 @@ public class Database implements IDataSource{
 		            System.out.println(e.getMessage());
 		        }
 		        try {
-		            dbConnection = DriverManager.getConnection(DB_CONNECTION, DB_USER,
-		                    DB_PASSWORD);
+		            dbConnection = DriverManager.getConnection(dbConnectionString, user,
+		                    password);
 		            return dbConnection;
 		        } catch (SQLException e) {
 		        	Log.addError(e);
@@ -37,6 +37,8 @@ public class Database implements IDataSource{
 		        }
     	});
     	
+    	//TODO: remove
+    	dbConnection.get();
 	}
 
     
