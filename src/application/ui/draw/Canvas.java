@@ -13,19 +13,20 @@ import javax.annotation.Nonnull;
 import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 
+import observer.ObservationManager;
+
 public class Canvas extends JPanel implements AutoCloseable{
 	
-	public interface Listener{
-		public void newPointsUpdate(List<Point> points);
-	}
-
-	
-	private final @Nonnull LinkedList<List<Point>> points = new LinkedList<>();
+	private final @Nonnull LinkedList<List<RelativePoint>> points = new LinkedList<>();
 	private final @Nonnull MouseAdapter mouseListener;
-	private final @Nonnull List<Listener> listeners;
-
+	
+	public final @Nonnull ObservationManager<List<RelativePoint>> observationManager;
+	
 	public Canvas() {
 
+		observationManager = new ObservationManager<>();
+
+		//UI initialization
 		setBackground(Color.WHITE);
 		setBorder(BorderFactory.createMatteBorder(10, 5, 10, 5, Color.LIGHT_GRAY));
 
@@ -34,25 +35,23 @@ public class Canvas extends JPanel implements AutoCloseable{
 
 			@Override
 			public void mousePressed(MouseEvent e) {
-				List<Point> pointsList = new ArrayList<>();
-				pointsList.add(e.getPoint());
+				List<RelativePoint> pointsList = new ArrayList<>();
+				
+				pointsList.add(RelativePoint.getAsRelative(e.getPoint(),getWidth(), getHeight()));
+				
 				points.add(pointsList);
 				repaint();
 			}
 
 			@Override
 			public void mouseDragged(MouseEvent e) {
-				points.getLast().add(e.getPoint());
+				points.getLast().add(RelativePoint.getAsRelative(e.getPoint(), getWidth(), getHeight()));
 				repaint();
 			}
 
 			@Override
 			public void mouseReleased(MouseEvent e) {
-				//TODO
-//				listeners.forEach(
-//						l->l.newPointsUpdate(points)
-//				);
-//				points.clear();
+				observationManager.updateObservers(points.getLast());
 				repaint();
 			}
 
@@ -60,40 +59,37 @@ public class Canvas extends JPanel implements AutoCloseable{
 
 		addMouseListener(mouseListener);
 		addMouseMotionListener(mouseListener);
-
-		//External listener support initialization
-		listeners = new ArrayList<>();
 	}
 	
-	public void addListener(@Nonnull Listener listener){
-		listeners.add(listener);
-	}
-	
-	public void removeListener(@Nonnull Listener listener){
-		listeners.remove(listener);
-	}
-
 	@Override
 	protected void paintComponent(Graphics g) {
 		super.paintComponent(g);
 
+		int width = getWidth();
+		int height = getHeight();
+		
 		Color oldColor = g.getColor();
 		g.setColor(Color.BLUE);
-		for(List<Point> pointsList:points){
+		for(List<RelativePoint> pointsList:points){
 			for (int i = 0, size = pointsList.size() - 1; i < size; i++) {
-				Point first = pointsList.get(i);
-				Point second = pointsList.get(i + 1);
+				Point first = pointsList.get(i).toPoint(width,height);
+				Point second = pointsList.get(i + 1).toPoint(width,height);
 				g.drawLine(first.x, first.y, second.x, second.y);
 			}
 		}
 		g.setColor(oldColor);
+	}
 
+	public void clear() {
+		points.clear();
+		repaint();
 	}
 	
 	@Override
 	public void close() {
 		removeMouseListener(mouseListener);
 		removeMouseMotionListener(mouseListener);
+		observationManager.close();
 	}
 	
 

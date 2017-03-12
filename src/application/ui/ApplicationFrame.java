@@ -12,7 +12,6 @@ import javax.swing.WindowConstants;
 
 import application.AApplicationFrame;
 import application.Application;
-import utilities.PPrimitives;
 
 public class ApplicationFrame extends AApplicationFrame{
 	
@@ -62,10 +61,10 @@ public class ApplicationFrame extends AApplicationFrame{
 		double screenWidth = screenSize.getWidth();
 		double screenHeight = screenSize.getHeight();
 		
-		int x = PPrimitives.doubleToInt(screenWidth*(1.0-screenFactor)/2.0);
-		int y = PPrimitives.doubleToInt(screenHeight*(1.0-screenFactor)/2.0);
-		int width = PPrimitives.doubleToInt(screenWidth*screenFactor);
-		int height = PPrimitives.doubleToInt(screenHeight*screenFactor);
+		int x = (int)(screenWidth*(1.0-screenFactor)/2.0);
+		int y = (int)(screenHeight*(1.0-screenFactor)/2.0);
+		int width = (int)(screenWidth*screenFactor);
+		int height = (int)(screenHeight*screenFactor);
 		
 		setBounds(x, y, width, height);
 	}
