@@ -30,21 +30,22 @@ public class LexicalToken {
 		LEFT_BRACKET('('),
 		RIGHT_BRACKET(')');
 
+		//TODO: since this is used in syntax analysis I am not sure if it should be here
 		static{
-			TRUE.nextPossibleType = new Type[]{AND,OR,RIGHT_BRACKET};
-			FALSE.nextPossibleType = new Type[]{AND,OR,RIGHT_BRACKET};
-			VARIABLE.nextPossibleType = new Type[]{AND,OR,RIGHT_BRACKET};
-			NOT.nextPossibleType = new Type[]{TRUE,FALSE,VARIABLE,LEFT_BRACKET};
-			AND.nextPossibleType = new Type[]{TRUE,FALSE,VARIABLE,LEFT_BRACKET};
-			OR.nextPossibleType = new Type[]{TRUE,FALSE,VARIABLE,LEFT_BRACKET};
-			LEFT_BRACKET.nextPossibleType = new Type[]{TRUE,FALSE,VARIABLE,LEFT_BRACKET};
-			RIGHT_BRACKET.nextPossibleType = new Type[]{AND,OR,RIGHT_BRACKET};
+			TRUE.nextPossibleTypes = new Type[]{AND,OR,RIGHT_BRACKET};
+			FALSE.nextPossibleTypes = new Type[]{AND,OR,RIGHT_BRACKET};
+			VARIABLE.nextPossibleTypes = new Type[]{AND,OR,RIGHT_BRACKET};
+			NOT.nextPossibleTypes = new Type[]{TRUE,FALSE,VARIABLE,LEFT_BRACKET};
+			AND.nextPossibleTypes = new Type[]{TRUE,FALSE,VARIABLE,LEFT_BRACKET};
+			OR.nextPossibleTypes = new Type[]{TRUE,FALSE,VARIABLE,LEFT_BRACKET};
+			LEFT_BRACKET.nextPossibleTypes = new Type[]{TRUE,FALSE,VARIABLE,LEFT_BRACKET};
+			RIGHT_BRACKET.nextPossibleTypes = new Type[]{AND,OR,RIGHT_BRACKET};
 		}
 		
 
 		private final @Nonnull CharacterPredicate matcher;
 		private final char symbol;
-		private @Nonnull Type[] nextPossibleType;
+		private @Nonnull Type[] nextPossibleTypes;
 		
 		private Type(char c) {
 			this(ch->ch==c,c);
@@ -66,6 +67,15 @@ public class LexicalToken {
 		
 		public @Nonnull String getSymbolAsString() {
 			return Character.toString(symbol);
+		}
+		
+		public boolean canComeBefore(@Nonnull Type next){
+			for(Type nextType:nextPossibleTypes){
+				if(next==nextType)
+					return true;
+			}
+			
+			return false;
 		}
 
 	}

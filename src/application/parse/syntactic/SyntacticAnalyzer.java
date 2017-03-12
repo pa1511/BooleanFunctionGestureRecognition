@@ -38,15 +38,9 @@ public class SyntacticAnalyzer implements ISyntacticAnalyzer {
 			LexicalToken.Type tokenType = lexicalToken.getType();
 			
 			if(currentTokenType!=null){
-				
-//				if(currentTokenType == LexicalToken.Type.TRUE ||
-//				   currentTokenType == LexicalToken.Type.FALSE ||
-//				   currentTokenType == LexicalToken.Type.VARIABLE){
-//					
-//				}
-				
-				//TODO
-				
+				if(!currentTokenType.canComeBefore(tokenType)){
+					throw new BooleanExpressionSyntacticExceptiona(currentTokenType + " can not be followed by " + tokenType);
+				}
 			}
 			else if(tokenType == LexicalToken.Type.AND || 
 					tokenType == LexicalToken.Type.OR ||
@@ -64,6 +58,7 @@ public class SyntacticAnalyzer implements ISyntacticAnalyzer {
 					throw new BooleanExpressionSyntacticExceptiona("Too many right brackets");
 				}
 			}
+			
 		}
 		
 		if(bracketCounter>0){
