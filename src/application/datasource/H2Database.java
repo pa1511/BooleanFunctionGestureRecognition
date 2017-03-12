@@ -9,13 +9,13 @@ import javax.annotation.Nonnull;
 import log.Log;
 import utilities.lazy.Lazy;
 
-public class H2Database extends ADataSource{
+public final class H2Database extends ADataSource{
 	
     private static final String DB_DRIVER = "org.h2.Driver";
 
     private final @Nonnull Lazy<Connection> dbConnection;
     
-    public H2Database(@Nonnull String user, @Nonnull String password, @Nonnull String dbLocation) {
+    public H2Database(@Nonnull String user, @Nonnull String password, @Nonnull String dbLocation) throws SQLException {
     	super(user,password,dbLocation);
     	
     	String dbConnectionString = "jdbc:h2:" + dbLocation;
@@ -37,8 +37,37 @@ public class H2Database extends ADataSource{
 		        }
     	});
     	
-    	//TODO: remove
-    	dbConnection.get();
+    	initializeDBTables();
+	}
+
+	private void initializeDBTables() throws SQLException {
+		
+		Connection connection = dbConnection.get();
+
+		connection.createStatement().execute("CREATE TABLE IF NOT EXISTS " + "CONCEPT" + "("
+				+ "ID " + "INT PRIMARY KEY, "
+				+ "NAME " + "VARCHAR(255)"
+				+ ")");
+
+		connection.createStatement().execute("CREATE TABLE IF NOT EXISTS " + "CONCEPT_EXAMPLE" + "("
+				+ "ID " + "INT PRIMARY KEY, "
+				+ "IDF " + "INT,"
+				+ "FOREIGN KEY(IDF) REFERENCES " + "CONCEPT" + "(ID)"
+				+ ")");
+		
+		connection.createStatement().execute("CREATE TABLE IF NOT EXISTS " + "GESTURE" + "("
+				+ "ID " + "INT PRIMARY KEY, "
+				+ "IDF " + "INT, "
+				+ "POINTS " + "ARRAY, "
+				+ "FOREIGN KEY(IDF) REFERENCES " + "CONCEPT_EXAMPLE" + "(ID)"
+				+ ")");
+	}
+
+	@Override
+	public void close() throws Exception {
+		Connection connection = dbConnection.get();
+		connection.commit();
+		connection.close();
 	}
 
     

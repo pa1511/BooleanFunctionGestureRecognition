@@ -1,2 +1,4 @@
+DATABASE INFO FOR UI CONNECTION: jdbc:h2:~/workspace/BooleanFunctionGestureRecognition/data/boolean_gesture_recognition
+
 Development decisions: 
 	- all lexical tokens are single character (for now)
