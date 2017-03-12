@@ -45,10 +45,10 @@ public class BooleanNodeFactory {
 		case VARIABLE:
 			node = new VariableNode(symbolAsString);
 			break;
-		case BRACKET_LEFT:
-			node = new BracketsNode(LexicalToken.Type.BRACKET_LEFT.getSymbolAsString(), LexicalToken.Type.BRACKET_RIGHT.getSymbolAsString());
+		case LEFT_BRACKET:
+			node = new BracketsNode(LexicalToken.Type.LEFT_BRACKET.getSymbolAsString(), LexicalToken.Type.RIGHT_BRACKET.getSymbolAsString());
 			break;
-		case BRACKET_RIGHT:
+		case RIGHT_BRACKET:
 			throw new InternalError("Should never be asked for the right bracket node.");
 			
 		default:

@@ -27,12 +27,24 @@ public class LexicalToken {
 		NOT('!'),
 		AND('*'),
 		OR('+'),
-		BRACKET_LEFT('('),
-		BRACKET_RIGHT(')');
+		LEFT_BRACKET('('),
+		RIGHT_BRACKET(')');
+
+		static{
+			TRUE.nextPossibleType = new Type[]{AND,OR,RIGHT_BRACKET};
+			FALSE.nextPossibleType = new Type[]{AND,OR,RIGHT_BRACKET};
+			VARIABLE.nextPossibleType = new Type[]{AND,OR,RIGHT_BRACKET};
+			NOT.nextPossibleType = new Type[]{TRUE,FALSE,VARIABLE,LEFT_BRACKET};
+			AND.nextPossibleType = new Type[]{TRUE,FALSE,VARIABLE,LEFT_BRACKET};
+			OR.nextPossibleType = new Type[]{TRUE,FALSE,VARIABLE,LEFT_BRACKET};
+			LEFT_BRACKET.nextPossibleType = new Type[]{TRUE,FALSE,VARIABLE,LEFT_BRACKET};
+			RIGHT_BRACKET.nextPossibleType = new Type[]{AND,OR,RIGHT_BRACKET};
+		}
 		
 
 		private final @Nonnull CharacterPredicate matcher;
 		private final char symbol;
+		private @Nonnull Type[] nextPossibleType;
 		
 		private Type(char c) {
 			this(ch->ch==c,c);

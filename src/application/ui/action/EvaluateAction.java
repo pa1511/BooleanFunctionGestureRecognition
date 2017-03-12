@@ -42,5 +42,9 @@ public final class EvaluateAction extends AbstractAction {
 			Log.addError(exception);
 			JOptionPane.showMessageDialog(null, "Could not parse the given expression.\nReason: " + exception.getMessage(), "Parse exception", JOptionPane.WARNING_MESSAGE);
 		}
+		catch(Exception exception){
+			Log.addError(exception);
+			JOptionPane.showMessageDialog(null, "A critical error has happened: " + exception.getClass().getSimpleName(), "Parse exception", JOptionPane.ERROR_MESSAGE);
+		}
 	}
 }

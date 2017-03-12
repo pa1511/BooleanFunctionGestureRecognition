@@ -28,8 +28,48 @@ public class SyntacticAnalyzer implements ISyntacticAnalyzer {
 
 	
 	@Override
-	public IBooleanExpressionNode analyze(LexicalToken[] tokens) throws BooleanExpressionSyntacticExceptiona {
+	public IBooleanExpressionNode analyze(@Nonnull LexicalToken[] tokens) throws BooleanExpressionSyntacticExceptiona {
+		
+		LexicalToken.Type currentTokenType = null;
+		int bracketCounter = 0;
+		
+		for(LexicalToken lexicalToken:tokens){
+			
+			LexicalToken.Type tokenType = lexicalToken.getType();
+			
+			if(currentTokenType!=null){
 				
+//				if(currentTokenType == LexicalToken.Type.TRUE ||
+//				   currentTokenType == LexicalToken.Type.FALSE ||
+//				   currentTokenType == LexicalToken.Type.VARIABLE){
+//					
+//				}
+				
+				//TODO
+				
+			}
+			else if(tokenType == LexicalToken.Type.AND || 
+					tokenType == LexicalToken.Type.OR ||
+					tokenType == LexicalToken.Type.RIGHT_BRACKET){
+				throw new BooleanExpressionSyntacticExceptiona("Expression can not start with: " + lexicalToken);
+			}
+			
+			currentTokenType = tokenType;
+			
+			if(currentTokenType==Type.LEFT_BRACKET)
+				bracketCounter++;
+			else if(currentTokenType==Type.RIGHT_BRACKET){
+				bracketCounter--;
+				if(bracketCounter<0){
+					throw new BooleanExpressionSyntacticExceptiona("Too many right brackets");
+				}
+			}
+		}
+		
+		if(bracketCounter>0){
+			throw new BooleanExpressionSyntacticExceptiona("Too many left brackets");
+		}
+		
 		/*
 		 * If everything is working correctly the stacks should be empty at each beginning and end of this method. <br> 
 		 */
@@ -39,7 +79,7 @@ public class SyntacticAnalyzer implements ISyntacticAnalyzer {
 			LexicalToken token = tokens[i];
 			IBooleanExpressionNode node;
 			
-			if(token.getType()==Type.BRACKET_RIGHT){
+			if(token.getType()==Type.RIGHT_BRACKET){
 				
 				while(!(operationStack.peek() instanceof BracketsNode)){
 					reduceSyntacticTree();
@@ -60,7 +100,7 @@ public class SyntacticAnalyzer implements ISyntacticAnalyzer {
 					do{
 						AOperationNode current = (AOperationNode)node;
 						
-						if(operationStack.isEmpty() || operationStack.peek().getPriority().value<current.getPriority().value || operationStack.peek() instanceof BracketsNode){
+						if(operationStack.isEmpty() || operationStack.peek().getPriority().value<=current.getPriority().value || operationStack.peek() instanceof BracketsNode){
 							operationStack.push(current);
 							currentNodeIncorporated = true;
 						}
