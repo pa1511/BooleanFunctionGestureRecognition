@@ -9,13 +9,13 @@ import javax.annotation.Nonnull;
 import log.Log;
 import utilities.lazy.Lazy;
 
-public class Database extends ADataSource{
+public class H2Database extends ADataSource{
 	
     private static final String DB_DRIVER = "org.h2.Driver";
 
     private final @Nonnull Lazy<Connection> dbConnection;
     
-    public Database(@Nonnull String user, @Nonnull String password, @Nonnull String dbLocation) {
+    public H2Database(@Nonnull String user, @Nonnull String password, @Nonnull String dbLocation) {
     	super(user,password,dbLocation);
     	
     	String dbConnectionString = "jdbc:h2:" + dbLocation;
