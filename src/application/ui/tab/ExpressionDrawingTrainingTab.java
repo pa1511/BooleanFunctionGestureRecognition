@@ -15,13 +15,15 @@ import javax.swing.JSplitPane;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 
+import application.data.model.Expression;
+import application.data.model.ExpressionFactory;
 import application.data.model.geometry.MouseClickType;
 import application.data.model.geometry.RelativePoint;
 import application.ui.AbstractApplicationTab;
 import application.ui.draw.Canvas;
-import application.ui.draw.RectangleRepresentationCanvas;
+import application.ui.draw.ACanvasObserver;
+import application.ui.draw.RectangleRepresentationView;
 import dataModels.Pair;
-import observer.IObserver;
 
 public class ExpressionDrawingTrainingTab extends AbstractApplicationTab{
 	
@@ -30,7 +32,7 @@ public class ExpressionDrawingTrainingTab extends AbstractApplicationTab{
 	private final @Nonnull JSplitPane mainSplitPane;
 
 	private final @Nonnull Canvas canvas;
-	private final @Nonnull RectangleRepresentationCanvas rectangleRepresentationCanvas;
+	private final @Nonnull RectangleRepresentationView rectangleRepresentationView;
 
 	
 	public ExpressionDrawingTrainingTab() {
@@ -49,17 +51,19 @@ public class ExpressionDrawingTrainingTab extends AbstractApplicationTab{
 		
 		//Drawing canvas
 		canvas = new Canvas();
-		rectangleRepresentationCanvas = new RectangleRepresentationCanvas();
+		rectangleRepresentationView = new RectangleRepresentationView();
 		
 		
 		
-		mainSplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, canvas, rectangleRepresentationCanvas);
+		mainSplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, canvas, rectangleRepresentationView);
 		SwingUtilities.invokeLater(()->mainSplitPane.setDividerLocation(0.5));
 		add(mainSplitPane,BorderLayout.CENTER);
 		
 		//Control panel
 		JPanel controlPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
 		controlPanel.add(new JButton(new ClearCanvasAction()));
+		controlPanel.add(new JButton(new UndoAction()));
+		controlPanel.add(new JButton(new RedoAction()));
 		controlPanel.add(new JButton(new StoreExpressionAction()));
 		add(controlPanel,BorderLayout.SOUTH);
 		
@@ -71,15 +75,30 @@ public class ExpressionDrawingTrainingTab extends AbstractApplicationTab{
 
 	
 	
-	private final class CanvasObserver implements IObserver<Pair<MouseClickType,List<RelativePoint>>> {
+	private final class CanvasObserver extends ACanvasObserver {
 		
 		@Override
-		public void update(@Nonnull Pair<MouseClickType,List<RelativePoint>> relativePoints) throws Exception {
-			if((relativePoints.left()==MouseClickType.RIGHT))
-				rectangleRepresentationCanvas.createRectangle(relativePoints.right(),Color.RED);
-			else
-				rectangleRepresentationCanvas.createRectangle(relativePoints.right());
+		public void clearUpdate() {
+			rectangleRepresentationView.clear();
 		}
+
+		@Override
+		public void newInputUpdate(@Nonnull Pair<MouseClickType, List<RelativePoint>> relativePoints) {
+			if((relativePoints.left()==MouseClickType.RIGHT))
+				rectangleRepresentationView.createRectangle(relativePoints.right(),Color.RED);
+			else
+				rectangleRepresentationView.createRectangle(relativePoints.right());
+		}
+
+		@Override
+		public void redoUpdate(@Nonnull Pair<MouseClickType, List<RelativePoint>> input) {
+			rectangleRepresentationView.redo();
+		}
+		@Override
+		public void undoUpdate() {
+			rectangleRepresentationView.undo();
+		}
+
 		
 	}
 	
@@ -93,7 +112,6 @@ public class ExpressionDrawingTrainingTab extends AbstractApplicationTab{
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			canvas.clear();
-			rectangleRepresentationCanvas.clear();
 		}
 	}
 
@@ -105,10 +123,37 @@ public class ExpressionDrawingTrainingTab extends AbstractApplicationTab{
 		
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			// TODO Auto-generated method stub
+			Expression expression = ExpressionFactory.getExpressionFor(conceptDescriptionField.getText(),canvas.getData());
 			
+			//TODO: have to make it so I get a application specific data source not the genral one
+			//Application.getInstance().getDataSource().store(expression);
 		}
 		
 	}
 	
+	private final class UndoAction extends AbstractAction {
+		
+		public UndoAction() {
+			super("Undo");
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			canvas.undo();
+		}
+		
+	}
+	
+	private final class RedoAction extends AbstractAction {
+		
+		public RedoAction() {
+			super("Redo");
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			canvas.redo();
+		}
+		
+	}
 }

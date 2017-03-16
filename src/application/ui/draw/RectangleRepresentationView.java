@@ -2,7 +2,7 @@ package application.ui.draw;
 
 import java.awt.Color;
 import java.awt.Graphics;
-import java.util.ArrayList;
+import java.util.ArrayDeque;
 import java.util.List;
 
 import javax.annotation.Nonnegative;
@@ -13,20 +13,23 @@ import javax.swing.JPanel;
 import application.data.model.geometry.RelativePoint;
 import dataModels.Pair;
 
-public class RectangleRepresentationCanvas extends JPanel {
+public class RectangleRepresentationView extends JPanel {
 
 	private static final @Nonnegative int X = 0;
 	private static final @Nonnegative int Y = 1;
 	private static final @Nonnegative int WIDTH = 2;
 	private static final @Nonnegative int HEIGHT = 3;
 	
-	private final @Nonnull List<Pair<Color,double[]>> rectangleDescriptions;
+	private final @Nonnull ArrayDeque<Pair<Color,double[]>> rectangleDescriptions;
+	private final @Nonnull ArrayDeque<Pair<Color,double[]>> undoneDescriptions;
+	
 	private final @Nonnull Color defaultColor = Color.BLACK;
 	
-	public RectangleRepresentationCanvas() {
+	public RectangleRepresentationView() {
 		
 		//Data structure initialization
-		rectangleDescriptions = new ArrayList<>();
+		rectangleDescriptions = new ArrayDeque<>();
+		undoneDescriptions = new ArrayDeque<>();
 		
 		//UI initialization
 		setBackground(Color.WHITE);
@@ -67,8 +70,9 @@ public class RectangleRepresentationCanvas extends JPanel {
 		createRectangle(x, y, width, height, defaultColor);
 	}
 
-	public void createRectangle(double x, double y, double width, double height,@Nonnull Color color){		
-		rectangleDescriptions.add(Pair.of(color, new double[]{x, y, width, height}));
+	public void createRectangle(double x, double y, double width, double height,@Nonnull Color color){	
+		undoneDescriptions.clear();
+		rectangleDescriptions.push(Pair.of(color, new double[]{x, y, width, height}));
 		repaint();
 	}
 
@@ -93,8 +97,21 @@ public class RectangleRepresentationCanvas extends JPanel {
 	}
 
 	public void clear() {
+		//TODO: should I support undo here
 		rectangleDescriptions.clear();
 		repaint();
+	}
+	
+	public boolean redo(){
+		rectangleDescriptions.push(undoneDescriptions.pop());
+		repaint();
+		return !undoneDescriptions.isEmpty();
+	}
+
+	public boolean undo() {
+		undoneDescriptions.push(rectangleDescriptions.pop());
+		repaint();
+		return !rectangleDescriptions.isEmpty();
 	}
 
 }

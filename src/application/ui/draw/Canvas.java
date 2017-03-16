@@ -5,9 +5,11 @@ import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
 import javax.annotation.Nonnull;
 import javax.swing.BorderFactory;
@@ -17,17 +19,22 @@ import javax.swing.SwingUtilities;
 import application.data.model.geometry.MouseClickType;
 import application.data.model.geometry.RelativePoint;
 import dataModels.Pair;
-import observer.ObservationManager;
+import observer.StrictObservationManager;
 
 public class Canvas extends JPanel implements AutoCloseable{
 	
-	private final @Nonnull LinkedList<Pair<MouseClickType,List<RelativePoint>>> pointGroups = new LinkedList<>();
-	private final @Nonnull MouseAdapter mouseListener;
-	public final @Nonnull ObservationManager<Pair<MouseClickType,List<RelativePoint>>> observationManager;
+	private final @Nonnull ArrayDeque<Pair<MouseClickType,List<RelativePoint>>> pointGroups; 
+	private final @Nonnull ArrayDeque<Pair<MouseClickType,List<RelativePoint>>> undoneInput;
 	
+	private final @Nonnull MouseAdapter mouseListener;
+	public final @Nonnull StrictObservationManager<Canvas,ACanvasObserver> observationManager;
+	
+		
 	public Canvas() {
 
-		observationManager = new ObservationManager<>();
+		observationManager = new CanvasObservationManager();
+		pointGroups = new ArrayDeque<>();
+		undoneInput = new ArrayDeque<>();
 
 		//UI initialization
 		setBackground(Color.WHITE);
@@ -38,15 +45,17 @@ public class Canvas extends JPanel implements AutoCloseable{
 
 			@Override
 			public void mousePressed(MouseEvent e) {
+				
+				undoneInput.clear();
 								
 				List<RelativePoint> pointsList = new ArrayList<>();
 				pointsList.add(RelativePoint.getAsRelative(e.getPoint(),getWidth(), getHeight()));
 				
 				if(SwingUtilities.isLeftMouseButton(e)){
-					pointGroups.add(Pair.of(MouseClickType.LEFT,pointsList));
+					pointGroups.push(Pair.of(MouseClickType.LEFT,pointsList));
 				}
 				else if(SwingUtilities.isRightMouseButton(e)){
-					pointGroups.add(Pair.of(MouseClickType.RIGHT,pointsList));
+					pointGroups.push(Pair.of(MouseClickType.RIGHT,pointsList));
 				}
 				
 				repaint();
@@ -55,16 +64,16 @@ public class Canvas extends JPanel implements AutoCloseable{
 			@Override
 			public void mouseDragged(MouseEvent e) {				
 				RelativePoint point = RelativePoint.getAsRelative(e.getPoint(), getWidth(), getHeight());
-				pointGroups.getLast().right().add(point);
+				pointGroups.peek().right().add(point);
 				repaint();
 			}
 
 			@Override
 			public void mouseReleased(MouseEvent e) {
 				RelativePoint point = RelativePoint.getAsRelative(e.getPoint(), getWidth(), getHeight());
-				Pair<MouseClickType,List<RelativePoint>> line = pointGroups.getLast();
-				line.right().add(point);
-				observationManager.updateObservers(line);
+				Pair<MouseClickType,List<RelativePoint>> input = pointGroups.peek();
+				input.right().add(point);
+				((CanvasObservationManager)observationManager).newInputUpdate(input);
 				repaint();
 			}
 
@@ -73,6 +82,12 @@ public class Canvas extends JPanel implements AutoCloseable{
 		addMouseListener(mouseListener);
 		addMouseMotionListener(mouseListener);
 	}
+	
+
+	public @Nonnull List<Pair<MouseClickType, List<RelativePoint>>> getData() {
+		return new ArrayList<>(pointGroups);
+	}
+
 	
 	@Override
 	protected void paintComponent(Graphics g) {
@@ -104,8 +119,35 @@ public class Canvas extends JPanel implements AutoCloseable{
 		g.setColor(oldColor);
 	}
 
+	/**
+	 * Redoes the  last input made to the canvas. <br>
+	 * The return value indicate are there more things that can be redone. <br>
+	 * @return
+	 */
+	public boolean redo(){
+		Pair<MouseClickType,List<RelativePoint>> input = undoneInput.pop();
+		pointGroups.push(input);
+		((CanvasObservationManager)observationManager).redo(input);
+		repaint();
+		return !undoneInput.isEmpty();
+	}
+
+	
+	/**
+	 * Undoes the last input made to the canvas. <br>
+	 * The return value indicates are there more things that can be undone. <br>
+	 */
+	public boolean undo(){
+		undoneInput.push(pointGroups.pop());
+		((CanvasObservationManager)observationManager).undoUpdate();
+		repaint();
+		return !pointGroups.isEmpty();
+	}
+
 	public void clear() {
+		//TODO: should I support undo here
 		pointGroups.clear();
+		((CanvasObservationManager)observationManager).clearUpdate();
 		repaint();
 	}
 	
@@ -115,6 +157,32 @@ public class Canvas extends JPanel implements AutoCloseable{
 		removeMouseMotionListener(mouseListener);
 		observationManager.close();
 	}
-	
 
+	//===================================================================================================================================
+	
+	public static class CanvasObservationManager extends StrictObservationManager<Canvas,ACanvasObserver>{
+
+		private final @Nonnull Consumer<ACanvasObserver> clear = o -> o.clearUpdate();
+		private final @Nonnull Function<Pair<MouseClickType,List<RelativePoint>>, Consumer<ACanvasObserver>> newInput = input -> o -> o.newInputUpdate(input);
+		private final @Nonnull Function<Pair<MouseClickType,List<RelativePoint>>, Consumer<ACanvasObserver>> redo = input -> o -> o.redoUpdate(input);
+		private final @Nonnull Consumer<ACanvasObserver> undo = o->o.undoUpdate();
+
+		public void clearUpdate(){
+			updateObserversAbout(clear);
+		}
+
+		public void newInputUpdate(@Nonnull Pair<MouseClickType,List<RelativePoint>> input){
+			updateObserversAbout(newInput.apply(input));
+		}
+		
+		public void redo(@Nonnull Pair<MouseClickType, List<RelativePoint>> input) {
+			updateObserversAbout(redo.apply(input));
+		}
+
+		public void undoUpdate(){
+			updateObserversAbout(undo);
+		}
+	}
+
+	
 }
