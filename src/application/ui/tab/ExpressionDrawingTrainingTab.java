@@ -1,6 +1,7 @@
 package application.ui.tab;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.util.List;
@@ -14,10 +15,12 @@ import javax.swing.JSplitPane;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 
+import application.data.model.geometry.MouseClickType;
+import application.data.model.geometry.RelativePoint;
 import application.ui.AbstractApplicationTab;
 import application.ui.draw.Canvas;
 import application.ui.draw.RectangleRepresentationCanvas;
-import application.ui.draw.RelativePoint;
+import dataModels.Pair;
 import observer.IObserver;
 
 public class ExpressionDrawingTrainingTab extends AbstractApplicationTab{
@@ -57,6 +60,7 @@ public class ExpressionDrawingTrainingTab extends AbstractApplicationTab{
 		//Control panel
 		JPanel controlPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
 		controlPanel.add(new JButton(new ClearCanvasAction()));
+		controlPanel.add(new JButton(new StoreExpressionAction()));
 		add(controlPanel,BorderLayout.SOUTH);
 		
 		//Adding listener to canvas
@@ -65,25 +69,18 @@ public class ExpressionDrawingTrainingTab extends AbstractApplicationTab{
 	
 	//========================================================================================================================
 
-	private final class CanvasObserver implements IObserver<List<RelativePoint>> {
+	
+	
+	private final class CanvasObserver implements IObserver<Pair<MouseClickType,List<RelativePoint>>> {
+		
 		@Override
-		public void update(List<RelativePoint> relativePoints) throws Exception {
-			double maxX = Double.MIN_VALUE;
-			double minX = Double.MAX_VALUE;
-			double maxY = Double.MIN_VALUE;
-			double minY = Double.MAX_VALUE;
-			
-			for(RelativePoint relativePoint:relativePoints){
-				
-				maxX = Math.max(maxX, relativePoint.x);
-				minX = Math.min(minX, relativePoint.x);
-				
-				maxY = Math.max(maxY, relativePoint.y);
-				minY = Math.min(minY, relativePoint.y);
-			}
-
-			rectangleRepresentationCanvas.createRectangle(minX, minY, maxX-minX, maxY-minY);
+		public void update(@Nonnull Pair<MouseClickType,List<RelativePoint>> relativePoints) throws Exception {
+			if((relativePoints.left()==MouseClickType.RIGHT))
+				rectangleRepresentationCanvas.createRectangle(relativePoints.right(),Color.RED);
+			else
+				rectangleRepresentationCanvas.createRectangle(relativePoints.right());
 		}
+		
 	}
 	
 	//========================================================================================================================
@@ -100,4 +97,18 @@ public class ExpressionDrawingTrainingTab extends AbstractApplicationTab{
 		}
 	}
 
+	private final class StoreExpressionAction extends AbstractAction {
+		
+		private StoreExpressionAction(){
+			super("Store expression");
+		}
+		
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			// TODO Auto-generated method stub
+			
+		}
+		
+	}
+	
 }

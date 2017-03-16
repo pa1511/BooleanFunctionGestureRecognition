@@ -1,4 +1,4 @@
-package application.ui.draw;
+package application.data.model.geometry;
 
 import java.awt.Point;
 

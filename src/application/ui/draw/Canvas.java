@@ -12,15 +12,18 @@ import java.util.List;
 import javax.annotation.Nonnull;
 import javax.swing.BorderFactory;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 
+import application.data.model.geometry.MouseClickType;
+import application.data.model.geometry.RelativePoint;
+import dataModels.Pair;
 import observer.ObservationManager;
 
 public class Canvas extends JPanel implements AutoCloseable{
 	
-	private final @Nonnull LinkedList<List<RelativePoint>> points = new LinkedList<>();
+	private final @Nonnull LinkedList<Pair<MouseClickType,List<RelativePoint>>> pointGroups = new LinkedList<>();
 	private final @Nonnull MouseAdapter mouseListener;
-	
-	public final @Nonnull ObservationManager<List<RelativePoint>> observationManager;
+	public final @Nonnull ObservationManager<Pair<MouseClickType,List<RelativePoint>>> observationManager;
 	
 	public Canvas() {
 
@@ -35,23 +38,33 @@ public class Canvas extends JPanel implements AutoCloseable{
 
 			@Override
 			public void mousePressed(MouseEvent e) {
+								
 				List<RelativePoint> pointsList = new ArrayList<>();
-				
 				pointsList.add(RelativePoint.getAsRelative(e.getPoint(),getWidth(), getHeight()));
 				
-				points.add(pointsList);
+				if(SwingUtilities.isLeftMouseButton(e)){
+					pointGroups.add(Pair.of(MouseClickType.LEFT,pointsList));
+				}
+				else if(SwingUtilities.isRightMouseButton(e)){
+					pointGroups.add(Pair.of(MouseClickType.RIGHT,pointsList));
+				}
+				
 				repaint();
 			}
 
 			@Override
-			public void mouseDragged(MouseEvent e) {
-				points.getLast().add(RelativePoint.getAsRelative(e.getPoint(), getWidth(), getHeight()));
+			public void mouseDragged(MouseEvent e) {				
+				RelativePoint point = RelativePoint.getAsRelative(e.getPoint(), getWidth(), getHeight());
+				pointGroups.getLast().right().add(point);
 				repaint();
 			}
 
 			@Override
 			public void mouseReleased(MouseEvent e) {
-				observationManager.updateObservers(points.getLast());
+				RelativePoint point = RelativePoint.getAsRelative(e.getPoint(), getWidth(), getHeight());
+				Pair<MouseClickType,List<RelativePoint>> line = pointGroups.getLast();
+				line.right().add(point);
+				observationManager.updateObservers(line);
 				repaint();
 			}
 
@@ -69,8 +82,19 @@ public class Canvas extends JPanel implements AutoCloseable{
 		int height = getHeight();
 		
 		Color oldColor = g.getColor();
-		g.setColor(Color.BLUE);
-		for(List<RelativePoint> pointsList:points){
+		for(Pair<MouseClickType,List<RelativePoint>> pointGroup:pointGroups){
+			
+			MouseClickType type = pointGroup.left();
+			
+			if(type==MouseClickType.LEFT){
+				g.setColor(Color.BLUE);
+			}
+			else{
+				g.setColor(Color.RED);
+			}
+			
+			List<RelativePoint> pointsList = pointGroup.right();
+			
 			for (int i = 0, size = pointsList.size() - 1; i < size; i++) {
 				Point first = pointsList.get(i).toPoint(width,height);
 				Point second = pointsList.get(i + 1).toPoint(width,height);
@@ -81,7 +105,7 @@ public class Canvas extends JPanel implements AutoCloseable{
 	}
 
 	public void clear() {
-		points.clear();
+		pointGroups.clear();
 		repaint();
 	}
 	
