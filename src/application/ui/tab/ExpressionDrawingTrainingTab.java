@@ -24,6 +24,7 @@ import application.ui.draw.Canvas;
 import application.ui.draw.ACanvasObserver;
 import application.ui.draw.RectangleRepresentationView;
 import dataModels.Pair;
+import log.Log;
 
 public class ExpressionDrawingTrainingTab extends AbstractApplicationTab{
 	
@@ -33,6 +34,12 @@ public class ExpressionDrawingTrainingTab extends AbstractApplicationTab{
 
 	private final @Nonnull Canvas canvas;
 	private final @Nonnull RectangleRepresentationView rectangleRepresentationView;
+
+	//Actions
+	private final @Nonnull UndoAction undoAction;
+	private final @Nonnull RedoAction redoAction;
+	private final @Nonnull StoreExpressionAction storeExpressionAction;
+	private final @Nonnull ClearCanvasAction clearCanvasAction;
 
 	
 	public ExpressionDrawingTrainingTab() {
@@ -53,24 +60,34 @@ public class ExpressionDrawingTrainingTab extends AbstractApplicationTab{
 		canvas = new Canvas();
 		rectangleRepresentationView = new RectangleRepresentationView();
 		
-		
-		
 		mainSplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, canvas, rectangleRepresentationView);
 		SwingUtilities.invokeLater(()->mainSplitPane.setDividerLocation(0.5));
 		add(mainSplitPane,BorderLayout.CENTER);
 		
 		//Control panel
+		undoAction = new UndoAction();
+		redoAction = new RedoAction();
+		storeExpressionAction = new StoreExpressionAction();
+		clearCanvasAction = new ClearCanvasAction();
+		
+		initalizeActions();
+		
 		JPanel controlPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-		controlPanel.add(new JButton(new ClearCanvasAction()));
-		controlPanel.add(new JButton(new UndoAction()));
-		controlPanel.add(new JButton(new RedoAction()));
-		controlPanel.add(new JButton(new StoreExpressionAction()));
+		controlPanel.add(new JButton(undoAction));
+		controlPanel.add(new JButton(redoAction));
+		controlPanel.add(new JButton(storeExpressionAction));
+		controlPanel.add(new JButton(clearCanvasAction));
 		add(controlPanel,BorderLayout.SOUTH);
 		
 		//Adding listener to canvas
 		canvas.observationManager.addObserver(new CanvasObserver());
 	}
 	
+	private void initalizeActions() {
+		undoAction.setEnabled(false);
+		redoAction.setEnabled(false);
+	}
+
 	//========================================================================================================================
 
 	
@@ -80,6 +97,7 @@ public class ExpressionDrawingTrainingTab extends AbstractApplicationTab{
 		@Override
 		public void clearUpdate() {
 			rectangleRepresentationView.clear();
+			initalizeActions();
 		}
 
 		@Override
@@ -88,15 +106,20 @@ public class ExpressionDrawingTrainingTab extends AbstractApplicationTab{
 				rectangleRepresentationView.createRectangle(relativePoints.right(),Color.RED);
 			else
 				rectangleRepresentationView.createRectangle(relativePoints.right());
+			
+			undoAction.setEnabled(true);
 		}
 
 		@Override
 		public void redoUpdate(@Nonnull Pair<MouseClickType, List<RelativePoint>> input) {
 			rectangleRepresentationView.redo();
+			undoAction.setEnabled(true);
 		}
+		
 		@Override
 		public void undoUpdate() {
 			rectangleRepresentationView.undo();
+			redoAction.setEnabled(true);
 		}
 
 		
@@ -111,6 +134,7 @@ public class ExpressionDrawingTrainingTab extends AbstractApplicationTab{
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
+			Log.addMessage("Clear action called", Log.Type.Plain);
 			canvas.clear();
 		}
 	}
@@ -123,10 +147,14 @@ public class ExpressionDrawingTrainingTab extends AbstractApplicationTab{
 		
 		@Override
 		public void actionPerformed(ActionEvent e) {
+			Log.addMessage("Storing expression", Log.Type.Plain);
+
 			Expression expression = ExpressionFactory.getExpressionFor(conceptDescriptionField.getText(),canvas.getData());
 			
 			//TODO: have to make it so I get a application specific data source not the genral one
 			//Application.getInstance().getDataSource().store(expression);
+			
+			Log.addMessage("Expression stored", Log.Type.Plain);
 		}
 		
 	}
@@ -139,7 +167,8 @@ public class ExpressionDrawingTrainingTab extends AbstractApplicationTab{
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			canvas.undo();
+			Log.addMessage("Undo action called", Log.Type.Plain);
+			setEnabled(canvas.undo());
 		}
 		
 	}
@@ -152,7 +181,8 @@ public class ExpressionDrawingTrainingTab extends AbstractApplicationTab{
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			canvas.redo();
+			Log.addMessage("Redo action called", Log.Type.Plain);
+			setEnabled(canvas.redo());
 		}
 		
 	}
