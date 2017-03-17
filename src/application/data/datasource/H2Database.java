@@ -79,7 +79,7 @@ public final class H2Database extends ADataSource{
 
 	private void initializeDBTables() throws SQLException {
 		
-		Connection connection = dbConnection.get();
+		Connection connection = dbConnection.getOrThrow();
 				
 		connection.createStatement().execute("CREATE TABLE IF NOT EXISTS " + expressionTable + "("
 				+ exIdColumn + " " + "INT AUTO_INCREMENT PRIMARY KEY, "
@@ -99,7 +99,7 @@ public final class H2Database extends ADataSource{
 	@Override
 	public void close() throws Exception {
 		if(dbConnection.isLoaded()){
-			Connection connection = dbConnection.get();
+			Connection connection = dbConnection.getOrThrow();
 			connection.commit();
 			connection.close();
 		}
@@ -107,11 +107,13 @@ public final class H2Database extends ADataSource{
 
 	@Override
 	public void store(@Nonnull Expression expression) throws Exception {
+		
+		Connection connection = dbConnection.getOrThrow();
+		
 		String insertExpressionSql = "INSERT INTO " + expressionTable + " ( "+exWrittenFormColumn+" ) VALUES( ? )";
-
 		int expressionId;
 
-		try(PreparedStatement statement = dbConnection.get().prepareStatement(insertExpressionSql,Statement.RETURN_GENERATED_KEYS)){
+		try(PreparedStatement statement = connection.prepareStatement(insertExpressionSql,Statement.RETURN_GENERATED_KEYS)){
 			
 			statement.setString(1, expression.getSymbolicForm());
 			statement.execute();
@@ -128,7 +130,8 @@ public final class H2Database extends ADataSource{
 		String insertGestureSql = "INSERT INTO " + gestureTable + " ( " + geFIdExColumn + "," + geSymbolColumn + ","
 				+ geExPositionColumn + "," + gePointsColumn + " ) VALUES( ?,?,?,? )";
 
-		try(PreparedStatement statement = dbConnection.get().prepareStatement(insertGestureSql)){
+		
+		try(PreparedStatement statement = connection.prepareStatement(insertGestureSql)){
 			for(Symbol symbol:expression.getSymbols()){
 				List<Gesture> gestures = symbol.getGestures();
 				for(int i=0,limit=gestures.size();i<limit;i++ ){

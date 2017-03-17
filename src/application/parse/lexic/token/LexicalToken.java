@@ -45,7 +45,7 @@ public class LexicalToken {
 
 		private final @Nonnull CharacterPredicate matcher;
 		private final char symbol;
-		private @Nonnull Type[] nextPossibleTypes;
+		private Type[] nextPossibleTypes;
 		
 		private Type(char c) {
 			this(ch->ch==c,c);
