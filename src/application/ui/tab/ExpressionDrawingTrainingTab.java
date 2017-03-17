@@ -4,16 +4,19 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 import java.util.List;
 
 import javax.annotation.Nonnull;
 import javax.swing.AbstractAction;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 import javax.swing.JTextField;
+import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 
 import application.Application;
@@ -73,7 +76,8 @@ public class ExpressionDrawingTrainingTab extends AbstractApplicationTab{
 		storeExpressionAction = new StoreExpressionAction();
 		clearCanvasAction = new ClearCanvasAction();
 		
-		initalizeActions();
+		undoAction.setEnabled(false);
+		redoAction.setEnabled(false);
 		
 		JPanel controlPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
 		controlPanel.add(new JButton(undoAction));
@@ -81,16 +85,23 @@ public class ExpressionDrawingTrainingTab extends AbstractApplicationTab{
 		controlPanel.add(new JButton(storeExpressionAction));
 		controlPanel.add(new JButton(clearCanvasAction));
 		add(controlPanel,BorderLayout.SOUTH);
+		registerKeyboardActions();
 		
 		//Adding listener to canvas
 		canvas.observationManager.addObserver(new CanvasObserver());
 	}
-	
-	private void initalizeActions() {
-		undoAction.setEnabled(false);
-		redoAction.setEnabled(false);
-	}
 
+	private void registerKeyboardActions() {
+		conceptDescriptionField.registerKeyboardAction(undoAction, 
+				KeyStroke.getKeyStroke(KeyEvent.VK_U, KeyEvent.CTRL_DOWN_MASK), JComponent.WHEN_FOCUSED);
+		conceptDescriptionField.registerKeyboardAction(redoAction, 
+				KeyStroke.getKeyStroke(KeyEvent.VK_R, KeyEvent.CTRL_DOWN_MASK), JComponent.WHEN_FOCUSED);
+		conceptDescriptionField.registerKeyboardAction(storeExpressionAction, 
+				KeyStroke.getKeyStroke(KeyEvent.VK_S, KeyEvent.CTRL_DOWN_MASK), JComponent.WHEN_FOCUSED);
+		conceptDescriptionField.registerKeyboardAction(clearCanvasAction, 
+				KeyStroke.getKeyStroke(KeyEvent.VK_C, KeyEvent.CTRL_DOWN_MASK + KeyEvent.SHIFT_DOWN_MASK), JComponent.WHEN_FOCUSED);
+	}
+	
 	//========================================================================================================================
 
 	
@@ -100,7 +111,8 @@ public class ExpressionDrawingTrainingTab extends AbstractApplicationTab{
 		@Override
 		public void clearUpdate() {
 			rectangleRepresentationView.clear();
-			initalizeActions();
+			undoAction.setEnabled(false);
+			redoAction.setEnabled(false);
 		}
 
 		@Override
@@ -150,14 +162,20 @@ public class ExpressionDrawingTrainingTab extends AbstractApplicationTab{
 		
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			Log.addMessage("Storing expression", Log.Type.Plain);
-
+			String text = conceptDescriptionField.getText();
+			
+			Log.addMessage("Storing expression: " + text, Log.Type.Plain);
+			
 			try {
-				//TODO: check is empty and similar things
-				String text = conceptDescriptionField.getText();
+				if(text==null || text.isEmpty())
+					throw new IllegalArgumentException("No expression provided");
+
 				String expressionSymbolicForm = BooleanParser.expressionPreprocessing(text);
 				Expression expression = ExpressionFactory.getExpressionFor(expressionSymbolicForm,canvas.getData());
 				Application.getInstance().getDataSource().store(expression);
+			} catch(IllegalArgumentException e1){
+				Log.addMessage(e1.getMessage(),Log.Type.Warning);
+				JOptionPane.showMessageDialog(null, e1.getMessage(), "Warning", JOptionPane.WARNING_MESSAGE);
 			} catch (Exception e1) {
 				Log.addError(e1);
 				JOptionPane.showMessageDialog(null, "A critical error has occured during storage attempt." + e1.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
