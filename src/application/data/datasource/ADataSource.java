@@ -3,6 +3,7 @@ package application.data.datasource;
 import javax.annotation.Nonnull;
 
 import application.IApplicationDataSource;
+import application.data.model.Expression;
 
 public abstract class ADataSource implements IApplicationDataSource{
 
@@ -15,5 +16,7 @@ public abstract class ADataSource implements IApplicationDataSource{
 		this.password = password;
 		this.sourceLocation = sourceLocation;
 	}
+
+	public abstract void store(@Nonnull Expression expression);
 	
 }

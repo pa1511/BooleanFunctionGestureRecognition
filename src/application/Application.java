@@ -22,6 +22,11 @@ import log.Log;
  *
  */
 public final class Application extends AApplication {
+	
+	
+	public static @Nonnull Application getInstance(){
+		return (Application) AApplication.getInstance();
+	}
 
 	// static keys
 	public static final @Nonnull String LOG_LOCATION_KEY = "log.location";

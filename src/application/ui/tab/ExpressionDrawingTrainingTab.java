@@ -10,11 +10,13 @@ import javax.annotation.Nonnull;
 import javax.swing.AbstractAction;
 import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 
+import application.Application;
 import application.data.model.Expression;
 import application.data.model.ExpressionFactory;
 import application.data.model.geometry.MouseClickType;
@@ -149,10 +151,13 @@ public class ExpressionDrawingTrainingTab extends AbstractApplicationTab{
 		public void actionPerformed(ActionEvent e) {
 			Log.addMessage("Storing expression", Log.Type.Plain);
 
-			Expression expression = ExpressionFactory.getExpressionFor(conceptDescriptionField.getText(),canvas.getData());
-			
-			//TODO: have to make it so I get a application specific data source not the genral one
-			//Application.getInstance().getDataSource().store(expression);
+			try {
+				Expression expression = ExpressionFactory.getExpressionFor(conceptDescriptionField.getText(),canvas.getData());
+				Application.getInstance().getDataSource().store(expression);
+			} catch (Exception e1) {
+				Log.addError(e1);
+				JOptionPane.showMessageDialog(null, "A critical error has occured during storage attempt." + e1.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+			}
 			
 			Log.addMessage("Expression stored", Log.Type.Plain);
 		}

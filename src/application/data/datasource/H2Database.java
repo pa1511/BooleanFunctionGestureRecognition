@@ -6,6 +6,7 @@ import java.sql.SQLException;
 
 import javax.annotation.Nonnull;
 
+import application.data.model.Expression;
 import log.Log;
 import utilities.lazy.Lazy;
 
@@ -68,6 +69,12 @@ public final class H2Database extends ADataSource{
 		Connection connection = dbConnection.get();
 		connection.commit();
 		connection.close();
+	}
+
+	@Override
+	public void store(Expression expression) {
+		// TODO Auto-generated method stub
+		
 	}
 
     
