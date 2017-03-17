@@ -17,6 +17,6 @@ public abstract class ADataSource implements IApplicationDataSource{
 		this.sourceLocation = sourceLocation;
 	}
 
-	public abstract void store(@Nonnull Expression expression);
+	public abstract void store(@Nonnull Expression expression) throws Exception;
 	
 }

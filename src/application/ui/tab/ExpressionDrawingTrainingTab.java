@@ -21,6 +21,7 @@ import application.data.model.Expression;
 import application.data.model.ExpressionFactory;
 import application.data.model.geometry.MouseClickType;
 import application.data.model.geometry.RelativePoint;
+import application.parse.BooleanParser;
 import application.ui.AbstractApplicationTab;
 import application.ui.draw.Canvas;
 import application.ui.draw.ACanvasObserver;
@@ -152,7 +153,10 @@ public class ExpressionDrawingTrainingTab extends AbstractApplicationTab{
 			Log.addMessage("Storing expression", Log.Type.Plain);
 
 			try {
-				Expression expression = ExpressionFactory.getExpressionFor(conceptDescriptionField.getText(),canvas.getData());
+				//TODO: check is empty and similar things
+				String text = conceptDescriptionField.getText();
+				String expressionSymbolicForm = BooleanParser.expressionPreprocessing(text);
+				Expression expression = ExpressionFactory.getExpressionFor(expressionSymbolicForm,canvas.getData());
 				Application.getInstance().getDataSource().store(expression);
 			} catch (Exception e1) {
 				Log.addError(e1);

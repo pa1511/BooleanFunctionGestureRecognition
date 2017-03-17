@@ -36,5 +36,14 @@ public class Symbol {
 	public @Nonnull String getSymbolAsString(){
 		return Character.toString(symbol);
 	}
+
+	public List<Gesture> getGestures() {
+		return gestures;
+	}
+	
+	@Override
+	public String toString() {
+		return getSymbolAsString();
+	}
 	
 }

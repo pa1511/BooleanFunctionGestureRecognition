@@ -28,5 +28,13 @@ public class Gesture {
 		points.remove(point);
 		return this;
 	}
+
+	public RelativePoint[] getPointsAsArray() {
+		return points.toArray(new RelativePoint[points.size()]);
+	}
+
+	public List<RelativePoint> getPoints() {
+		return points;
+	}
 		
 }
