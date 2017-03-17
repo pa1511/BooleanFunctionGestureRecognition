@@ -169,6 +169,7 @@ public class ExpressionDrawingTrainingTab extends AbstractApplicationTab{
 		public void actionPerformed(ActionEvent e) {
 			Log.addMessage("Undo action called", Log.Type.Plain);
 			setEnabled(canvas.undo());
+			
 		}
 		
 	}
