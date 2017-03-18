@@ -30,6 +30,7 @@ public final class Application extends AApplication {
 
 	// static keys
 	public static final @Nonnull String LOG_LOCATION_KEY = "log.location";
+	public static final @Nonnull String LOG_KEEP_KEY = "log.keep";
 	
 	public static final @Nonnull String DATA_SOURCE_IMPL_KEY = "data.source.impl";
 	public static final @Nonnull String DATA_SOURCE_IMPL_PATH_KEY = "data.source.impl.path";
@@ -92,4 +93,11 @@ public final class Application extends AApplication {
 		return (ADataSource) dataSource.get();
 	}
 
+	
+	@Override
+	public void close() throws Exception {
+		super.close();
+		int fewToKeep = Integer.parseInt(properties.getProperty(LOG_KEEP_KEY));
+		Log.deleteAllExceptLast(fewToKeep);
+	}
 }
