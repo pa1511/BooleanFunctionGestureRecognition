@@ -22,11 +22,13 @@ import javax.swing.SwingUtilities;
 import application.Application;
 import application.data.model.Expression;
 import application.data.model.ExpressionFactory;
+import application.data.model.Gesture;
 import application.data.model.geometry.MouseClickType;
 import application.data.model.geometry.RelativePoint;
 import application.parse.BooleanParser;
 import application.ui.AbstractApplicationTab;
 import application.ui.draw.Canvas;
+import application.ui.draw.PerGestureView;
 import application.ui.draw.ACanvasObserver;
 import application.ui.draw.RectangleRepresentationView;
 import dataModels.Pair;
@@ -40,6 +42,7 @@ public class ExpressionDrawingTrainingTab extends AbstractApplicationTab{
 
 	private final @Nonnull Canvas canvas;
 	private final @Nonnull RectangleRepresentationView rectangleRepresentationView;
+	private final @Nonnull PerGestureView perGestureView;
 
 	//Actions
 	private final @Nonnull UndoAction undoAction;
@@ -65,8 +68,13 @@ public class ExpressionDrawingTrainingTab extends AbstractApplicationTab{
 		//Drawing canvas
 		canvas = new Canvas();
 		rectangleRepresentationView = new RectangleRepresentationView();
+		perGestureView = new PerGestureView();
 		
-		mainSplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, canvas, rectangleRepresentationView);
+		JPanel dataAbstractionPanel = new JPanel(new BorderLayout());
+		dataAbstractionPanel.add(rectangleRepresentationView, BorderLayout.CENTER);
+		dataAbstractionPanel.add(perGestureView,BorderLayout.NORTH);
+		
+		mainSplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, canvas, dataAbstractionPanel);
 		SwingUtilities.invokeLater(()->mainSplitPane.setDividerLocation(0.5));
 		add(mainSplitPane,BorderLayout.CENTER);
 		
@@ -101,6 +109,17 @@ public class ExpressionDrawingTrainingTab extends AbstractApplicationTab{
 		conceptDescriptionField.registerKeyboardAction(clearCanvasAction, 
 				KeyStroke.getKeyStroke(KeyEvent.VK_C, KeyEvent.CTRL_DOWN_MASK + KeyEvent.SHIFT_DOWN_MASK), JComponent.WHEN_FOCUSED);
 	}
+
+	private void forceRepaint() {
+		revalidate();
+		repaint();
+	}
+	
+	@Override
+	public void close() throws Exception {
+		canvas.close();
+	}
+
 	
 	//========================================================================================================================
 
@@ -111,32 +130,48 @@ public class ExpressionDrawingTrainingTab extends AbstractApplicationTab{
 		@Override
 		public void clearUpdate() {
 			rectangleRepresentationView.clear();
+			perGestureView.clear();
 			undoAction.setEnabled(false);
 			redoAction.setEnabled(false);
+			
+			forceRepaint();
 		}
 
 		@Override
 		public void newInputUpdate(@Nonnull Pair<MouseClickType, List<RelativePoint>> relativePoints) {
-			if((relativePoints.left()==MouseClickType.RIGHT))
+			if((relativePoints.left()==MouseClickType.RIGHT)){
 				rectangleRepresentationView.createRectangle(relativePoints.right(),Color.RED);
-			else
-				rectangleRepresentationView.createRectangle(relativePoints.right());
+			}
+			else{
+				List<RelativePoint> points = relativePoints.right();
+				rectangleRepresentationView.createRectangle(points);
+				
+				//TODO: would be nice to detect the string
+				perGestureView.addGesture("XY", new Gesture(points));
+			}
 			
 			undoAction.setEnabled(true);
+			
+			forceRepaint();
 		}
 
 		@Override
 		public void redoUpdate(@Nonnull Pair<MouseClickType, List<RelativePoint>> input) {
 			rectangleRepresentationView.redo();
+			perGestureView.redo();
 			undoAction.setEnabled(true);
+			
+			forceRepaint();
 		}
 		
 		@Override
 		public void undoUpdate() {
 			rectangleRepresentationView.undo();
+			perGestureView.undo();
 			redoAction.setEnabled(true);
+			
+			forceRepaint();
 		}
-
 		
 	}
 	
@@ -213,4 +248,5 @@ public class ExpressionDrawingTrainingTab extends AbstractApplicationTab{
 		}
 		
 	}
+
 }

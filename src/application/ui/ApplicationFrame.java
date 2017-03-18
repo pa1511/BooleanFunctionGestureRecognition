@@ -14,9 +14,10 @@ import application.AApplicationFrame;
 import application.Application;
 import generalfactory.Factory;
 
-public class ApplicationFrame extends AApplicationFrame{
+public class ApplicationFrame extends AApplicationFrame {
 	
 	private final static @Nonnegative double screenFactor = 0.45;
+	private final AbstractApplicationTab[] tabs;
 
 	public ApplicationFrame() throws Exception{
 				
@@ -26,7 +27,8 @@ public class ApplicationFrame extends AApplicationFrame{
 		//Initialize window content
 		JTabbedPane tabbedPane = new JTabbedPane();
 		
-		for(AbstractApplicationTab tab:loadApplicationTabs())
+		tabs = loadApplicationTabs();
+		for(AbstractApplicationTab tab:tabs)
 			tabbedPane.addTab(tab.getTabName(), tab);
 
 		setLayout(new BorderLayout());
@@ -68,4 +70,12 @@ public class ApplicationFrame extends AApplicationFrame{
 		
 		setBounds(x, y, width, height);
 	}
+
+	@Override
+	public void close() throws Exception {
+		for(AbstractApplicationTab tab:tabs){
+			tab.close();
+		}
+	}
+	
 }

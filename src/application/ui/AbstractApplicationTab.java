@@ -3,7 +3,7 @@ package application.ui;
 import javax.annotation.Nonnull;
 import javax.swing.JPanel;
 
-public abstract class AbstractApplicationTab extends JPanel{
+public abstract class AbstractApplicationTab extends JPanel implements AutoCloseable {
 
 	protected final @Nonnull String tabName;
 	
@@ -13,6 +13,11 @@ public abstract class AbstractApplicationTab extends JPanel{
 	
 	public String getTabName() {
 		return tabName;
+	}
+	
+	@Override
+	public void close() throws Exception {
+		//Empty dummy implementation because not every implementation will have something to close
 	}
 	
 }
