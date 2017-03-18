@@ -24,7 +24,7 @@ public abstract class ACanvasObserver  extends AbstractObserver<Canvas>{
 	/**
 	 * Called when a undo action is performed on the canvas <br>
 	 */
-	public abstract void undoUpdate();
+	public abstract void undoUpdate(@Nonnull Pair<MouseClickType, List<RelativePoint>> input);
 
 	/**
 	 * Called when a redo action is performed on the canvas. <br>

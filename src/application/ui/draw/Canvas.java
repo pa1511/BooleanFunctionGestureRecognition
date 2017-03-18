@@ -28,10 +28,16 @@ public class Canvas extends JPanel implements AutoCloseable{
 	
 	private final @Nonnull MouseAdapter mouseListener;
 	public final @Nonnull StrictObservationManager<Canvas,ACanvasObserver> observationManager;
+	private boolean lock;
 	
-		
-	public Canvas() {
 
+	public Canvas(){
+		this(false);
+	}
+		
+	public Canvas(boolean lock) {
+
+		this.lock = lock;
 		observationManager = new CanvasObservationManager();
 		pointGroups = new ArrayDeque<>();
 		undoneInput = new ArrayDeque<>();
@@ -45,6 +51,9 @@ public class Canvas extends JPanel implements AutoCloseable{
 
 			@Override
 			public void mousePressed(MouseEvent e) {
+				
+				if(lock)
+					return;
 				
 				undoneInput.clear();
 								
@@ -63,6 +72,9 @@ public class Canvas extends JPanel implements AutoCloseable{
 
 			@Override
 			public void mouseDragged(MouseEvent e) {				
+				if(lock)
+					return;
+				
 				RelativePoint point = RelativePoint.getAsRelative(e.getPoint(), getWidth(), getHeight());
 				pointGroups.peek().right().add(point);
 				repaint();
@@ -70,6 +82,9 @@ public class Canvas extends JPanel implements AutoCloseable{
 
 			@Override
 			public void mouseReleased(MouseEvent e) {
+				if(lock)
+					return;
+
 				RelativePoint point = RelativePoint.getAsRelative(e.getPoint(), getWidth(), getHeight());
 				Pair<MouseClickType,List<RelativePoint>> input = pointGroups.peek();
 				input.right().add(point);
@@ -119,6 +134,10 @@ public class Canvas extends JPanel implements AutoCloseable{
 		g.setColor(oldColor);
 	}
 
+	public void setLock(boolean lock){
+		this.lock  = lock;
+	}
+
 	/**
 	 * Redoes the  last input made to the canvas. <br>
 	 * The return value indicate are there more things that can be redone. <br>
@@ -128,7 +147,7 @@ public class Canvas extends JPanel implements AutoCloseable{
 		
 		int redoCount = undoneInput.size();
 		
-		if(redoCount>0){
+		if(redoCount>0 && !lock){
 			Pair<MouseClickType,List<RelativePoint>> input = undoneInput.pop();
 			pointGroups.push(input);
 			((CanvasObservationManager)observationManager).redo(input);
@@ -147,9 +166,10 @@ public class Canvas extends JPanel implements AutoCloseable{
 		
 		int undoCount = pointGroups.size();
 		
-		if(undoCount>0){
-			undoneInput.push(pointGroups.pop());
-			((CanvasObservationManager)observationManager).undoUpdate();
+		if(undoCount>0 && !lock){
+			@Nonnull Pair<MouseClickType, List<RelativePoint>> input = pointGroups.pop();
+			undoneInput.push(input);
+			((CanvasObservationManager)observationManager).undoUpdate(input);
 			repaint();
 		}
 		
@@ -157,6 +177,10 @@ public class Canvas extends JPanel implements AutoCloseable{
 	}
 
 	public void clear() {
+		
+		if(lock)
+			return;
+		
 		//TODO: should I support undo here
 		pointGroups.clear();
 		((CanvasObservationManager)observationManager).clearUpdate();
@@ -177,7 +201,7 @@ public class Canvas extends JPanel implements AutoCloseable{
 		private final @Nonnull Consumer<ACanvasObserver> clear = o -> o.clearUpdate();
 		private final @Nonnull Function<Pair<MouseClickType,List<RelativePoint>>, Consumer<ACanvasObserver>> newInput = input -> o -> o.newInputUpdate(input);
 		private final @Nonnull Function<Pair<MouseClickType,List<RelativePoint>>, Consumer<ACanvasObserver>> redo = input -> o -> o.redoUpdate(input);
-		private final @Nonnull Consumer<ACanvasObserver> undo = o->o.undoUpdate();
+		private final @Nonnull Function<Pair<MouseClickType,List<RelativePoint>>, Consumer<ACanvasObserver>> undo = input -> o -> o.undoUpdate(input);
 
 		public void clearUpdate(){
 			updateObserversAbout(clear);
@@ -191,8 +215,8 @@ public class Canvas extends JPanel implements AutoCloseable{
 			updateObserversAbout(redo.apply(input));
 		}
 
-		public void undoUpdate(){
-			updateObserversAbout(undo);
+		public void undoUpdate(@Nonnull Pair<MouseClickType, List<RelativePoint>> input){
+			updateObserversAbout(undo.apply(input));
 		}
 	}
 

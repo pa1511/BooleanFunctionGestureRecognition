@@ -3,10 +3,12 @@ package application.ui.tab;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.FlowLayout;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.util.List;
 
+import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
 import javax.swing.AbstractAction;
 import javax.swing.JButton;
@@ -18,6 +20,8 @@ import javax.swing.JSplitPane;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 
 import application.Application;
 import application.data.model.Expression;
@@ -49,7 +53,10 @@ public class ExpressionDrawingTrainingTab extends AbstractApplicationTab{
 	private final @Nonnull RedoAction redoAction;
 	private final @Nonnull StoreExpressionAction storeExpressionAction;
 	private final @Nonnull ClearCanvasAction clearCanvasAction;
-
+	
+	//Listeners
+	private final @Nonnull ConceptFieldListener conceptFieldListener;
+	private final @Nonnull CanvasObserver canvasObserver;
 	
 	public ExpressionDrawingTrainingTab() {
 		super("Expression drawing training");
@@ -63,18 +70,31 @@ public class ExpressionDrawingTrainingTab extends AbstractApplicationTab{
 		JPanel conceptDescriptionHolderPanel = new JPanel(new BorderLayout());
 		conceptDescriptionHolderPanel.add(new JLabel("Concept description: "), BorderLayout.WEST);
 		conceptDescriptionHolderPanel.add(conceptDescriptionField,BorderLayout.CENTER);
+		JLabel conceptInstruction = new JLabel("The canvas is initially locked. In order to unlock it please provide a concept. Example: \"a+b\"");
+		Font tipFont = conceptInstruction.getFont().deriveFont(Font.ITALIC);
+		conceptInstruction.setFont(tipFont);
+		conceptDescriptionHolderPanel.add(conceptInstruction,BorderLayout.SOUTH);
 		add(conceptDescriptionHolderPanel,BorderLayout.NORTH);
 		
 		//Drawing canvas
 		canvas = new Canvas();
+		conceptFieldListener = new ConceptFieldListener();
+		conceptDescriptionField.getDocument().addDocumentListener(conceptFieldListener);
 		rectangleRepresentationView = new RectangleRepresentationView();
 		perGestureView = new PerGestureView();
+		
+		JLabel canvasInstruction = new JLabel("Left click and drag for gesture input. Right click to signal symbol end. ");
+		tipFont = canvasInstruction.getFont().deriveFont(Font.ITALIC);
+		canvasInstruction.setFont(tipFont);
+		JPanel canvasHolderPanel = new JPanel(new BorderLayout());
+		canvasHolderPanel.add(canvas,BorderLayout.CENTER);
+		canvasHolderPanel.add(canvasInstruction, BorderLayout.SOUTH);
 		
 		JPanel dataAbstractionPanel = new JPanel(new BorderLayout());
 		dataAbstractionPanel.add(rectangleRepresentationView, BorderLayout.CENTER);
 		dataAbstractionPanel.add(perGestureView,BorderLayout.NORTH);
 		
-		mainSplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, canvas, dataAbstractionPanel);
+		mainSplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, canvasHolderPanel, dataAbstractionPanel);
 		SwingUtilities.invokeLater(()->mainSplitPane.setDividerLocation(0.5));
 		add(mainSplitPane,BorderLayout.CENTER);
 		
@@ -95,8 +115,8 @@ public class ExpressionDrawingTrainingTab extends AbstractApplicationTab{
 		add(controlPanel,BorderLayout.SOUTH);
 		registerKeyboardActions();
 		
-		//Adding listener to canvas
-		canvas.observationManager.addObserver(new CanvasObserver());
+		canvasObserver = new CanvasObserver();
+		canvas.observationManager.addObserver(canvasObserver);
 	}
 
 	private void registerKeyboardActions() {
@@ -117,6 +137,8 @@ public class ExpressionDrawingTrainingTab extends AbstractApplicationTab{
 	
 	@Override
 	public void close() throws Exception {
+		conceptDescriptionField.getDocument().removeDocumentListener(conceptFieldListener);
+		canvas.observationManager.removeObserver(canvasObserver);
 		canvas.close();
 	}
 
@@ -125,12 +147,38 @@ public class ExpressionDrawingTrainingTab extends AbstractApplicationTab{
 
 	
 	
+	private final class ConceptFieldListener implements DocumentListener {
+		@Override
+		public void removeUpdate(DocumentEvent e) {
+			updateCanvas();
+		}
+
+		@Override
+		public void insertUpdate(DocumentEvent e) {
+			updateCanvas();
+		}
+
+		@Override
+		public void changedUpdate(DocumentEvent e) {
+			updateCanvas();
+		}
+
+		private void updateCanvas(){
+			String concept = conceptDescriptionField.getText();
+			canvas.setLock(concept==null || concept.isEmpty());
+		}
+	}
+
 	private final class CanvasObserver extends ACanvasObserver {
+		
+		private @Nonnegative int currentSy = 0;
 		
 		@Override
 		public void clearUpdate() {
 			rectangleRepresentationView.clear();
 			perGestureView.clear();
+			currentSy = 0;
+			
 			undoAction.setEnabled(false);
 			redoAction.setEnabled(false);
 			
@@ -141,13 +189,15 @@ public class ExpressionDrawingTrainingTab extends AbstractApplicationTab{
 		public void newInputUpdate(@Nonnull Pair<MouseClickType, List<RelativePoint>> relativePoints) {
 			if((relativePoints.left()==MouseClickType.RIGHT)){
 				rectangleRepresentationView.createRectangle(relativePoints.right(),Color.RED);
+				currentSy++;
 			}
 			else{
 				List<RelativePoint> points = relativePoints.right();
 				rectangleRepresentationView.createRectangle(points);
 				
-				//TODO: would be nice to detect the string
-				perGestureView.addGesture("XY", new Gesture(points));
+				char[] symbols = conceptDescriptionField.getText().toCharArray();
+				
+				perGestureView.addGesture(Character.toString(symbols[currentSy]), new Gesture(points));
 			}
 			
 			undoAction.setEnabled(true);
@@ -157,17 +207,34 @@ public class ExpressionDrawingTrainingTab extends AbstractApplicationTab{
 
 		@Override
 		public void redoUpdate(@Nonnull Pair<MouseClickType, List<RelativePoint>> input) {
+			MouseClickType type = input.left();
+			
+			if(type==MouseClickType.RIGHT){
+				currentSy++;
+			}
+			else if(type==MouseClickType.LEFT){
+				perGestureView.redo();
+			}
+						
 			rectangleRepresentationView.redo();
-			perGestureView.redo();
 			undoAction.setEnabled(true);
 			
 			forceRepaint();
 		}
 		
 		@Override
-		public void undoUpdate() {
+		public void undoUpdate(@Nonnull Pair<MouseClickType, List<RelativePoint>> input) {
+			
+			MouseClickType type = input.left();
+			
+			if(type==MouseClickType.RIGHT){
+				currentSy--;
+			}
+			else{
+				perGestureView.undo();
+			}
+			
 			rectangleRepresentationView.undo();
-			perGestureView.undo();
 			redoAction.setEnabled(true);
 			
 			forceRepaint();
