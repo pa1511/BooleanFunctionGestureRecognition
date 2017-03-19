@@ -1,11 +1,9 @@
 package application;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.nio.file.Paths;
 
 import javax.annotation.Nonnull;
@@ -14,6 +12,7 @@ import javax.swing.UIManager;
 import application.data.datasource.ADataSource;
 import generalfactory.Factory;
 import log.Log;
+import src.utilities.PProperties;
 
 /**
  * Implementation of {@link AApplication}. <br>
@@ -65,9 +64,7 @@ public final class Application extends AApplication {
 
 	@Override
 	protected final void loadApplicationProperties() throws URISyntaxException, IOException, FileNotFoundException {
-		URL url = ClassLoader.getSystemResource("config.properties");
-		File propertyFile = new File(url.toURI());
-		properties.load(new FileInputStream(propertyFile));
+		PProperties.loadTo(properties, "config.properties");
 	}
 
 	@Override

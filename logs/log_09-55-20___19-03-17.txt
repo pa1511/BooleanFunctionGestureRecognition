@@ -1,0 +1,2 @@
+Time: 09-55-20___19-03-17 "Application setup completed successfully" Type:Plain Thread: AWT-EventQueue-0
+Time: 09-55-24___19-03-17 "Closing log" Type:Plain Thread: AWT-EventQueue-0
