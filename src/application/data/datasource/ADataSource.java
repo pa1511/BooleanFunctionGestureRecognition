@@ -1,5 +1,8 @@
 package application.data.datasource;
 
+import java.util.List;
+
+import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
 
 import application.IApplicationDataSource;
@@ -18,5 +21,8 @@ public abstract class ADataSource implements IApplicationDataSource{
 	}
 
 	public abstract void store(@Nonnull Expression expression) throws Exception;
+
+	public abstract @Nonnegative int getExpressionCount() throws Exception;
+	public abstract @Nonnull List<Expression> getExpressions() throws Exception;
 	
 }

@@ -13,7 +13,7 @@ import application.parse.syntactic.node.IBooleanExpressionNode;
  * 
  * @author paf
  */
-public class ExpressionTableModel extends AbstractTableModel{
+public class ExpressionEvaluationTableModel extends AbstractTableModel {
 
 	private final @Nonnull String[] variables;
 	private final @Nonnull VariableValueProvider variableValueProvider;
@@ -26,7 +26,7 @@ public class ExpressionTableModel extends AbstractTableModel{
 	 * @param variableValueProvider
 	 * @param expression
 	 */
-	public ExpressionTableModel(@Nonnull VariableValueProvider variableValueProvider, @Nonnull IBooleanExpressionNode expression) {
+	public ExpressionEvaluationTableModel(@Nonnull VariableValueProvider variableValueProvider, @Nonnull IBooleanExpressionNode expression) {
 		this.variableValueProvider = variableValueProvider;
 		this.expression = expression;
 		

@@ -16,7 +16,7 @@ import generalfactory.Factory;
 
 public class ApplicationFrame extends AApplicationFrame {
 	
-	private final static @Nonnegative double screenFactor = 0.45;
+	private final static @Nonnegative double screenFactor = 0.8;
 	private final AbstractApplicationTab[] tabs;
 
 	public ApplicationFrame() throws Exception{

@@ -15,7 +15,7 @@ import application.parse.VariableValueProvider;
 import application.parse.syntactic.node.IBooleanExpressionNode;
 import application.ui.AbstractApplicationTab;
 import application.ui.action.EvaluateAction;
-import application.ui.table.ExpressionTableModel;
+import application.ui.table.ExpressionEvaluationTableModel;
 
 public class ExpressionTypingTab extends AbstractApplicationTab{
 
@@ -60,7 +60,7 @@ public class ExpressionTypingTab extends AbstractApplicationTab{
 
 	private void updateExpressionUI() {
 		if(variableValueProvider!=null && expression!=null)
-			truthTable.setModel(new ExpressionTableModel(variableValueProvider, expression));
+			truthTable.setModel(new ExpressionEvaluationTableModel(variableValueProvider, expression));
 	}
 
 }

@@ -88,7 +88,7 @@ public final class Application extends AApplication {
 	}
 
 	@Override
-	public ADataSource getDataSource() throws Exception {
+	public ADataSource getDataSource() {
 		return (ADataSource) dataSource.get();
 	}
 

@@ -283,6 +283,7 @@ public class ExpressionDrawingTrainingTab extends AbstractApplicationTab{
 				JOptionPane.showMessageDialog(null, "A critical error has occured during storage attempt." + e1.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
 			}
 			
+			JOptionPane.showMessageDialog(null, "Expression successfully stored", "Info", JOptionPane.INFORMATION_MESSAGE);
 			Log.addMessage("Expression stored", Log.Type.Plain);
 		}
 		

@@ -6,6 +6,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.Nonnull;
@@ -163,19 +164,30 @@ public final class H2Database extends ADataSource{
 		return array;
 	}
 
-//	public void load() throws SQLException{
-//		String selectSQL = "SELECT * FROM " + gestureTable;
-//		
-//		try(Statement statement = dbConnection.get().createStatement()){
-//			ResultSet resultSet = statement.executeQuery(selectSQL);
-//			resultSet.next();
-//			Object[] points =  (Object[]) resultSet.getObject(5);
-//			for(Object object:points){
-//				Double d = (Double) object;
-//				System.out.println(d);
-//			}
-//		}
-//				
-//	}
+	@Override
+	public int getExpressionCount() throws SQLException {
+		Statement statement = dbConnection.getOrThrow().createStatement();
+		ResultSet resultSet = statement.executeQuery("SELECT COUNT(" + exIdColumn + ") FROM " + expressionTable);
+		if(resultSet.next())
+			return resultSet.getInt(1);
+		return 0;
+	}
+
+	@Override
+	public List<Expression> getExpressions() throws Exception {
+		
+		List<Expression> expressions = new ArrayList<>();
+		
+		Statement statement = dbConnection.getOrThrow().createStatement();
+		ResultSet resultSet = statement.executeQuery("SELECT * FROM " +  expressionTable);
+		
+		while(resultSet.next()){
+			int id = resultSet.getInt(1);
+			System.out.println(id);
+			Expression expression = new Expression(resultSet.getString(2));
+			expressions.add(expression);
+		}
+		return expressions;
+	}
 	
 }

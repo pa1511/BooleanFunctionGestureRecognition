@@ -137,6 +137,12 @@ public class Canvas extends JPanel implements AutoCloseable{
 	public void setLock(boolean lock){
 		this.lock  = lock;
 	}
+	
+	public void show(@Nonnull ArrayDeque<Pair<MouseClickType,List<RelativePoint>>> data){
+		for(Pair<MouseClickType, List<RelativePoint>> gesture:data){
+			pointGroups.add(gesture);
+		}
+	}
 
 	/**
 	 * Redoes the  last input made to the canvas. <br>

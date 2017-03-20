@@ -1,9 +1,14 @@
 package application.data.model;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.Nonnull;
+
+import application.data.model.geometry.MouseClickType;
+import application.data.model.geometry.RelativePoint;
+import dataModels.Pair;
 
 public class Expression {
 	
@@ -35,6 +40,26 @@ public class Expression {
 	
 	public String getSymbolicForm() {
 		return symbolicForm;
+	}
+	
+	@Override
+	public String toString() {
+		return symbolicForm;
+	}
+
+	//TODO: perhaps this should not be here
+	public @Nonnull ArrayDeque<Pair<MouseClickType, List<RelativePoint>>> getCanvasForm() {
+		
+		ArrayDeque<Pair<MouseClickType, List<RelativePoint>>> canvasForm = new ArrayDeque();
+		
+		for(Symbol symbol:getSymbols()){
+			for(Gesture gesture:symbol.getGestures()){
+				canvasForm.add(Pair.of(MouseClickType.LEFT,gesture.getPoints()));
+			}
+			//TODO: add separation points
+		}
+		
+		return canvasForm;
 	}
 
 }
