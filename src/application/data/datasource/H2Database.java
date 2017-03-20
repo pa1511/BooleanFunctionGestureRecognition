@@ -177,6 +177,7 @@ public final class H2Database extends ADataSource {
 					Map<String, Symbol> symbols = new HashMap<>();
 					try (Statement innerStatement = connection.createStatement()) {
 						try (ResultSet innerResultSet = innerStatement.executeQuery(
+								//TODO: this can be injected!
 								"SELECT * FROM " + gestureTable + " WHERE " + geFIdExColumn + " = " + id)) {
 							while (innerResultSet.next()) {
 								
