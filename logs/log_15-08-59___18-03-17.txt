@@ -1,7 +1,0 @@
-Time: 15-08-59___18-03-17 "Application setup completed successfully" Type:Plain Thread: AWT-EventQueue-0
-Time: 15-09-36___18-03-17 "Attemting to parse: a+b" Type:Plain Thread: AWT-EventQueue-0
-Time: 15-09-36___18-03-17 "Expression after preprocessing: A+B" Type:Plain Thread: AWT-EventQueue-0
-Time: 15-09-36___18-03-17 "Lexical analysis result: [VARIABLE(A), OR(+), VARIABLE(B)]" Type:Plain Thread: AWT-EventQueue-0
-Time: 15-09-36___18-03-17 "Syntactic analysis result: A + B" Type:Plain Thread: AWT-EventQueue-0
-Time: 15-09-36___18-03-17 "New expression successfully set. Evaluation time: 37.457626999999995 ms" Type:Plain Thread: AWT-EventQueue-0
-Time: 15-10-13___18-03-17 "Closing log" Type:Plain Thread: AWT-EventQueue-0
