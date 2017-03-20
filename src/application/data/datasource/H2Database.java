@@ -7,7 +7,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Nonnull;
 
@@ -19,85 +21,82 @@ import database.H2DatabaseSupport;
 import log.Log;
 import utilities.lazy.Lazy;
 
-public final class H2Database extends ADataSource{
+public final class H2Database extends ADataSource {
 
-	//Database driver
-    private static final String DB_DRIVER = "org.h2.Driver";
+	// Database driver
+	private static final String DB_DRIVER = "org.h2.Driver";
 
-	//Expression table
-    private static final @Nonnull String expressionTable = "EXPRESSION";
+	// Expression table
+	private static final @Nonnull String expressionTable = "EXPRESSION";
 	private static final @Nonnull String exIdColumn = "ID";
 	private static final @Nonnull String exWrittenFormColumn = "WRITTEN_FORM";
-	
-	//Gesture table
+
+	// Gesture table
 	private static final @Nonnull String gestureTable = "GESTURE";
 	private static final @Nonnull String geIdColumn = "ID";
 	private static final @Nonnull String geFIdExColumn = "ID_EX";
 	private static final @Nonnull String geSymbolColumn = "ID_SY";
 	private static final @Nonnull String geExPositionColumn = "EX_POSITION";
 	private static final @Nonnull String gePointsColumn = "POINTS";
-       
-    //Database connection
-    private final @Nonnull Lazy<Connection> dbConnection;
-    
-    public H2Database(@Nonnull String user, @Nonnull String password, @Nonnull String dbLocation) throws SQLException {
-    	super(user,password,dbLocation);
-    	
-    	String dbConnectionString = "jdbc:h2:" + dbLocation;
-    	    	
-    	dbConnection = new Lazy<>(()->{
-    		
-    			boolean didDbExistPriorToThis = H2DatabaseSupport.doesDbExist(dbLocation, user, password);
-    		
-		        Connection dbConnection = null;
-		        try {
-		            Class.forName(DB_DRIVER);
-		        } catch (ClassNotFoundException e) {
-		            Log.addError(e);
-		        }
-		        try {
-		        	Log.addMessage("Connecting to database", Log.Type.Plain);
-		            dbConnection = DriverManager.getConnection(dbConnectionString, user,
-		                    password);
-		        	Log.addMessage("Connection to database established", Log.Type.Plain);
-		            
-			        if(!didDbExistPriorToThis){
-			        	Log.addMessage("Initializing database tables", Log.Type.Plain);
-			        	initializeDBTables();
-			        }
 
-		            return dbConnection;
-		        } catch (SQLException e) {
-		        	Log.addError(e);
-		        	throw new RuntimeException(e);
-		        }
-		        
-    	});
-    	
+	// Database connection
+	private final @Nonnull Lazy<Connection> dbConnection;
+
+	public H2Database(@Nonnull String user, @Nonnull String password, @Nonnull String dbLocation) {
+		super(user, password, dbLocation);
+
+		String dbConnectionString = "jdbc:h2:" + dbLocation;
+
+		dbConnection = new Lazy<>(() -> {
+
+			boolean didDbExistPriorToThis = H2DatabaseSupport.doesDbExist(dbLocation, user, password);
+
+			Connection connection = null;
+			try {
+				Class.forName(DB_DRIVER);
+			} catch (ClassNotFoundException e) {
+				Log.addError(e);
+			}
+			try {
+				Log.addMessage("Connecting to database", Log.Type.Plain);
+				connection = DriverManager.getConnection(dbConnectionString, user, password);
+				Log.addMessage("Connection to database established", Log.Type.Plain);
+
+				if (!didDbExistPriorToThis) {
+					Log.addMessage("Initializing database tables", Log.Type.Plain);
+					initializeDBTables();
+				}
+
+				return connection;
+			} catch (SQLException e) {
+				Log.addError(e);
+				throw new RuntimeException(e);
+			}
+
+		});
+
 	}
 
 	private void initializeDBTables() throws SQLException {
-		
+
 		Connection connection = dbConnection.getOrThrow();
-				
-		connection.createStatement().execute("CREATE TABLE IF NOT EXISTS " + expressionTable + "("
-				+ exIdColumn + " " + "INT AUTO_INCREMENT PRIMARY KEY, "
-				+ exWrittenFormColumn + " " + "VARCHAR(255)"
-				+ ")");
+
+		try(Statement statement = connection.createStatement()){
 		
-		connection.createStatement().execute("CREATE TABLE IF NOT EXISTS " + gestureTable + "("
-				+ geIdColumn + " " + "INT AUTO_INCREMENT PRIMARY KEY, "
-				+ geFIdExColumn + " " + "INT, "
-				+ geSymbolColumn + " " + "CHAR, "
-				+ geExPositionColumn + " " + "INT, "
-				+ gePointsColumn + " " + "ARRAY, "
-				+ "FOREIGN KEY(" + geFIdExColumn + ") REFERENCES " + expressionTable + "(ID), "
-				+ ")");
+			statement.execute("CREATE TABLE IF NOT EXISTS " + expressionTable + "(" + exIdColumn + " "
+					+ "INT AUTO_INCREMENT PRIMARY KEY, " + exWrittenFormColumn + " " + "VARCHAR(255)" + ")");
+			
+			statement.execute("CREATE TABLE IF NOT EXISTS " + gestureTable + "(" + geIdColumn + " "
+					+ "INT AUTO_INCREMENT PRIMARY KEY, " + geFIdExColumn + " " + "INT, " + geSymbolColumn + " "
+					+ "CHAR, " + geExPositionColumn + " " + "INT, " + gePointsColumn + " " + "ARRAY, "
+					+ "FOREIGN KEY(" + geFIdExColumn + ") REFERENCES " + expressionTable + "(ID), " + ")");
+		}
+		
 	}
 
 	@Override
 	public void close() throws Exception {
-		if(dbConnection.isLoaded()){
+		if (dbConnection.isLoaded()) {
 			Connection connection = dbConnection.getOrThrow();
 			connection.commit();
 			connection.close();
@@ -106,36 +105,34 @@ public final class H2Database extends ADataSource{
 
 	@Override
 	public void store(@Nonnull Expression expression) throws Exception {
-		
+
 		Connection connection = dbConnection.getOrThrow();
-		
-		String insertExpressionSql = "INSERT INTO " + expressionTable + " ( "+exWrittenFormColumn+" ) VALUES( ? )";
+
+		String insertExpressionSql = "INSERT INTO " + expressionTable + " ( " + exWrittenFormColumn + " ) VALUES( ? )";
 		int expressionId;
 
-		try(PreparedStatement statement = connection.prepareStatement(insertExpressionSql,Statement.RETURN_GENERATED_KEYS)){
-			
+		try (PreparedStatement statement = connection.prepareStatement(insertExpressionSql,
+				Statement.RETURN_GENERATED_KEYS)) {
+
 			statement.setString(1, expression.getSymbolicForm());
 			statement.execute();
-			
-			
-			try(ResultSet generatedKeys=statement.getGeneratedKeys()){
+
+			try (ResultSet generatedKeys = statement.getGeneratedKeys()) {
 				generatedKeys.next();
 				expressionId = (int) generatedKeys.getLong(1);
 			}
-						
+
 		}
-		
-		
+
 		String insertGestureSql = "INSERT INTO " + gestureTable + " ( " + geFIdExColumn + "," + geSymbolColumn + ","
 				+ geExPositionColumn + "," + gePointsColumn + " ) VALUES( ?,?,?,? )";
 
-		
-		try(PreparedStatement statement = connection.prepareStatement(insertGestureSql)){
-			for(Symbol symbol:expression.getSymbols()){
+		try (PreparedStatement statement = connection.prepareStatement(insertGestureSql)) {
+			for (Symbol symbol : expression.getSymbols()) {
 				List<Gesture> gestures = symbol.getGestures();
-				for(int i=0,limit=gestures.size();i<limit;i++ ){
+				for (int i = 0, limit = gestures.size(); i < limit; i++) {
 					Gesture gesture = gestures.get(i);
-					
+
 					statement.setInt(1, expressionId);
 					statement.setString(2, symbol.getSymbolAsString());
 					statement.setInt(3, i);
@@ -144,50 +141,100 @@ public final class H2Database extends ADataSource{
 				}
 			}
 			statement.executeBatch();
-									
+
 		}
 
-	}
-
-	private @Nonnull Double[] asArray(Gesture gesture) {
-		
-		List<RelativePoint> points = gesture.getPoints();
-		int pointsCount = points.size();
-		Double[] array = new Double[pointsCount*2];
-		
-		for(int i=0;i<pointsCount;i++){
-			RelativePoint point = points.get(i);
-			array[2*i] = Double.valueOf(point.getX());
-			array[2*i+1] = Double.valueOf(point.getY());
-		}
-		
-		return array;
 	}
 
 	@Override
 	public int getExpressionCount() throws SQLException {
-		Statement statement = dbConnection.getOrThrow().createStatement();
-		ResultSet resultSet = statement.executeQuery("SELECT COUNT(" + exIdColumn + ") FROM " + expressionTable);
-		if(resultSet.next())
-			return resultSet.getInt(1);
+		try (Statement statement = dbConnection.getOrThrow().createStatement()) {
+			try (ResultSet resultSet = statement
+					.executeQuery("SELECT COUNT(" + exIdColumn + ") FROM " + expressionTable)) {
+				if (resultSet.next())
+					return resultSet.getInt(1);
+			}
+		}
 		return 0;
 	}
 
 	@Override
 	public List<Expression> getExpressions() throws Exception {
-		
+
 		List<Expression> expressions = new ArrayList<>();
-		
-		Statement statement = dbConnection.getOrThrow().createStatement();
-		ResultSet resultSet = statement.executeQuery("SELECT * FROM " +  expressionTable);
-		
-		while(resultSet.next()){
-			int id = resultSet.getInt(1);
-			System.out.println(id);
-			Expression expression = new Expression(resultSet.getString(2));
-			expressions.add(expression);
+
+		Connection connection = dbConnection.getOrThrow();
+
+		//TODO: use some SQL JOINS!!!
+		try (Statement statement = connection.createStatement()) {
+			try (ResultSet resultSet = statement.executeQuery("SELECT * FROM " + expressionTable)) {
+
+				while (resultSet.next()) {
+					int id = resultSet.getInt(1);
+					Expression expression = new Expression(resultSet.getString(2),id);
+					expressions.add(expression);
+
+					Map<String, Symbol> symbols = new HashMap<>();
+					try (Statement innerStatement = connection.createStatement()) {
+						try (ResultSet innerResultSet = innerStatement.executeQuery(
+								"SELECT * FROM " + gestureTable + " WHERE " + geFIdExColumn + " = " + id)) {
+							while (innerResultSet.next()) {
+								
+								int geId = innerResultSet.getInt(1);
+								String symbolAsString = innerResultSet.getString(3);
+								Object[] points = (Object[]) innerResultSet.getObject(5);
+
+								Symbol symbol = symbols.get(symbolAsString);
+								if (symbol == null) {
+									int syId = innerResultSet.getInt(4);
+									symbol = new Symbol(symbolAsString.toCharArray()[0],syId);
+									symbols.put(symbolAsString, symbol);
+								}
+
+								symbol.addGesture(getPointsAsGesture(geId,points));
+							}
+						}
+					}
+
+					for (Symbol symbol : symbols.values()) {
+						expression.addSymbol(symbol);
+					}
+
+				}
+			}
 		}
+		
 		return expressions;
 	}
+
+	//TODO: there should be a better way!
+	private @Nonnull Gesture getPointsAsGesture(int geId, @Nonnull Object[] points) {
+		List<RelativePoint> relativePoints = new ArrayList<>();
+
+		for (int i = 0; i < points.length; i += 2) {
+			Double x = (Double) points[i];
+			Double y = (Double) points[i + 1];
+			relativePoints.add(new RelativePoint(x.doubleValue(), y.doubleValue()));
+		}
+
+		return new Gesture(relativePoints,geId);
+	}
 	
+
+	private @Nonnull Double[] asArray(@Nonnull Gesture gesture) {
+
+		List<RelativePoint> points = gesture.getPoints();
+		int pointsCount = points.size();
+		Double[] array = new Double[pointsCount * 2];
+
+		for (int i = 0; i < pointsCount; i++) {
+			RelativePoint point = points.get(i);
+			array[2 * i] = Double.valueOf(point.getX());
+			array[2 * i + 1] = Double.valueOf(point.getY());
+		}
+
+		return array;
+	}
+
+
 }

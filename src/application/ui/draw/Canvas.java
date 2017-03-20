@@ -52,7 +52,7 @@ public class Canvas extends JPanel implements AutoCloseable{
 			@Override
 			public void mousePressed(MouseEvent e) {
 				
-				if(lock)
+				if(Canvas.this.lock)
 					return;
 				
 				undoneInput.clear();
@@ -72,7 +72,7 @@ public class Canvas extends JPanel implements AutoCloseable{
 
 			@Override
 			public void mouseDragged(MouseEvent e) {				
-				if(lock)
+				if(Canvas.this.lock)
 					return;
 				
 				RelativePoint point = RelativePoint.getAsRelative(e.getPoint(), getWidth(), getHeight());
@@ -82,7 +82,7 @@ public class Canvas extends JPanel implements AutoCloseable{
 
 			@Override
 			public void mouseReleased(MouseEvent e) {
-				if(lock)
+				if(Canvas.this.lock)
 					return;
 
 				RelativePoint point = RelativePoint.getAsRelative(e.getPoint(), getWidth(), getHeight());
@@ -142,6 +142,7 @@ public class Canvas extends JPanel implements AutoCloseable{
 		for(Pair<MouseClickType, List<RelativePoint>> gesture:data){
 			pointGroups.add(gesture);
 		}
+		repaint();
 	}
 
 	/**
@@ -153,7 +154,7 @@ public class Canvas extends JPanel implements AutoCloseable{
 		
 		int redoCount = undoneInput.size();
 		
-		if(redoCount>0 && !lock){
+		if(redoCount>0){
 			Pair<MouseClickType,List<RelativePoint>> input = undoneInput.pop();
 			pointGroups.push(input);
 			((CanvasObservationManager)observationManager).redo(input);
@@ -172,7 +173,7 @@ public class Canvas extends JPanel implements AutoCloseable{
 		
 		int undoCount = pointGroups.size();
 		
-		if(undoCount>0 && !lock){
+		if(undoCount>0){
 			@Nonnull Pair<MouseClickType, List<RelativePoint>> input = pointGroups.pop();
 			undoneInput.push(input);
 			((CanvasObservationManager)observationManager).undoUpdate(input);
@@ -183,9 +184,6 @@ public class Canvas extends JPanel implements AutoCloseable{
 	}
 
 	public void clear() {
-		
-		if(lock)
-			return;
 		
 		//TODO: should I support undo here
 		pointGroups.clear();

@@ -38,7 +38,7 @@ import application.ui.draw.RectangleRepresentationView;
 import dataModels.Pair;
 import log.Log;
 
-public class ExpressionDrawingTrainingTab extends AbstractApplicationTab{
+public class ExpressionDrawingTab extends AbstractApplicationTab{
 	
 	private final @Nonnull JTextField conceptDescriptionField;
 		
@@ -58,7 +58,7 @@ public class ExpressionDrawingTrainingTab extends AbstractApplicationTab{
 	private final @Nonnull ConceptFieldListener conceptFieldListener;
 	private final @Nonnull CanvasObserver canvasObserver;
 	
-	public ExpressionDrawingTrainingTab() {
+	public ExpressionDrawingTab() {
 		super("Expression drawing training");
 		
 		//set tab  layout

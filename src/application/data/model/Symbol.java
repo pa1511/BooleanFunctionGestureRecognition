@@ -3,9 +3,10 @@ package application.data.model;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 
-public class Symbol {
+public class Symbol extends AIdentifiable{
 
 	private final char symbol;
 	private final @Nonnull List<Gesture> gestures;
@@ -14,7 +15,16 @@ public class Symbol {
 		this(symbol,new ArrayList<>());
 	}
 	
+	public Symbol(char symbol,int id) {
+		this(symbol,new ArrayList<>(),id);
+	}
+	
 	public Symbol(char symbol, @Nonnull List<Gesture> gestures) {
+		this(symbol,gestures,-1);
+	}
+	
+	public Symbol(char symbol, @Nonnull List<Gesture> gestures, @CheckForNull int id) {
+		super(id);
 		this.symbol = symbol;
 		this.gestures = gestures;
 	}

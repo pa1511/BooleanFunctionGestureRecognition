@@ -34,7 +34,8 @@ public class ExpressionManagementTable extends JTable implements AutoCloseable{
 			
 			@Override
 			public void valueChanged(ListSelectionEvent e) {
-				observationManager.updateObservers(model.expressions.get().get(e.getFirstIndex()));
+				if(!e.getValueIsAdjusting())
+					observationManager.updateObservers(model.expressions.get().get(getSelectedRow()));
 			}
 		});
 

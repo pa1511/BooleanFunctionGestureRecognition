@@ -7,15 +7,20 @@ import javax.annotation.Nonnull;
 
 import application.data.model.geometry.RelativePoint;
 
-public class Gesture {
+public class Gesture extends AIdentifiable{
 
 	private final @Nonnull List<RelativePoint> points;
 
 	public Gesture() {
 		this(new ArrayList<>());
 	}
-	
+
 	public Gesture(List<RelativePoint> points) {
+		this(points,-1);
+	}
+
+	public Gesture(List<RelativePoint> points,int id) {
+		super(id);
 		this.points = points;
 	}
 

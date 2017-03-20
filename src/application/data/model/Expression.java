@@ -10,7 +10,7 @@ import application.data.model.geometry.MouseClickType;
 import application.data.model.geometry.RelativePoint;
 import dataModels.Pair;
 
-public class Expression {
+public class Expression extends AIdentifiable {
 	
 	private final @Nonnull String symbolicForm;
 	private final @Nonnull List<Symbol> symbols;
@@ -19,11 +19,20 @@ public class Expression {
 		this(symbolicForm,new ArrayList<>());
 	}
 
+	public Expression(@Nonnull String symbolicForm,int id) {
+		this(symbolicForm,new ArrayList<>(),id);
+	}
+	
 	public Expression(@Nonnull String symbolicForm, @Nonnull List<Symbol> symbols) {
+		this(symbolicForm,symbols,-1);
+	}
+
+	public Expression(@Nonnull String symbolicForm, @Nonnull List<Symbol> symbols,int id) {
+		super(id);
 		this.symbolicForm = symbolicForm;
 		this.symbols = symbols;
 	}
-
+	
 	public @Nonnull Expression addSymbol(@Nonnull Symbol symbol){
 		symbols.add(symbol);
 		return this;
@@ -50,7 +59,7 @@ public class Expression {
 	//TODO: perhaps this should not be here
 	public @Nonnull ArrayDeque<Pair<MouseClickType, List<RelativePoint>>> getCanvasForm() {
 		
-		ArrayDeque<Pair<MouseClickType, List<RelativePoint>>> canvasForm = new ArrayDeque();
+		ArrayDeque<Pair<MouseClickType, List<RelativePoint>>> canvasForm = new ArrayDeque<>();
 		
 		for(Symbol symbol:getSymbols()){
 			for(Gesture gesture:symbol.getGestures()){
