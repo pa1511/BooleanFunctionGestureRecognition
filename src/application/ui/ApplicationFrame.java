@@ -26,6 +26,7 @@ public class ApplicationFrame extends AApplicationFrame {
 		
 		//Initialize window content
 		JTabbedPane tabbedPane = new JTabbedPane();
+		tabbedPane.setTabPlacement(JTabbedPane.LEFT);
 		tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
 		tabs = loadApplicationTabs();
 		for(AbstractApplicationTab tab:tabs)

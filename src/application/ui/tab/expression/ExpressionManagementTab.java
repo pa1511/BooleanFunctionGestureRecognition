@@ -1,4 +1,4 @@
-package application.ui.tab;
+package application.ui.tab.expression;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
@@ -21,7 +21,7 @@ public class ExpressionManagementTab extends AbstractApplicationTab{
 	private final @Nonnull Canvas canvas;
 	
 	public ExpressionManagementTab() {
-		super("Expression management");
+		super("Management");
 		
 		setLayout(new BorderLayout());
 		

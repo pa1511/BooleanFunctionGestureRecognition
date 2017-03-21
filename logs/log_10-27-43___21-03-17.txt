@@ -1,0 +1,6 @@
+Time: 10-27-43___21-03-17 "Application setup completed successfully" Type:Plain Thread: AWT-EventQueue-0
+Time: 10-27-43___21-03-17 "Connecting to database" Type:Plain Thread: AWT-EventQueue-0
+Time: 10-27-43___21-03-17 "Connection to database established" Type:Plain Thread: AWT-EventQueue-0
+Time: 10-27-43___21-03-17 "Connecting to database" Type:Plain Thread: AWT-EventQueue-0
+Time: 10-27-43___21-03-17 "Connection to database established" Type:Plain Thread: AWT-EventQueue-0
+Time: 10-27-54___21-03-17 "Closing log" Type:Plain Thread: AWT-EventQueue-0

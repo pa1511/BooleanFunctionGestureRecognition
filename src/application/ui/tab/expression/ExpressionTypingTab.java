@@ -1,4 +1,4 @@
-package application.ui.tab;
+package application.ui.tab.expression;
 
 import java.awt.BorderLayout;
 
@@ -28,7 +28,7 @@ public class ExpressionTypingTab extends AbstractApplicationTab{
 	private @CheckForNull VariableValueProvider variableValueProvider;
 	
 	public ExpressionTypingTab() {
-		super("Expression typing");
+		super("Typing");
 		
 		//setting tab layout
 		setLayout(new BorderLayout());

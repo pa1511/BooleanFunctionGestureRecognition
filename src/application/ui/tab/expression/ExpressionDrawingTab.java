@@ -1,4 +1,4 @@
-package application.ui.tab;
+package application.ui.tab.expression;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -59,7 +59,7 @@ public class ExpressionDrawingTab extends AbstractApplicationTab{
 	private final @Nonnull CanvasObserver canvasObserver;
 	
 	public ExpressionDrawingTab() {
-		super("Expression drawing training");
+		super("Drawing");
 		
 		//set tab  layout
 		setLayout(new BorderLayout());
