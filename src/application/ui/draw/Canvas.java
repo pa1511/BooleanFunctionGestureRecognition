@@ -184,8 +184,6 @@ public class Canvas extends JPanel implements AutoCloseable{
 	}
 
 	public void clear() {
-		
-		//TODO: should I support undo here
 		pointGroups.clear();
 		((CanvasObservationManager)observationManager).clearUpdate();
 		repaint();

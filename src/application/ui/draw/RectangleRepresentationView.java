@@ -15,10 +15,10 @@ import dataModels.Pair;
 
 public class RectangleRepresentationView extends JPanel {
 
-	private static final @Nonnegative int X = 0;
-	private static final @Nonnegative int Y = 1;
-	private static final @Nonnegative int WIDTH = 2;
-	private static final @Nonnegative int HEIGHT = 3;
+	private static final @Nonnegative int _X_ = 0;
+	private static final @Nonnegative int _Y_ = 1;
+	private static final @Nonnegative int _WIDTH_ = 2;
+	private static final @Nonnegative int _HEIGHT_ = 3;
 	
 	private final @Nonnull ArrayDeque<Pair<Color,double[]>> rectangleDescriptions;
 	private final @Nonnull ArrayDeque<Pair<Color,double[]>> undoneDescriptions;
@@ -90,14 +90,13 @@ public class RectangleRepresentationView extends JPanel {
 
 			double[] rectangle = rectangleDescription.right();
 			
-			g.drawRect((int)(rectangle[X]*componentWidth), (int)(rectangle[Y]*componentHeight),
-					(int)(rectangle[WIDTH]*componentWidth), (int)(rectangle[HEIGHT]*componentHeight));
+			g.drawRect((int)(rectangle[_X_]*componentWidth), (int)(rectangle[_Y_]*componentHeight),
+					(int)(rectangle[_WIDTH_]*componentWidth), (int)(rectangle[_HEIGHT_]*componentHeight));
 		}
 		g.setColor(oldColor);
 	}
 
 	public void clear() {
-		//TODO: should I support undo here
 		rectangleDescriptions.clear();
 		repaint();
 	}
