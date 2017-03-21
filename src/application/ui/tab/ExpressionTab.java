@@ -28,7 +28,6 @@ public class ExpressionTab extends AbstractApplicationTab{
 		setLayout(new BorderLayout());
 		
 		JTabbedPane tabbedPane = new JTabbedPane();
-		tabbedPane.setTabPlacement(JTabbedPane.LEFT);
 		tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
 		
 		for(AbstractApplicationTab tab:tabs)
