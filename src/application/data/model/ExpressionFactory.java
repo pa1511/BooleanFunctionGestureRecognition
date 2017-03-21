@@ -26,6 +26,7 @@ public class ExpressionFactory {
 				symbol.addGesture(gesture);
 				dataPosition++;
 			}while(dataPosition<dataCount && data.get(dataPosition).left()!=MouseClickType.RIGHT);
+			dataPosition++;
 			
 			expression.addSymbol(symbol);
 		}
