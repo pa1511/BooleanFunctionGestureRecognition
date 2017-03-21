@@ -17,7 +17,7 @@ import application.ui.AbstractApplicationTab;
 import application.ui.action.EvaluateAction;
 import application.ui.table.ExpressionEvaluationTableModel;
 
-public class ExpressionTypingTab extends AbstractApplicationTab{
+public class ExpressionEvaluationTab extends AbstractApplicationTab{
 
 	@Nonnull JTextField expressionInputField;
 	private @Nonnull JButton evaluateButton;
@@ -27,8 +27,8 @@ public class ExpressionTypingTab extends AbstractApplicationTab{
 	private @CheckForNull IBooleanExpressionNode expression;
 	private @CheckForNull VariableValueProvider variableValueProvider;
 	
-	public ExpressionTypingTab() {
-		super("Typing");
+	public ExpressionEvaluationTab() {
+		super("Evaluation");
 		
 		//setting tab layout
 		setLayout(new BorderLayout());

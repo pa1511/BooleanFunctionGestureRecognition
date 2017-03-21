@@ -8,7 +8,7 @@ import javax.swing.JTabbedPane;
 import application.ui.AbstractApplicationTab;
 import application.ui.tab.expression.ExpressionDrawingTab;
 import application.ui.tab.expression.ExpressionManagementTab;
-import application.ui.tab.expression.ExpressionTypingTab;
+import application.ui.tab.expression.ExpressionEvaluationTab;
 
 public class ExpressionTab extends AbstractApplicationTab{
 
@@ -22,7 +22,7 @@ public class ExpressionTab extends AbstractApplicationTab{
 		tabs = new AbstractApplicationTab[]{
 				new ExpressionDrawingTab(),
 				new ExpressionManagementTab(),
-				new ExpressionTypingTab()
+				new ExpressionEvaluationTab()
 		};
 		
 		setLayout(new BorderLayout());
