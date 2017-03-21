@@ -18,7 +18,7 @@ public class ExpressionTab extends AbstractApplicationTab{
 	public ExpressionTab() {
 		super("Expression");
 		
-		//TODO: perhaps different loading
+		//TODO: which ones to load could be configured from a custom .properties file
 		tabs = new AbstractApplicationTab[]{
 				new ExpressionDrawingTab(),
 				new ExpressionManagementTab(),
