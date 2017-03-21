@@ -1,2 +1,4 @@
 /bin/
 /target/
+/logs/
+/test_logs/
