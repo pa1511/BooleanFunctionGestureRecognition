@@ -1,0 +1,11 @@
+Time: 08-43-22___21-03-17 "Application setup completed successfully" Type:Plain Thread: AWT-EventQueue-0
+Time: 08-43-22___21-03-17 "Connecting to database" Type:Plain Thread: AWT-EventQueue-0
+Time: 08-43-22___21-03-17 "Connection to database established" Type:Plain Thread: AWT-EventQueue-0
+Time: 08-43-29___21-03-17 "Storing expression: A" Type:Plain Thread: AWT-EventQueue-0
+Time: 08-43-30___21-03-17 "Connecting to database" Type:Plain Thread: AWT-EventQueue-0
+Time: 08-43-30___21-03-17 "Connection to database established" Type:Plain Thread: AWT-EventQueue-0
+Time: 08-43-31___21-03-17 "Expression stored" Type:Plain Thread: AWT-EventQueue-0
+Time: 08-43-34___21-03-17 "Reloaded expressions from db." Type:Plain Thread: AWT-EventQueue-0
+Time: 08-43-34___21-03-17 "Connecting to database" Type:Plain Thread: AWT-EventQueue-0
+Time: 08-43-34___21-03-17 "Connection to database established" Type:Plain Thread: AWT-EventQueue-0
+Time: 08-43-42___21-03-17 "Closing log" Type:Plain Thread: AWT-EventQueue-0

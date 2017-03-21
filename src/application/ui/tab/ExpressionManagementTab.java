@@ -1,12 +1,18 @@
 package application.ui.tab;
 
 import java.awt.BorderLayout;
+import java.awt.FlowLayout;
 
 import javax.annotation.Nonnull;
+import javax.swing.Action;
+import javax.swing.JButton;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
+import application.data.model.Expression;
 import application.ui.AbstractApplicationTab;
 import application.ui.draw.Canvas;
+import application.ui.table.AExpressionManagementObserver;
 import application.ui.table.ExpressionManagementTable;
 
 public class ExpressionManagementTab extends AbstractApplicationTab{
@@ -22,13 +28,28 @@ public class ExpressionManagementTab extends AbstractApplicationTab{
 		expressionTable = new ExpressionManagementTable();
 		canvas = new Canvas(true);		
 		
-		expressionTable.observationManager.addObserver(e->{
-			canvas.clear();
-			canvas.show(e.getCanvasForm());
+		expressionTable.observationManager.addObserver(new AExpressionManagementObserver() {
+			
+			@Override
+			public void update(Expression exp) throws Exception {
+				canvas.clear();
+				canvas.show(exp.getCanvasForm());
+			}
+			
+			@Override
+			public void expressionDelete(Expression expression) {
+				canvas.clear();
+			}
 		});
 		
 		add(new JScrollPane(expressionTable),BorderLayout.WEST);
 		add(canvas,BorderLayout.CENTER);
+		
+		JPanel commandPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+		for(Action managementAction:expressionTable.getManagementActions()){
+			commandPanel.add(new JButton(managementAction));
+		}
+		add(commandPanel,BorderLayout.SOUTH);
 	}
 	
 	@Override

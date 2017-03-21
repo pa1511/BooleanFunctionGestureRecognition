@@ -1,64 +1,130 @@
 package application.ui.table;
 
+import java.awt.event.ActionEvent;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
 import javax.annotation.Nonnegative;
+import javax.annotation.Nonnull;
+import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
-import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.AbstractTableModel;
 
 import application.Application;
 import application.data.model.Expression;
 import log.Log;
-import observer.ObservationManager;
+import observer.StrictObservationManager;
 import utilities.lazy.UnsafeLazy;
 
 public class ExpressionManagementTable extends JTable implements AutoCloseable{
 	
-	public final ObservationManager<Expression> observationManager;
-	private final Model model;
+	public final @Nonnull StrictObservationManager<Expression,AExpressionManagementObserver> observationManager;
+	private final @Nonnull Function<Expression, Consumer<AExpressionManagementObserver>> delete = exp -> o -> o.expressionDelete(exp);
+	
+	private final @Nonnull Model model;
+	private final @Nonnull ListSelectionListener selectionListener;
+	
+	private final @Nonnull Action[] standardActions;
 	
 	public ExpressionManagementTable() {
 		model = new Model();
 		setModel(model);
 		
-		observationManager = new ObservationManager<>();
+		observationManager = new StrictObservationManager<>();
 		
+		//Set row selection and create notifier about selection change
 		setRowSelectionAllowed(true);
-		ListSelectionModel selectionModel = getSelectionModel();
-		selectionModel.addListSelectionListener(new ListSelectionListener() {
-			
-			@Override
-			public void valueChanged(ListSelectionEvent e) {
-				if(!e.getValueIsAdjusting())
+		selectionModel.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		selectionListener = (e) -> 	{
+			if(!e.getValueIsAdjusting())
 					observationManager.updateObservers(model.expressions.get().get(getSelectedRow()));
-			}
-		});
+		};
+		selectionModel.addListSelectionListener(selectionListener);
+		
+		//Initialize standard management actions
+		standardActions = new Action[]{
+				new AbstractAction("Reload") {
+					
+					@Override
+					public void actionPerformed(ActionEvent arg0) {
+						model.expressions.reset();
+						Log.addMessage("Reloaded expressions from db.", Log.Type.Plain);
+						
+						revalidate();
+						repaint();
+					}
+				},
+				new AbstractAction("Delete") {
+					
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						int row = getSelectedRow();
+						List<Expression> expressions = model.expressions.get();
+						Expression expression = expressions.get(row);
+						try {
+							Application.getInstance().getDataSource().delete(expression);
+						} catch (Exception e1) {
+							Log.addError(e1);
+							JOptionPane.showMessageDialog(null, "Error while deleting expression: " + expression, "Error", JOptionPane.ERROR_MESSAGE);
+						}
+						expressions.remove(row);
+						observationManager.updateObserversAbout(delete.apply(expression));
+
+						if(expressions.size()==row){
+							if(row!=0){
+								observationManager.updateObservers(expressions.get(--row));
+								selectionModel.addSelectionInterval(row, row);
+							}
+						}
+						else{
+							observationManager.updateObservers(expressions.get(row));
+						}
+						Log.addMessage("Deleted expression: " + expression + " Id: " + expression.getId(), Log.Type.Plain);
+						
+						revalidate();
+						repaint();
+					}
+				}
+		};
 
 	}
+	
+
+	public Action[] getManagementActions() {
+		return standardActions;
+	}
+
+	@Override
+	public void close() throws Exception {
+		selectionModel.removeListSelectionListener(selectionListener);
+		observationManager.close();
+	}
+
+	//===============================================================================================================================
 
 	public static class Model extends AbstractTableModel {
 
-		private final String[] columnNames;
-		private final UnsafeLazy<List<Expression>> expressions;
+		private final @Nonnull String[] columnNames;
+		private final @Nonnull UnsafeLazy<List<Expression>> expressions;
 
 		public Model() {
 
 			columnNames = new String[] { "Row#", "Symbolic form" };
 			expressions = new UnsafeLazy<>(() -> {
-				List<Expression> expressions = Collections.emptyList();
 				try {
-					expressions = Application.getInstance().getDataSource().getExpressions();
+					return Application.getInstance().getDataSource().getExpressions();
 				} catch (Exception e) {
 					JOptionPane.showMessageDialog(null, "Error reading expressions from the database", "Error",
 							JOptionPane.ERROR_MESSAGE);
 					Log.addError(e);
 				}
-				return expressions;
+				return Collections.emptyList();
 			});
 		}
 
@@ -87,8 +153,4 @@ public class ExpressionManagementTable extends JTable implements AutoCloseable{
 
 	}
 
-	@Override
-	public void close() throws Exception {
-		observationManager.close();
-	}
 }

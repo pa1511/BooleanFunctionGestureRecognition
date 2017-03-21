@@ -47,6 +47,7 @@ public final class Application extends AApplication {
 		Log.addMessage("Application setup completed successfully", Log.Type.Plain);
 	}
 
+	@SuppressWarnings({ "resource", "hiding" })
 	@Override
 	protected void initializeApplicationDataSource() throws Exception {
 		ADataSource dataSource = Factory.getInstance(
@@ -65,7 +66,9 @@ public final class Application extends AApplication {
 	@Override
 	protected final void loadApplicationProperties() throws URISyntaxException, IOException, FileNotFoundException {
 		File propertyFile = new File(System.getProperty("user.dir"),"config.properties");
-		properties.load(new FileInputStream(propertyFile));
+		try(FileInputStream inputStream = new FileInputStream(propertyFile)){
+			properties.load(inputStream);
+		}
 		
 	}
 

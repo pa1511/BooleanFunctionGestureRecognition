@@ -26,7 +26,7 @@ public class ApplicationFrame extends AApplicationFrame {
 		
 		//Initialize window content
 		JTabbedPane tabbedPane = new JTabbedPane();
-		
+		tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
 		tabs = loadApplicationTabs();
 		for(AbstractApplicationTab tab:tabs)
 			tabbedPane.addTab(tab.getTabName(), tab);
@@ -38,6 +38,7 @@ public class ApplicationFrame extends AApplicationFrame {
 		setWindowSizeAndLocation();
 	}
 
+	@SuppressWarnings("hiding")
 	private @Nonnull AbstractApplicationTab[] loadApplicationTabs() throws Exception {
 		
 		Properties properties = Application.getInstance().getProperties();
