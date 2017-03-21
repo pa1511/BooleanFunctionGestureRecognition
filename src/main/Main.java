@@ -26,9 +26,7 @@ public class Main {
 		AApplication.setApplicationImplementationClassName(Application.class.getName());
 		
 		SwingUtilities.invokeLater(()->{
-			AApplicationFrame frame;
-			try {
-				frame = new ApplicationFrame();
+			try(AApplicationFrame frame = new ApplicationFrame()){
 				AApplication.getInstance().registerApplicationFrame(frame);
 				frame.setVisible(true);
 			} catch (Exception e) {
