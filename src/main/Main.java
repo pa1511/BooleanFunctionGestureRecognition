@@ -21,12 +21,15 @@ public class Main {
 	/**
 	 * Application entry point. <br>
 	 */
+	@SuppressWarnings("resource")
 	public static void main(@Nonnull String[] args) {
 		
 		AApplication.setApplicationImplementationClassName(Application.class.getName());
 		
 		SwingUtilities.invokeLater(()->{
-			try(AApplicationFrame frame = new ApplicationFrame()){
+			AApplicationFrame frame;
+			try {
+				frame = new ApplicationFrame();
 				AApplication.getInstance().registerApplicationFrame(frame);
 				frame.setVisible(true);
 			} catch (Exception e) {
