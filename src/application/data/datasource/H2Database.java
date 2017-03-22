@@ -14,10 +14,10 @@ import java.util.function.Supplier;
 
 import javax.annotation.Nonnull;
 
+import application.data.handling.GestureTransformer;
 import application.data.model.Expression;
 import application.data.model.Gesture;
 import application.data.model.Symbol;
-import application.data.model.geometry.RelativePoint;
 import database.H2DatabaseSupport;
 import log.Log;
 
@@ -129,7 +129,7 @@ public final class H2Database extends ADataSource {
 						statement.setInt(1, expressionId);
 						statement.setString(2, symbol.getSymbolAsString());
 						statement.setInt(3, i);
-						statement.setObject(4, asArray(gesture));
+						statement.setObject(4, GestureTransformer.gestureToArray(gesture));
 						statement.addBatch();
 					}
 				}
@@ -185,8 +185,8 @@ public final class H2Database extends ADataSource {
 										symbol = new Symbol(symbolAsString.toCharArray()[0], syId);
 										symbols.put(symbolAsString, symbol);
 									}
-
-									symbol.addGesture(getPointsAsGesture(geId, points));
+									
+									symbol.addGesture(GestureTransformer.getPointsAsGesture(geId, points));
 								}
 							}
 						}
@@ -221,36 +221,5 @@ public final class H2Database extends ADataSource {
 		}
 	}
 
-	//============================================================================================================================
-	//gesture storage support methods
-	
-	//TODO: there should be a better way!
-	private @Nonnull Gesture getPointsAsGesture(int geId, @Nonnull Object[] points) {
-		List<RelativePoint> relativePoints = new ArrayList<>();
-
-		for (int i = 0; i < points.length; i += 2) {
-			Double x = (Double) points[i];
-			Double y = (Double) points[i + 1];
-			relativePoints.add(new RelativePoint(x.doubleValue(), y.doubleValue()));
-		}
-
-		return new Gesture(relativePoints,geId);
-	}
-	
-
-	private @Nonnull Double[] asArray(@Nonnull Gesture gesture) {
-
-		List<RelativePoint> points = gesture.getPoints();
-		int pointsCount = points.size();
-		Double[] array = new Double[pointsCount * 2];
-
-		for (int i = 0; i < pointsCount; i++) {
-			RelativePoint point = points.get(i);
-			array[2 * i] = Double.valueOf(point.getX());
-			array[2 * i + 1] = Double.valueOf(point.getY());
-		}
-
-		return array;
-	}
 
 }

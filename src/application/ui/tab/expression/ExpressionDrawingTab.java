@@ -24,8 +24,8 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
 import application.Application;
+import application.data.handling.ExpressionFactory;
 import application.data.model.Expression;
-import application.data.model.ExpressionFactory;
 import application.data.model.Gesture;
 import application.data.model.geometry.MouseClickType;
 import application.data.model.geometry.RelativePoint;

@@ -1,9 +1,12 @@
-package application.data.model;
+package application.data.handling;
 
 import java.util.List;
 
 import javax.annotation.Nonnull;
 
+import application.data.model.Expression;
+import application.data.model.Gesture;
+import application.data.model.Symbol;
 import application.data.model.geometry.MouseClickType;
 import application.data.model.geometry.RelativePoint;
 import dataModels.Pair;

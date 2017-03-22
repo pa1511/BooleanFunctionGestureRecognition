@@ -9,6 +9,8 @@ public class TrainingSymbolClassificationTab extends AbstractApplicationTab{
 		
 		
 		
+		
+		
 		// TODO Auto-generated constructor stub
 	}
 
