@@ -6,12 +6,9 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.io.File;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnegative;
@@ -29,7 +26,8 @@ import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 
 import application.Application;
-import application.data.model.SymbolSamplesInformation;
+import application.data.handling.dataset.DatasetEncoder;
+import application.data.model.Symbol;
 import application.ui.AbstractApplicationTab;
 import application.ui.table.SymbolInformationTableModel;
 import log.Log;
@@ -79,8 +77,8 @@ public class TrainingSymbolClassificationTab extends AbstractApplicationTab{
 								
 				Log.addMessage("Creating output file clicked.", Log.Type.Plain);
 				
-				String fieldName = fileNameField.getText();
-				if(fieldName==null || fieldName.isEmpty()){
+				String fileName = fileNameField.getText();
+				if(fileName==null || fileName.isEmpty()){
 					Log.addMessage("No file name provided.", Log.Type.Warning);
 					JOptionPane.showMessageDialog(null, "No file name provided.", "Warning", JOptionPane.WARNING_MESSAGE);
 					return;
@@ -116,15 +114,19 @@ public class TrainingSymbolClassificationTab extends AbstractApplicationTab{
 //			     Matcher matcher = symbolsPattern.matcher(symbolsAsString);
 //			     if(matcher.find()){
 //			     }
-
-			      // Now create matcher object.
 				
-				Log.addMessage("Creating output file: " + fieldName, Log.Type.Plain);
+				File outputFile = new File(outputFolder, fileName);
+				Log.addMessage("Creating output file: " + outputFile, Log.Type.Plain);
 					
 				// TODO Auto-generated method stub
-				Map<String, Integer> getRequestedSymbolMap = parseRequest(requestedSymbolAsString);
+				Map<String, Integer> requestedSymbolMap = parseRequest(requestedSymbolAsString);
 				
+				
+				//Application.getInstance().getDataSource().getSymbols(requestedSymbolMap.keySet());
+				
+				DatasetEncoder.encodeToCVS();
 					
+				Log.addMessage("Output file created: " + outputFile, Log.Type.Plain);
 			}
 
 			private Map<String, Integer> parseRequest(String requestedSymbolAsString) {
@@ -180,8 +182,6 @@ public class TrainingSymbolClassificationTab extends AbstractApplicationTab{
 		JSplitPane mainContentHolder = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, inputFileCreationContentHolder, trainingAlgorithmSetupContentHolder);
 		SwingUtilities.invokeLater(()->mainContentHolder.setDividerLocation(0.5));
 		add(mainContentHolder,BorderLayout.CENTER);
-		
-		// TODO Auto-generated constructor stub
 	}
 
 }

@@ -1,4 +1,4 @@
-package application.data.handling;
+package application.data.handling.dataset;
 
 import java.util.List;
 
@@ -7,7 +7,6 @@ import javax.annotation.Nonnull;
 
 import application.data.model.Symbol;
 import dataset.IDataSet;
-import util.NormalizationUtils;
 
 public class DatasetCreator {
 	
