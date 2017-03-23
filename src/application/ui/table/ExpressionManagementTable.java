@@ -65,7 +65,7 @@ public class ExpressionManagementTable extends JTable implements AutoCloseable{
 					@Override
 					public void actionPerformed(ActionEvent e) {
 						int row = getSelectedRow();
-						List<Expression> expressions = model.expressions.get();
+						List<Expression> expressions = model.expressions.getOrThrow();
 						Expression expression = expressions.get(row);
 						try {
 							Application.getInstance().getDataSource().delete(expression);
@@ -140,7 +140,7 @@ public class ExpressionManagementTable extends JTable implements AutoCloseable{
 
 		@Override
 		public int getRowCount() {
-			return expressions.get().size();
+			return expressions.getOrThrow().size();
 		}
 
 		@Override
@@ -148,7 +148,7 @@ public class ExpressionManagementTable extends JTable implements AutoCloseable{
 			if (columnIndex == 0)
 				return Integer.valueOf(rowIndex + 1);
 
-			return expressions.get().get(rowIndex);
+			return expressions.getOrThrow().get(rowIndex);
 		}
 
 	}
