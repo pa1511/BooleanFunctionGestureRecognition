@@ -46,7 +46,7 @@ public class BooleanParser {
 	 * Does initial expression preparation for further analysis. <br>
 	 */
 	public static String expressionPreprocessing(String expression) {
-		return expression.toUpperCase().replaceAll("\\s", "")
+		return expression.replaceAll("\\s", "").toUpperCase()
 				.replaceAll("[0|1|A-Z|\\)](?=[A-Z|0|1|\\(|!])", "$0\\*");
 	}
 	
