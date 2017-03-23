@@ -6,8 +6,10 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.PrintStream;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import javax.annotation.CheckForNull;
@@ -25,11 +27,11 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 
-import application.Application;
-import application.data.handling.dataset.DatasetEncoder;
-import application.data.model.Symbol;
+import application.data.handling.dataset.DatasetCreator;
 import application.ui.AbstractApplicationTab;
 import application.ui.table.SymbolInformationTableModel;
+import dataset.IDataSet;
+import dataset.handeling.DataSetDepositers;
 import log.Log;
 import net.miginfocom.swing.MigLayout;
 import ui.CommonUIActions;
@@ -108,23 +110,23 @@ public class TrainingSymbolClassificationTab extends AbstractApplicationTab{
 					JOptionPane.showMessageDialog(null, "No symbols requested.", "Error", JOptionPane.ERROR_MESSAGE);
 					return;
 				}
-
-//				 TODO: match input
-//			     Pattern symbolsPattern = Pattern.compile("[[A-Z]:[0-9]+[|,]]+");
-//			     Matcher matcher = symbolsPattern.matcher(symbolsAsString);
-//			     if(matcher.find()){
-//			     }
 				
 				File outputFile = new File(outputFolder, fileName);
 				Log.addMessage("Creating output file: " + outputFile, Log.Type.Plain);
 					
-				// TODO Auto-generated method stub
 				Map<String, Integer> requestedSymbolMap = parseRequest(requestedSymbolAsString);
 				
 				
 				//Application.getInstance().getDataSource().getSymbols(requestedSymbolMap.keySet());
+				IDataSet dataSet = DatasetCreator.createSymbolClassificationDataset(requestedSymbolMap);
 				
-				DatasetEncoder.encodeToCVS();
+				try(PrintStream outputPrintstream = new PrintStream(new FileOutputStream(outputFile))){
+					DataSetDepositers.depositToCSV(dataSet, outputPrintstream);
+				} catch (FileNotFoundException e1) {
+					JOptionPane.showMessageDialog(null, "A critical error has occured.", "Error", JOptionPane.ERROR_MESSAGE);
+					Log.addError(e1);
+					return;
+				}
 					
 				Log.addMessage("Output file created: " + outputFile, Log.Type.Plain);
 			}

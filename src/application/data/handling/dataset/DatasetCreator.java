@@ -1,6 +1,7 @@
 package application.data.handling.dataset;
 
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
@@ -11,14 +12,10 @@ import dataset.IDataSet;
 public class DatasetCreator {
 	
 	private DatasetCreator() {}
-	
-	
-	public static IDataSet createSymbolClassificationDataset(@Nonnull List<Symbol> symbols, @Nonnegative int gestureRepresentationCount){
-		
-		//NormalizationUtils.normalize(data, minFence, maxFence, parallel);
-		
-		//IDataSet dataSet = new ClassificationDataSet(samples, samplesOutput, classToSampleOutput);
-		//TODO
+
+
+	public static IDataSet createSymbolClassificationDataset(Map<String, Integer> requestedSymbolMap) {
+		// TODO Auto-generated method stub
 		return null;
 	}
 	
