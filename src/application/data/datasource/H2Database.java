@@ -18,6 +18,7 @@ import application.data.handling.GestureTransformer;
 import application.data.model.Expression;
 import application.data.model.Gesture;
 import application.data.model.Symbol;
+import application.data.model.SymbolSamplesInformation;
 import database.H2DatabaseSupport;
 import log.Log;
 
@@ -219,6 +220,33 @@ public final class H2Database extends ADataSource {
 				statement.execute();
 			}
 		}
+	}
+
+	@Override
+	public @Nonnull List<SymbolSamplesInformation> getSymbolSamplesInformation() throws Exception {
+		
+		List<SymbolSamplesInformation> symbolSamplesInformations = new ArrayList<>();
+		
+		try(Connection connection = dbConnection.get()){
+			try(Statement statement = connection.createStatement()){
+				try(ResultSet resultSet = statement.executeQuery(
+						"SELECT "+ 
+						"DISTINCT " + exWrittenFormColumn + ", "+ 
+						"COUNT( "+exWrittenFormColumn+" ) " + 
+						"FROM " + expressionTable + " "+
+						"WHERE LENGTH( " + exWrittenFormColumn + " ) = 1"+ 
+						"GROUP BY " + exWrittenFormColumn)){
+					while(resultSet.next()){
+						//TODO: missing complex info
+						SymbolSamplesInformation symbolInfo = 
+								new SymbolSamplesInformation(resultSet.getString(1), Integer.valueOf(resultSet.getInt(2)), Integer.valueOf(0));
+						symbolSamplesInformations.add(symbolInfo);
+					}
+				}
+			}
+		}
+		
+		return symbolSamplesInformations;
 	}
 
 
