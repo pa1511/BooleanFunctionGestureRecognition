@@ -77,7 +77,7 @@ public class ExpressionDrawingTab extends AbstractApplicationTab{
 		add(conceptDescriptionHolderPanel,BorderLayout.NORTH);
 		
 		//Drawing canvas
-		canvas = new Canvas();
+		canvas = new Canvas(true);
 		conceptFieldListener = new ConceptFieldListener();
 		conceptDescriptionField.getDocument().addDocumentListener(conceptFieldListener);
 		rectangleRepresentationView = new RectangleRepresentationView();
