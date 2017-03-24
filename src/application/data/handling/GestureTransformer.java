@@ -27,7 +27,7 @@ public class GestureTransformer {
 		return new Gesture(relativePoints,geId);
 	}
 
-	public static @Nonnull double[] gestureToPrimitiveArray(@Nonnull Gesture gesture) {
+	public static @Nonnull double[] getRawGestureRepresentation(@Nonnull Gesture gesture) {
 
 		List<RelativePoint> points = gesture.getPoints();
 		int pointsCount = points.size();

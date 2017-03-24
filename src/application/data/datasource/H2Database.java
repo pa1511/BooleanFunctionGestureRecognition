@@ -260,11 +260,14 @@ public final class H2Database extends ADataSource {
 			try(PreparedStatement statement = connection.prepareStatement(
 				"SELECT * FROM " + gestureTable +" " + 
 				"WHERE " + geSymbolColumn + " = ? " +
-				"ORDER BY " + geFIdExColumn + ", " + geExPositionColumn + " " +
-				"LIMIT ?")){
+				"ORDER BY " + geFIdExColumn + ", " + geExPositionColumn //+ " " +
+				//"LIMIT ?"
+				//TODO: can't limit like this because I am not limiting to n gestures but symbols samples !!!
+				
+				)){
 				
 				statement.setString(1, symbolAsString);
-				statement.setInt(2, limit.intValue());
+//				statement.setInt(2, limit.intValue());
 				try(ResultSet resultSet = statement.executeQuery()){
 					Symbol current = null;
 					while(resultSet.next()){
@@ -276,6 +279,9 @@ public final class H2Database extends ADataSource {
 						if(exPosition == 0 || current==null){
 							if(current!=null){
 								symbols.add(current);
+								//TODO: hack limit fix
+								if(symbols.size()==limit.intValue())
+									break;
 							}
 							
 							//TODO: symbol id is not unique
