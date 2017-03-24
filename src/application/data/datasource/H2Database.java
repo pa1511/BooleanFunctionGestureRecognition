@@ -183,6 +183,7 @@ public final class H2Database extends ADataSource {
 									Symbol symbol = symbols.get(symbolAsString);
 									if (symbol == null) {
 										int syId = innerResultSet.getInt(4);
+										//TODO: symbol id is not unique
 										symbol = new Symbol(symbolAsString.toCharArray()[0], syId);
 										symbols.put(symbolAsString, symbol);
 									}
@@ -247,6 +248,48 @@ public final class H2Database extends ADataSource {
 		}
 		
 		return symbolSamplesInformations;
+	}
+
+	@Override
+	public @Nonnull List<Symbol> getSymbols(@Nonnull String symbolAsString, @Nonnull Integer limit) throws Exception {
+		
+		List<Symbol> symbols = new ArrayList<>();
+		char symbolAsChar = symbolAsString.charAt(0);
+		
+		try(Connection connection = dbConnection.get()){
+			try(PreparedStatement statement = connection.prepareStatement(
+				"SELECT * FROM " + gestureTable +" " + 
+				"WHERE " + geSymbolColumn + " = ? " +
+				"ORDER BY " + geFIdExColumn + ", " + geExPositionColumn + " " +
+				"LIMIT ?")){
+				
+				statement.setString(1, symbolAsString);
+				statement.setInt(2, limit.intValue());
+				try(ResultSet resultSet = statement.executeQuery()){
+					Symbol current = null;
+					while(resultSet.next()){
+						int geId = resultSet.getInt(1);
+						int exPosition = resultSet.getInt(4);
+						Object[] points = (Object[]) resultSet.getObject(5);
+						
+						
+						if(exPosition == 0 || current==null){
+							if(current!=null){
+								symbols.add(current);
+							}
+							
+							//TODO: symbol id is not unique
+							current  = new Symbol(symbolAsChar, exPosition);
+						}
+						Gesture gesture = GestureTransformer.getPointsAsGesture(geId, points);
+						current.addGesture(gesture);
+												
+					}
+				}
+			}
+		}
+		
+		return symbols;
 	}
 
 
