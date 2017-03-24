@@ -20,7 +20,7 @@ public class DatasetCreator {
 
 
 	@SuppressWarnings("resource")
-	public static @Nonnull IDataSet createSymbolClassificationDataset(Map<String, Integer> requestedSymbolMap) throws Exception {
+	public static @Nonnull IDataSet createSymbolClassificationDataset(@Nonnull Map<String, Integer> requestedSymbolMap) throws Exception {
 		
 		
 		ADataSource dataSource = Application.getInstance().getDataSource();
