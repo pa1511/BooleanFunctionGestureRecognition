@@ -120,9 +120,9 @@ public class ExpressionManagementTable extends JTable implements AutoCloseable{
 				try {
 					return Application.getInstance().getDataSource().getExpressions();
 				} catch (Exception e) {
+					Log.addError(e);
 					JOptionPane.showMessageDialog(null, "Error reading expressions from the database", "Error",
 							JOptionPane.ERROR_MESSAGE);
-					Log.addError(e);
 				}
 				return Collections.emptyList();
 			});
