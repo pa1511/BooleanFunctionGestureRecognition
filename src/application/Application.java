@@ -10,7 +10,7 @@ import java.nio.file.Paths;
 import javax.annotation.Nonnull;
 import javax.swing.UIManager;
 
-import application.data.datasource.ADataSource;
+import application.data.datasource.IDataSource;
 import generalfactory.Factory;
 import log.Log;
 
@@ -47,7 +47,7 @@ public final class Application extends AApplication {
 	@SuppressWarnings({ "resource", "hiding" })
 	@Override
 	protected void initializeApplicationDataSource() throws Exception {
-		ADataSource dataSource = Factory.getInstance(
+		IDataSource dataSource = Factory.getInstance(
 				properties.getProperty(DATA_SOURCE_IMPL_KEY),
 				properties.getProperty(DATA_SOURCE_IMPL_PATH_KEY),
 				new Class<?>[]{ properties.getClass()},
@@ -91,8 +91,8 @@ public final class Application extends AApplication {
 	}
 
 	@Override
-	public ADataSource getDataSource() {
-		return (ADataSource) dataSource.get();
+	public IDataSource getDataSource() {
+		return (IDataSource) dataSource.get();
 	}
 
 	

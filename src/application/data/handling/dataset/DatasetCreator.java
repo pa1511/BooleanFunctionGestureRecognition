@@ -7,7 +7,7 @@ import java.util.Map;
 import javax.annotation.Nonnull;
 
 import application.Application;
-import application.data.datasource.ADataSource;
+import application.data.datasource.IDataSource;
 import application.data.handling.SymbolTransformer;
 import application.data.model.Symbol;
 import dataset.ClassificationDataSet;
@@ -23,7 +23,7 @@ public class DatasetCreator {
 	public static @Nonnull IDataSet createSymbolClassificationDataset(@Nonnull Map<String, Integer> requestedSymbolMap, int pointCount) throws Exception {
 		
 		
-		ADataSource dataSource = Application.getInstance().getDataSource();
+		IDataSource dataSource = Application.getInstance().getDataSource();
 		
 		int totalSampleCount = requestedSymbolMap.values().stream().mapToInt(Integer::intValue).sum();
 		int differentSymbolCount = requestedSymbolMap.keySet().size();

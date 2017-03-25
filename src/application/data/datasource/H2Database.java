@@ -23,7 +23,7 @@ import application.data.model.SymbolSamplesInformation;
 import database.H2DatabaseSupport;
 import log.Log;
 
-public final class H2Database extends ADataSource {
+public final class H2Database implements IDataSource {
 
 	private static final @Nonnull String DATA_SOURCE_USER_KEY = "data.source.user";
 	private static final @Nonnull String DATA_SOURCE_PASSWORD_KEY = "data.source.password";
