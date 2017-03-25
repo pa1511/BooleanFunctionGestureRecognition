@@ -56,7 +56,7 @@ public class SymbolClassificationDatasetCreationPanel extends AbstractApplicatio
 		JButton selectOutputFolderButton = new JButton(new SelectDirectoryAction());
 		JLabel outputLabel = new JLabel("output folder: " );		
 		String outputFolderLocation = 
-				Application.getInstance().getProperties().getProperty(SymbolClassificationIn.TRAINING_OUTPUT_KEY);
+				Application.getInstance().getProperties().getProperty(SymbolClassificationIn.TRAINING_DATA_OUTPUT_KEY);
 		outputFolder = new File(outputFolderLocation);
 		outputFolderField = new JTextField(outputFolder.getAbsolutePath());
 		

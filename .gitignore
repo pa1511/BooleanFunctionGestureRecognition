@@ -2,4 +2,5 @@
 /target/
 /logs/
 /test_logs/
-/training/symbol/output
+/training/symbol/data/output
+/training/symbol/model/output
