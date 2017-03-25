@@ -37,6 +37,7 @@ public final class Application extends AApplication {
 	public static final @Nonnull String UI_TAB_PATH_KEY = "tab.path";
 	public static final @Nonnull String UI_TAB_NAMES_KEY = "tab.names";
 
+	public static final @Nonnull String EXTERNAL_KEY = "external.configuration";
 	
 	public static final @Nonnull String DATA_SOURCE_USER_KEY = "data.source.user";
 	public static final @Nonnull String DATA_SOURCE_PASSWORD_KEY = "data.source.password";
@@ -68,11 +69,18 @@ public final class Application extends AApplication {
 
 	@Override
 	protected final void loadApplicationProperties() throws URISyntaxException, IOException, FileNotFoundException {
-		File propertyFile = new File(System.getProperty("user.dir"),"config.properties");
+		String propertyFilesLocation = System.getProperty("user.dir") + File.separator + "properties";
+		File propertyFile = new File(propertyFilesLocation,"config.properties");
 		try(FileInputStream inputStream = new FileInputStream(propertyFile)){
 			properties.load(inputStream);
 		}
 		
+		String[] externalPropertiesFiles = properties.getProperty(EXTERNAL_KEY).split(";");
+		for(String file:externalPropertiesFiles){
+			try(FileInputStream inputStream = new FileInputStream(new File(propertyFilesLocation, file))){
+				properties.load(inputStream);
+			}
+		}
 	}
 
 	@Override
