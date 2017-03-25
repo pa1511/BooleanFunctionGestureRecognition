@@ -20,12 +20,10 @@ public class DatasetCreator {
 
 
 	@SuppressWarnings("resource")
-	public static @Nonnull IDataSet createSymbolClassificationDataset(@Nonnull Map<String, Integer> requestedSymbolMap) throws Exception {
+	public static @Nonnull IDataSet createSymbolClassificationDataset(@Nonnull Map<String, Integer> requestedSymbolMap, int pointCount) throws Exception {
 		
 		
 		ADataSource dataSource = Application.getInstance().getDataSource();
-		//TODO: should be user provided
-		int pointCount = 50;
 		
 		int totalSampleCount = requestedSymbolMap.values().stream().mapToInt(Integer::intValue).sum();
 		int differentSymbolCount = requestedSymbolMap.keySet().size();

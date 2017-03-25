@@ -93,7 +93,10 @@ public class SymbolTransformer {
 				int pointsToSelect = Math.round(rawGesture.length*rawForm.length/(float)totalSymbolLength);
 				
 				for(float i=0; i<rawGesture.length && destPos<rawForm.length; i+=((float)rawGesture.length/pointsToSelect)){
-					rawForm[destPos] = rawGesture[Math.round(i)];
+					int rounded = Math.round(i);
+					if(rounded>=rawGesture.length)
+						rounded = rawGesture.length-1;
+					rawForm[destPos] = rawGesture[rounded];
 					destPos++;
 				}
 			}
