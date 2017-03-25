@@ -34,6 +34,7 @@ import ui.CommonUIActions;
 
 public class SymbolClassificationDatasetCreationPanel extends AbstractApplicationTab{
 	
+	private static final @Nonnull String SYMBOL_CLASSIFICATION_TRAINING_OUTPUT_KEY = "classification.symbol.training.output.path";
 	private static final @Nonnegative int numberOfRowsToShow = 8;
 		
 	private final @Nonnull JTextField symbolsField;
@@ -56,7 +57,7 @@ public class SymbolClassificationDatasetCreationPanel extends AbstractApplicatio
 		JButton selectOutputFolderButton = new JButton(new SelectDirectoryAction());
 		JLabel outputLabel = new JLabel("output folder: " );		
 		String outputFolderLocation = 
-				Application.getInstance().getProperties().getProperty(Application.SYMBOL_CLASSIFICATION_TRAINING_OUTPUT_KEY);
+				Application.getInstance().getProperties().getProperty(SYMBOL_CLASSIFICATION_TRAINING_OUTPUT_KEY);
 		outputFolder = new File(outputFolderLocation);
 		outputFolderField = new JTextField(outputFolder.getAbsolutePath());
 		

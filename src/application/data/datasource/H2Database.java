@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.function.Supplier;
 
 import javax.annotation.Nonnull;
@@ -23,6 +24,11 @@ import database.H2DatabaseSupport;
 import log.Log;
 
 public final class H2Database extends ADataSource {
+
+	private static final @Nonnull String DATA_SOURCE_USER_KEY = "data.source.user";
+	private static final @Nonnull String DATA_SOURCE_PASSWORD_KEY = "data.source.password";
+	private static final @Nonnull String DATA_SOURCE_LOCATION_KEY = "data.source.location";
+	private static final @Nonnull String DATA_SOURCE_NAME_KEY = "data.source.name";
 
 	// Database driver
 	private static final String DB_DRIVER = "org.h2.Driver";
@@ -42,11 +48,14 @@ public final class H2Database extends ADataSource {
 
 	// Database connection
 	private final @Nonnull Supplier<Connection> dbConnection;
-
-	public H2Database(@Nonnull String user, @Nonnull String password, @Nonnull String dbLocation) {
-		super(user, password, dbLocation);
-
-		String dbConnectionString = "jdbc:h2:" + dbLocation;
+		
+	public H2Database(Properties properties) {
+		
+		String user = properties.getProperty(DATA_SOURCE_USER_KEY);
+		String password = properties.getProperty(DATA_SOURCE_PASSWORD_KEY);
+		String dbLocation = properties.getProperty(DATA_SOURCE_LOCATION_KEY) + properties.getProperty(DATA_SOURCE_NAME_KEY);
+		
+		final String dbConnectionString = "jdbc:h2:" + dbLocation;
 
 		dbConnection = () -> {
 
