@@ -16,14 +16,15 @@ import javax.swing.AbstractAction;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
-import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
 
+import application.Application;
 import application.data.handling.dataset.DatasetCreator;
+import application.ui.AbstractApplicationTab;
 import application.ui.table.SymbolInformationTableModel;
 import dataset.IDataSet;
 import dataset.handeling.DataSetDepositers;
@@ -31,7 +32,7 @@ import log.Log;
 import net.miginfocom.swing.MigLayout;
 import ui.CommonUIActions;
 
-public class SymbolClassificationDatasetCreationPanel extends JPanel{
+public class SymbolClassificationDatasetCreationPanel extends AbstractApplicationTab{
 	
 	private static final @Nonnegative int numberOfRowsToShow = 8;
 		
@@ -44,15 +45,22 @@ public class SymbolClassificationDatasetCreationPanel extends JPanel{
 	private @CheckForNull File outputFolder = null;
 
 	
-	public SymbolClassificationDatasetCreationPanel() {
+	public SymbolClassificationDatasetCreationPanel(String tabName) {
 
+		super(tabName);
+		
 		symbolsField = new JTextField();
 		JLabel instructionLabel = new JLabel("<html>Input the symbols you whish the system to use like this: \"A:10,B:20\".</br> The meaning is use the symbol and this amount of learning examples.</html>");
 		Font instructionFont = instructionLabel.getFont().deriveFont(Font.ITALIC);
 		instructionLabel.setFont(instructionFont);
 		JButton selectOutputFolderButton = new JButton(new SelectDirectoryAction());
-		JLabel outputLabel = new JLabel("output folder: " );
-		outputFolderField = new JTextField();
+		JLabel outputLabel = new JLabel("output folder: " );		
+		String outputFolderLocation = 
+				Application.getInstance().getProperties().getProperty(Application.SYMBOL_CLASSIFICATION_TRAINING_OUTPUT_KEY);
+		outputFolder = new File(outputFolderLocation);
+		outputFolderField = new JTextField(outputFolder.getAbsolutePath());
+		
+		//
 		fileNameField = new JTextField("output.csv");
 		JButton createOutputFileButton = new JButton(new CreateOutputFileAction());
 		precisionField = new JSpinner(new SpinnerNumberModel(50, 10, 200, 1));

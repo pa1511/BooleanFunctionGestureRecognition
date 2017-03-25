@@ -33,15 +33,18 @@ public final class Application extends AApplication {
 	
 	public static final @Nonnull String DATA_SOURCE_IMPL_KEY = "data.source.impl";
 	public static final @Nonnull String DATA_SOURCE_IMPL_PATH_KEY = "data.source.impl.path";
+		
+	public static final @Nonnull String UI_TAB_PATH_KEY = "tab.path";
+	public static final @Nonnull String UI_TAB_NAMES_KEY = "tab.names";
+
 	
 	public static final @Nonnull String DATA_SOURCE_USER_KEY = "data.source.user";
 	public static final @Nonnull String DATA_SOURCE_PASSWORD_KEY = "data.source.password";
 	public static final @Nonnull String DATA_SOURCE_LOCATION_KEY = "data.source.location";
 	public static final @Nonnull String DATA_SOURCE_NAME_KEY = "data.source.name";
-		
-	public static final @Nonnull String UI_TAB_PATH_KEY = "tab.path";
-	public static final @Nonnull String UI_TAB_NAMES_KEY = "tab.names";
 
+	public static final @Nonnull String SYMBOL_CLASSIFICATION_TRAINING_OUTPUT_KEY = "classification.symbol.training.output.path";
+	
 	public Application() throws Exception {
 		super();
 		Log.addMessage("Application setup completed successfully", Log.Type.Plain);
