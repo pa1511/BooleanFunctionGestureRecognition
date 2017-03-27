@@ -1,7 +1,6 @@
 package application.neural;
 
 import java.io.File;
-import java.io.IOException;
 
 import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
@@ -10,6 +9,7 @@ import org.datavec.api.records.reader.RecordReader;
 import org.datavec.api.records.reader.impl.csv.CSVRecordReader;
 import org.datavec.api.split.FileSplit;
 import org.deeplearning4j.datasets.datavec.RecordReaderDataSetIterator;
+import org.deeplearning4j.eval.Evaluation;
 import org.deeplearning4j.nn.api.OptimizationAlgorithm;
 import org.deeplearning4j.nn.conf.MultiLayerConfiguration;
 import org.deeplearning4j.nn.conf.NeuralNetConfiguration;
@@ -32,16 +32,24 @@ public class SymbolClassificationModelCreator {
 	    //TODO:  network creation
 	    MultiLayerConfiguration conf = new NeuralNetConfiguration.Builder()
 	            .seed(seed)
-	            .iterations(100)
-	            .optimizationAlgo(OptimizationAlgorithm.STOCHASTIC_GRADIENT_DESCENT)
+	            .iterations(50)
+	            .optimizationAlgo(OptimizationAlgorithm.LINE_GRADIENT_DESCENT)
 	            .learningRate(learningRate)
-	            .updater(Updater.NESTEROVS).momentum(0.9)
+	            .updater(Updater.NESTEROVS).momentum(0.95)
 	            .list()
 	            .layer(0, new DenseLayer.Builder().nIn(numInputs).nOut(numHiddenNodes)
 	                    .weightInit(WeightInit.XAVIER)
-	                    .activation(Activation.RELU)
+	                    .activation(Activation.SOFTMAX)
 	                    .build())
-	            .layer(1, new OutputLayer.Builder(LossFunction.NEGATIVELOGLIKELIHOOD)
+	            .layer(1, new DenseLayer.Builder().nIn(numHiddenNodes).nOut(numHiddenNodes)
+	                    .weightInit(WeightInit.XAVIER)
+	                    .activation(Activation.SOFTMAX)
+	                    .build())
+	            .layer(2, new DenseLayer.Builder().nIn(numHiddenNodes).nOut(numHiddenNodes)
+	                    .weightInit(WeightInit.XAVIER)
+	                    .activation(Activation.SOFTMAX)
+	                    .build())
+	            .layer(3, new OutputLayer.Builder(LossFunction.SQUARED_LOSS)
 	                    .weightInit(WeightInit.XAVIER)
 	                    .activation(Activation.SOFTMAX)
 	                    .nIn(numHiddenNodes).nOut(numOutputs).build())
@@ -50,7 +58,8 @@ public class SymbolClassificationModelCreator {
 
 	    MultiLayerNetwork model = new MultiLayerNetwork(conf);
 	    model.init();
-	    model.setListeners(new ScoreIterationListener(10));    //Print score every 10 parameter updates
+	    model.setListeners(new ScoreIterationListener(200));    
+	    //Print score every 20 parameter updates
 
 	    
 		//Load the training data:
@@ -63,27 +72,6 @@ public class SymbolClassificationModelCreator {
 	    for ( int n = 0; n < nEpochs; n++) {
 	        model.fit( trainIter );
 	    }
-
-
-	    //TODO
-//	    System.out.println("Evaluate model....");
-//
-//	    DataSetIterator testIter = new RecordReaderDataSetIterator(rr,batchSize,0,2);
-//	    Evaluation eval = new Evaluation(numOutputs);
-//	    while(testIter.hasNext()){
-//	        DataSet t = testIter.next();
-//	        INDArray features = t.getFeatureMatrix();
-//	        INDArray lables = t.getLabels();
-//	        INDArray predicted = model.output(features,false);
-//
-//	        eval.eval(lables, predicted);
-//
-//	    }
-//
-//
-//	    System.out.println(eval.stats());
-	    //------------------------------------------------------------------------------------
-	    //Training is complete. Code that follows is for plotting the data & predictions only
 	    
 		return model;
 	}

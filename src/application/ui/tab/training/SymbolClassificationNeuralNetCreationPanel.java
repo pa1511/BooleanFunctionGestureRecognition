@@ -76,17 +76,16 @@ public class SymbolClassificationNeuralNetCreationPanel extends AbstractApplicat
 		    String filenameTrain = inputFile.getAbsolutePath();
 
 		    //Number of epochs (full passes of the data)
-		    int nEpochs = 500;
+		    int nEpochs = 1000;
 
 		    int numInputs = 50;
+		    int numHiddenNodes = 50;
 		    int numOutputs = 2;
-		    int numHiddenNodes = 500;
 		    
-		    double learningRate = 0.005;
-		    int batchSize = 1;
+		    double learningRate = 0.02;
+		    int batchSize = 5;
 
 		    //TODO: dl4j direct references could be masked into a interface
-			System.out.println("new try");
 		    Nd4j.ENFORCE_NUMERICAL_STABILITY = true;
 		    int seed = RNGProvider.getRandom().nextInt(1000);
 		    
@@ -105,7 +104,10 @@ public class SymbolClassificationNeuralNetCreationPanel extends AbstractApplicat
 			} catch (IOException e) {
 				Log.addError(e);
 				JOptionPane.showMessageDialog(null, "An error occured during model storage.", "Error", JOptionPane.ERROR_MESSAGE);
+				return;
 			}
+		    
+		    JOptionPane.showMessageDialog(null, "Model successfully created.", "Info", JOptionPane.INFORMATION_MESSAGE);
 		}
 
 	}
@@ -130,6 +132,7 @@ public class SymbolClassificationNeuralNetCreationPanel extends AbstractApplicat
 		@Override
 		public void doWithSelectedDirectory(File selectedDirectory) {
 			modelOutputFolder = selectedDirectory;
+			outputFolderField.setText(selectedDirectory.getAbsolutePath());
 		}
 	}
 
