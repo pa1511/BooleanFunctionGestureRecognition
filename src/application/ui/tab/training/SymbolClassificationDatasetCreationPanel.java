@@ -22,9 +22,9 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
 
+import application.AbstractApplicationTab;
 import application.Application;
 import application.data.handling.dataset.DatasetCreator;
-import application.ui.AbstractApplicationTab;
 import application.ui.table.SymbolInformationTableModel;
 import dataset.IDataSet;
 import dataset.handeling.DataSetDepositers;

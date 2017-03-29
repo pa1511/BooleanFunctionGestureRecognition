@@ -9,8 +9,8 @@ import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
+import application.AbstractApplicationTab;
 import application.data.model.Expression;
-import application.ui.AbstractApplicationTab;
 import application.ui.draw.Canvas;
 import application.ui.table.AExpressionManagementObserver;
 import application.ui.table.ExpressionManagementTable;

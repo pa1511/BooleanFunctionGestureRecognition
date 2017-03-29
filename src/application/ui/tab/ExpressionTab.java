@@ -5,7 +5,7 @@ import java.awt.BorderLayout;
 import javax.annotation.Nonnull;
 import javax.swing.JTabbedPane;
 
-import application.ui.AbstractApplicationTab;
+import application.AbstractApplicationTab;
 import application.ui.tab.expression.ExpressionDrawingTab;
 import application.ui.tab.expression.ExpressionManagementTab;
 import application.ui.tab.expression.ExpressionEvaluationTab;

@@ -33,7 +33,7 @@ public class SymbolClassificationModelCreator {
 	    MultiLayerConfiguration conf = new NeuralNetConfiguration.Builder()
 	            .seed(seed)
 	            .iterations(50)
-	            .optimizationAlgo(OptimizationAlgorithm.LINE_GRADIENT_DESCENT)
+	            .optimizationAlgo(OptimizationAlgorithm.STOCHASTIC_GRADIENT_DESCENT)
 	            .learningRate(learningRate)
 	            .updater(Updater.NESTEROVS).momentum(0.95)
 	            .list()
@@ -58,7 +58,7 @@ public class SymbolClassificationModelCreator {
 
 	    MultiLayerNetwork model = new MultiLayerNetwork(conf);
 	    model.init();
-	    model.setListeners(new ScoreIterationListener(200));    
+	    model.setListeners(new ScoreIterationListener(1000));    
 	    //Print score every 20 parameter updates
 
 	    

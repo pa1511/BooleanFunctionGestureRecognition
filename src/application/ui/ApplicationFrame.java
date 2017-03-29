@@ -11,6 +11,7 @@ import javax.swing.JTabbedPane;
 import javax.swing.WindowConstants;
 
 import application.AApplicationFrame;
+import application.AbstractApplicationTab;
 import application.Application;
 import generalfactory.Factory;
 

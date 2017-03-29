@@ -3,6 +3,8 @@ package application.ui.tab.training;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.util.Properties;
 
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
@@ -16,8 +18,9 @@ import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
 import org.deeplearning4j.util.ModelSerializer;
 import org.nd4j.linalg.factory.Nd4j;
 
+import application.AbstractApplicationTab;
+import application.Application;
 import application.neural.SymbolClassificationModelCreator;
-import application.ui.AbstractApplicationTab;
 import log.Log;
 import net.miginfocom.swing.MigLayout;
 import ui.CommonUIActions;
@@ -36,11 +39,19 @@ public class SymbolClassificationNeuralNetCreationPanel extends AbstractApplicat
  		
 		super(tabName);
 		
-		JButton inputFileSelectionButton = new JButton(new SelectInputFileAction("Select"));
-		inputFileField = new JTextField();
+		Properties properties = Application.getInstance().getProperties();
 		
+		
+		String inputFileLocation = properties.getProperty(SymbolClassificationIn.TRAINING_DATA_OUTPUT_KEY);
+		JButton inputFileSelectionButton = new JButton(new SelectInputFileAction("Select"));
+		//TODO: hardcoded file name
+		inputFile = (inputFileLocation==null || inputFileLocation.isEmpty()) ? null : new File(inputFileLocation+File.separator+"output.csv");
+		inputFileField = new JTextField(inputFile.getAbsolutePath());
+		
+		String outputFolderLocation = properties.getProperty(SymbolClassificationIn.TRAINING_MODEl_OUTPUT_KEY);
 		JButton outputFileSelectionButton = new JButton(new SelectOutputDirectoryAction("Select"));
-		outputFolderField = new JTextField();
+		modelOutputFolder = (outputFolderLocation==null || outputFolderLocation.isEmpty())?null:new File(outputFolderLocation);
+		outputFolderField = new JTextField(modelOutputFolder.getAbsolutePath());
 
 		JButton trainNetworkButton = new JButton(new TrainAction("Train"));
 
@@ -79,14 +90,14 @@ public class SymbolClassificationNeuralNetCreationPanel extends AbstractApplicat
 		    int nEpochs = 1000;
 
 		    int numInputs = 50;
-		    int numHiddenNodes = 50;
+		    int numHiddenNodes = 10;
 		    int numOutputs = 2;
 		    
 		    double learningRate = 0.02;
 		    int batchSize = 5;
 
 		    //TODO: dl4j direct references could be masked into a interface
-		    Nd4j.ENFORCE_NUMERICAL_STABILITY = true;
+		    Nd4j.ENFORCE_NUMERICAL_STABILITY = false;
 		    int seed = RNGProvider.getRandom().nextInt(1000);
 		    
 		    MultiLayerNetwork model;

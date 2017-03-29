@@ -11,9 +11,9 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 
+import application.AbstractApplicationTab;
 import application.parse.VariableValueProvider;
 import application.parse.syntactic.node.IBooleanExpressionNode;
-import application.ui.AbstractApplicationTab;
 import application.ui.action.EvaluateAction;
 import application.ui.table.ExpressionEvaluationTableModel;
 

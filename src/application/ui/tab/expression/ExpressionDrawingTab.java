@@ -23,6 +23,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
+import application.AbstractApplicationTab;
 import application.Application;
 import application.data.handling.ExpressionFactory;
 import application.data.model.Expression;
@@ -30,7 +31,6 @@ import application.data.model.Gesture;
 import application.data.model.geometry.MouseClickType;
 import application.data.model.geometry.RelativePoint;
 import application.parse.BooleanParser;
-import application.ui.AbstractApplicationTab;
 import application.ui.draw.Canvas;
 import application.ui.draw.PerGestureView;
 import application.ui.draw.ACanvasObserver;
