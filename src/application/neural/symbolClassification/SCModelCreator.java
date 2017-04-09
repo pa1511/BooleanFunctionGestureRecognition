@@ -35,6 +35,7 @@ public class SCModelCreator {
 			@Nonnegative int nEpochs, 
 			@Nonnegative int iterationCount,
 			@Nonnegative int numInputs,@Nonnegative int numOutputs,@Nonnegative int[] hiddenNodes, 
+			@Nonnegative double scoreLimit,
 			@Nonnegative double learningRate, @Nonnegative int batchSize,
 			@Nonnull IntConsumer progressReporter) throws Exception{
 		
@@ -73,6 +74,9 @@ public class SCModelCreator {
 	    
 	    for ( int n = 0; n < nEpochs; n++) {
 	        model.fit(trainIter);
+	        if(model.gradientAndScore().getSecond().doubleValue()<scoreLimit){
+	        	break;
+	        }
 	        progressReporter.accept(100*n/nEpochs);
 	    }
 	    progressReporter.accept(100);

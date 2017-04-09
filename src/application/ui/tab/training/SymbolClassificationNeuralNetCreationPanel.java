@@ -39,6 +39,7 @@ public class SymbolClassificationNeuralNetCreationPanel extends AbstractApplicat
 	private final @Nonnull JTextField outputFolderField;
 	private final @Nonnull JTextField modelNameField;
 	//
+	private final @Nonnull JSpinner scoreLimitSpinner;
 	private final @Nonnull JSpinner learningRateSpinner;
 	private final @Nonnull JSpinner batchSizeSpinner;
 	private final @Nonnull JSpinner epocheNumberSpinner;
@@ -69,6 +70,7 @@ public class SymbolClassificationNeuralNetCreationPanel extends AbstractApplicat
 		
 		modelNameField = new JTextField("model");
 		
+		scoreLimitSpinner = new JSpinner(new SpinnerNumberModel(0.01, 0, 1, 0.001));
 		learningRateSpinner = new JSpinner(new SpinnerNumberModel(0.02, 0, 1, 0.001));
 		batchSizeSpinner = new JSpinner(new SpinnerNumberModel(5, 1, 100, 1));
 		epocheNumberSpinner = new JSpinner(new SpinnerNumberModel(1000, 1, 50000, 1));
@@ -79,7 +81,7 @@ public class SymbolClassificationNeuralNetCreationPanel extends AbstractApplicat
 		
 		
 		//===================================Layout======================================================
-		setLayout(new MigLayout("","[][][][][][][][grow]","[][][]20[][][][][grow][]"));
+		setLayout(new MigLayout("","[][][][][][][][grow][][grow]","[][][]20[][][][][grow][]"));
 		
 		//Row 1
 		add(inputFileSelectionButton,"span 1");
@@ -99,9 +101,11 @@ public class SymbolClassificationNeuralNetCreationPanel extends AbstractApplicat
 		add(new JLabel("Learning rate: "),"span 1");
 		add(learningRateSpinner,"span 1, growx");
 		add(new JLabel("Batch size: "), "span 1");
-		add(batchSizeSpinner,"span 1");
+		add(batchSizeSpinner,"span 1, growx");
 		add(new JLabel("Iteration count: "),"span 1");
 		add(iterationNumberSpinner,"span 1");
+		add(new JLabel("Score limit(*1e-2): "),"span 1");
+		add(scoreLimitSpinner,"span 1,  growx");
 		add(new JLabel("Epochs count: "),"span 1");
 		add(epocheNumberSpinner,"span, wrap");
 		
@@ -143,6 +147,7 @@ public class SymbolClassificationNeuralNetCreationPanel extends AbstractApplicat
 		    
 		    int[] hiddenNodes = Arrays.stream(hiddenNodesField.getText().toLowerCase().split("x")).mapToInt(Integer::parseInt).toArray();
 		    double learningRate = ((Double)learningRateSpinner.getValue()).doubleValue();
+		    double scoreLimit = ((Double)scoreLimitSpinner.getValue()).doubleValue()*1e-2;
 		    int batchSize = ((Integer)batchSizeSpinner.getValue()).intValue();
 		    int nEpochs = ((Integer)epocheNumberSpinner.getValue()).intValue();
 		    int iterationCount = ((Integer)iterationNumberSpinner.getValue()).intValue();
@@ -153,7 +158,7 @@ public class SymbolClassificationNeuralNetCreationPanel extends AbstractApplicat
 				@Override
 				protected MultiLayerNetwork doInBackground() throws Exception {
 					MultiLayerNetwork model = SCModelCreator.createAndTrainModel(fileNameTrain, nEpochs, iterationCount,
-							numInputs, numOutputs, hiddenNodes, learningRate, batchSize, progress -> setProgress(progress));
+							numInputs, numOutputs, hiddenNodes, scoreLimit, learningRate, batchSize, progress -> setProgress(progress));
 					ModelSerializer.writeModel(model, new File(modelOutputFolder, modelName), false);
 					
 					try(FileInputStream input = new FileInputStream(new File(DatasetCreator.getMetaFileName(fileNameTrain)));
