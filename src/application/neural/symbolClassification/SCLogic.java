@@ -1,4 +1,4 @@
-package application.neural;
+package application.neural.symbolClassification;
 
 import java.util.List;
 
@@ -18,9 +18,9 @@ import application.data.model.geometry.MouseClickType;
 import application.data.model.geometry.RelativePoint;
 import dataModels.Pair;
 
-public class SymbolClassificationLogic {
+public class SCLogic {
 	
-	private SymbolClassificationLogic() {}
+	private SCLogic() {}
 
 	
 	public static @Nonnull int[] performSymbolClassification(@Nonnull MultiLayerNetwork classificationModel,

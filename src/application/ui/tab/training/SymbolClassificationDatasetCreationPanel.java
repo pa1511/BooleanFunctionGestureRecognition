@@ -160,15 +160,17 @@ public class SymbolClassificationDatasetCreationPanel extends AbstractApplicatio
 			
 			int precision = ((Integer)precisionField.getValue()).intValue();
 			
-			
-				
 			Map<String, Integer> requestedSymbolMap = parseRequest(requestedSymbolAsString);
 			
-			File outputFile = new File(outputFolder, fileName+"-"+precision+"-"+requestedSymbolMap.size()+".csv");
+			File outputFile = new File(outputFolder, DatasetCreator.createCSVFileName(fileName, precision, requestedSymbolMap));
+			File metaOutputFile = new File(outputFolder,DatasetCreator.createMetaFileName(outputFile));
+			
 			Log.addMessage("Creating output file: " + outputFile, Log.Type.Plain);
-			try(PrintStream outputPrintstream = new PrintStream(new FileOutputStream(outputFile))){
+			try(PrintStream outputPrintStream = new PrintStream(new FileOutputStream(outputFile));
+				PrintStream metaOutputPrintStream = new PrintStream(new FileOutputStream(metaOutputFile))){
 				ClassificationDataSet dataSet = DatasetCreator.createSymbolClassificationDataset(requestedSymbolMap,precision);
-				DataSetDepositers.depositToCSV(dataSet, outputPrintstream, false);
+				DataSetDepositers.depositToCSV(dataSet, outputPrintStream, false);
+				DataSetDepositers.depositClassificationMeta(dataSet,metaOutputPrintStream, false);
 			} catch (Exception e1) {
 				Log.addError(e1);
 				JOptionPane.showMessageDialog(null, "A critical error has occured.", "Error", JOptionPane.ERROR_MESSAGE);
@@ -181,7 +183,7 @@ public class SymbolClassificationDatasetCreationPanel extends AbstractApplicatio
 
 	}
 
-	private Map<String, Integer> parseRequest(@Nonnull String requestedSymbolAsString) {
+	private @Nonnull Map<String, Integer> parseRequest(@Nonnull String requestedSymbolAsString) {
 		String[]  perSymbolRequests = requestedSymbolAsString.replaceAll("\\s", "").split(",");
 		Map<String, Integer> requestInfo = new HashMap<>();
 		

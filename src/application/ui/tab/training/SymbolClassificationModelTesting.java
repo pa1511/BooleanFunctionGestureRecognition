@@ -20,7 +20,7 @@ import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
 import org.deeplearning4j.util.ModelSerializer;
 
 import application.AbstractApplicationTab;
-import application.neural.SymbolClassificationLogic;
+import application.neural.symbolClassification.SCLogic;
 import application.ui.draw.Canvas;
 import log.Log;
 import net.miginfocom.swing.MigLayout;
@@ -92,7 +92,7 @@ public class SymbolClassificationModelTesting extends AbstractApplicationTab{
 			
 			try{
 				
-				int[] prediction = SymbolClassificationLogic.performSymbolClassification(classificationModel,testingCanvas.getData());
+				int[] prediction = SCLogic.performSymbolClassification(classificationModel,testingCanvas.getData());
 								
 				//TODO: should be visible in the UI
 				System.out.println(Arrays.toString(prediction));

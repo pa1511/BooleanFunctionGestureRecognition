@@ -1,9 +1,11 @@
 package application.data.handling.dataset;
 
+import java.io.File;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
 
 import application.Application;
@@ -57,5 +59,26 @@ public class DatasetCreator {
 		return new ClassificationDataSet(samples, samplesOutput, classToSampleOutput);
 	}
 	
+
+	public static @Nonnull String createCSVFileName(@Nonnull String fileName,@Nonnegative int precision,@Nonnegative Map<String, Integer> requestedSymbolMap) {
+		return fileName+"-"+precision+"-"+requestedSymbolMap.size()+".csv";
+	}
+
+
+	public static @Nonnegative int getNumberOfInputsFrom(@Nonnull File inputCSVFile) {
+	    String[] fileNameTrainData = inputCSVFile.getName().split("-");
+	    return Integer.parseInt(fileNameTrainData[1]);
+	}
+
+	public static @Nonnegative int getNumberOfOutputsFrom(@Nonnull File inputCSVFile) {
+	    String[] fileNameTrainData = inputCSVFile.getName().split("-");
+		return Integer.parseInt(fileNameTrainData[2].replaceAll(".csv", ""));
+	}
+
+
+	public static @Nonnull String createMetaFileName(File outputFile) {
+		String metaFileName = outputFile.getName().replaceAll(".csv", "")+".metadata";
+		return metaFileName;
+	}	
 
 }
