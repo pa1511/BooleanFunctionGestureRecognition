@@ -26,7 +26,7 @@ import application.AbstractApplicationTab;
 import application.Application;
 import application.data.handling.dataset.DatasetCreator;
 import application.ui.table.SymbolInformationTableModel;
-import dataset.IDataSet;
+import dataset.ClassificationDataSet;
 import dataset.handeling.DataSetDepositers;
 import log.Log;
 import net.miginfocom.swing.MigLayout;
@@ -61,7 +61,7 @@ public class SymbolClassificationDatasetCreationPanel extends AbstractApplicatio
 		outputFolderField = new JTextField(outputFolder.getAbsolutePath());
 		
 		//
-		fileNameField = new JTextField("output.csv");
+		fileNameField = new JTextField("output");
 		JButton createOutputFileButton = new JButton(new CreateOutputFileAction());
 		precisionField = new JSpinner(new SpinnerNumberModel(50, 10, 200, 1));
 		
@@ -127,6 +127,11 @@ public class SymbolClassificationDatasetCreationPanel extends AbstractApplicatio
 				JOptionPane.showMessageDialog(null, "No file name provided.", "Warning", JOptionPane.WARNING_MESSAGE);
 				return;
 			}
+			if(fileName.contains("-")){
+				Log.addMessage("- used in filename.", Log.Type.Warning);
+				JOptionPane.showMessageDialog(null, "Can't use - in file name.", "Warning", JOptionPane.WARNING_MESSAGE);
+				return;
+			}
 			
 			if(outputFolder==null){
 				String userProvidedDir = outputFolderField.getText();
@@ -153,17 +158,17 @@ public class SymbolClassificationDatasetCreationPanel extends AbstractApplicatio
 				return;
 			}
 			
-			File outputFile = new File(outputFolder, fileName);
 			int precision = ((Integer)precisionField.getValue()).intValue();
 			
 			
-			Log.addMessage("Creating output file: " + outputFile, Log.Type.Plain);
 				
 			Map<String, Integer> requestedSymbolMap = parseRequest(requestedSymbolAsString);
 			
+			File outputFile = new File(outputFolder, fileName+"-"+precision+"-"+requestedSymbolMap.size()+".csv");
+			Log.addMessage("Creating output file: " + outputFile, Log.Type.Plain);
 			try(PrintStream outputPrintstream = new PrintStream(new FileOutputStream(outputFile))){
-				IDataSet dataSet = DatasetCreator.createSymbolClassificationDataset(requestedSymbolMap,precision);
-				DataSetDepositers.depositToCSV(dataSet, outputPrintstream);
+				ClassificationDataSet dataSet = DatasetCreator.createSymbolClassificationDataset(requestedSymbolMap,precision);
+				DataSetDepositers.depositToCSV(dataSet, outputPrintstream, false);
 			} catch (Exception e1) {
 				Log.addError(e1);
 				JOptionPane.showMessageDialog(null, "A critical error has occured.", "Error", JOptionPane.ERROR_MESSAGE);

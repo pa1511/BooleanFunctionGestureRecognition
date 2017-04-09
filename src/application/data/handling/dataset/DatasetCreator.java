@@ -8,11 +8,10 @@ import javax.annotation.Nonnull;
 
 import application.Application;
 import application.data.datasource.IDataSource;
+import application.data.handling.SymbolDataNormalizer;
 import application.data.handling.SymbolTransformer;
 import application.data.model.Symbol;
 import dataset.ClassificationDataSet;
-import dataset.IDataSet;
-import util.NormalizationUtils;
 
 public class DatasetCreator {
 	
@@ -20,7 +19,7 @@ public class DatasetCreator {
 
 
 	@SuppressWarnings("resource")
-	public static @Nonnull IDataSet createSymbolClassificationDataset(@Nonnull Map<String, Integer> requestedSymbolMap, int pointCount) throws Exception {
+	public static @Nonnull ClassificationDataSet createSymbolClassificationDataset(@Nonnull Map<String, Integer> requestedSymbolMap, int pointCount) throws Exception {
 		
 		
 		IDataSource dataSource = Application.getInstance().getDataSource();
@@ -53,7 +52,7 @@ public class DatasetCreator {
 			symbolEntryId++;
 		}
 
-		NormalizationUtils.normalize(samples, -1, 1, true);
+		SymbolDataNormalizer.normalizeSymbolSamples(samples);
 		
 		return new ClassificationDataSet(samples, samplesOutput, classToSampleOutput);
 	}

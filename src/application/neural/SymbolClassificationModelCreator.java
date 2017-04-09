@@ -9,7 +9,6 @@ import org.datavec.api.records.reader.RecordReader;
 import org.datavec.api.records.reader.impl.csv.CSVRecordReader;
 import org.datavec.api.split.FileSplit;
 import org.deeplearning4j.datasets.datavec.RecordReaderDataSetIterator;
-import org.deeplearning4j.eval.Evaluation;
 import org.deeplearning4j.nn.api.OptimizationAlgorithm;
 import org.deeplearning4j.nn.conf.MultiLayerConfiguration;
 import org.deeplearning4j.nn.conf.NeuralNetConfiguration;
@@ -21,18 +20,24 @@ import org.deeplearning4j.nn.weights.WeightInit;
 import org.deeplearning4j.optimize.listeners.ScoreIterationListener;
 import org.nd4j.linalg.activations.Activation;
 import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
+import org.nd4j.linalg.factory.Nd4j;
 import org.nd4j.linalg.lossfunctions.LossFunctions.LossFunction;
+
+import utilities.random.RNGProvider;
 
 public class SymbolClassificationModelCreator {
 
 	public static @Nonnull MultiLayerNetwork createAndTrainModel(@Nonnull String filenameTrain, 
-			@Nonnegative int nEpochs,@Nonnegative int numInputs,@Nonnegative int numOutputs,@Nonnegative int numHiddenNodes, 
-			@Nonnegative double learningRate,@Nonnegative int batchSize,@Nonnegative int seed) throws Exception{
+			@Nonnegative int nEpochs, @Nonnegative int iterationCount,@Nonnegative int numInputs,@Nonnegative int numOutputs,@Nonnegative int numHiddenNodes, 
+			@Nonnegative double learningRate,@Nonnegative int batchSize) throws Exception{
 			    
+	    Nd4j.ENFORCE_NUMERICAL_STABILITY = false;
+	    int seed = RNGProvider.getRandom().nextInt(1000);
+		
 	    //TODO:  network creation
 	    MultiLayerConfiguration conf = new NeuralNetConfiguration.Builder()
 	            .seed(seed)
-	            .iterations(50)
+	            .iterations(iterationCount)
 	            .optimizationAlgo(OptimizationAlgorithm.STOCHASTIC_GRADIENT_DESCENT)
 	            .learningRate(learningRate)
 	            .updater(Updater.NESTEROVS).momentum(0.95)
@@ -59,15 +64,13 @@ public class SymbolClassificationModelCreator {
 	    MultiLayerNetwork model = new MultiLayerNetwork(conf);
 	    model.init();
 	    model.setListeners(new ScoreIterationListener(1000));    
-	    //Print score every 20 parameter updates
 
 	    
 		//Load the training data:
 	    DataSetIterator trainIter;
 	    try(RecordReader rr = new CSVRecordReader()){
 			rr.initialize(new FileSplit(new File(filenameTrain)));
-			//TODO: magic numbers
-		    trainIter = new RecordReaderDataSetIterator(rr,batchSize,0,2);
+		    trainIter = new RecordReaderDataSetIterator(rr,batchSize,0,numOutputs);
 	    }
 	    for ( int n = 0; n < nEpochs; n++) {
 	        model.fit( trainIter );

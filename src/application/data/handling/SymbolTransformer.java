@@ -15,10 +15,12 @@ public class SymbolTransformer {
 	private SymbolTransformer() {}
 	
 	public static @Nonnull double[] getRawSymbolRepresentation(@Nonnull Symbol symbol, @Nonnegative int pointCount){
-		
-		double[] rawForm = new double[pointCount];
-		
 		List<Gesture> gestures = symbol.getGestures();
+		return getRawSymbolRepresentation(gestures,pointCount);
+	}
+
+	public static double[] getRawSymbolRepresentation(@Nonnull List<Gesture> gestures, @Nonnegative int pointCount) {
+		double[] rawForm = new double[pointCount];
 		double[][] rawGestures = new double[gestures.size()][];
 		
 		int gesturePosition = 0;

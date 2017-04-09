@@ -14,23 +14,31 @@ public abstract class ACanvasObserver  extends AbstractObserver<Canvas>{
 	/**
 	 * Called when the canvas is cleared. <br>
 	 */
-	public abstract void clearUpdate();
+	public void clearUpdate(){
+		
+	}
 
 	/**
 	 * Called when a new input to the canvas is made. <br>
 	 */
-	public abstract void newInputUpdate(@Nonnull Pair<MouseClickType,List<RelativePoint>> input);
+	public void newInputUpdate(@Nonnull Pair<MouseClickType,List<RelativePoint>> input){
+		
+	}
 
 	/**
 	 * Called when a undo action is performed on the canvas <br>
 	 */
-	public abstract void undoUpdate(@Nonnull Pair<MouseClickType, List<RelativePoint>> input);
+	public void undoUpdate(@Nonnull Pair<MouseClickType, List<RelativePoint>> input){
+		
+	}
 
 	/**
 	 * Called when a redo action is performed on the canvas. <br>
 	 * @param input which should be redone
 	 */
-	public abstract void redoUpdate(@Nonnull Pair<MouseClickType, List<RelativePoint>> input);
+	public void redoUpdate(@Nonnull Pair<MouseClickType, List<RelativePoint>> input){
+		
+	}
 
 	
 }

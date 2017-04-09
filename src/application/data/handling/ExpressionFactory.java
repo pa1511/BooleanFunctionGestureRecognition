@@ -18,8 +18,8 @@ public class ExpressionFactory {
 		Expression expression = new Expression(symbolicForm);
 
 		char[] symbols = symbolicForm.toCharArray();
-		int dataCount = data.size();
 		
+		int dataCount = data.size();
 		for(int i=0, dataPosition=0; i<symbols.length; i++){
 			char symbolChar = symbols[i];
 			Symbol symbol = new Symbol(symbolChar);
