@@ -37,6 +37,8 @@ public class SCModelCreator {
 			@Nonnegative int numInputs,@Nonnegative int numOutputs,@Nonnegative int[] hiddenNodes, 
 			@Nonnegative double learningRate, @Nonnegative int batchSize,
 			@Nonnull IntConsumer progressReporter) throws Exception{
+		
+		//TODO: limit optimization when a certain score is reached
 			    
 	    Nd4j.ENFORCE_NUMERICAL_STABILITY = false;
 		
@@ -90,6 +92,10 @@ public class SCModelCreator {
 		        .weightInit(weightInit)
 		        .activation(activationMethod)
 		        .nIn(numHiddenNodes).nOut(numOutputs).build();
+	}
+	
+	public static String modelMetaDataFileName(@Nonnull String modelName){
+		return modelName+".metadata";
 	}
 	
 }

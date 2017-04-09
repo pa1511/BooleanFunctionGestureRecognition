@@ -3,6 +3,8 @@ package application.ui.tab.training;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.util.Arrays;
 import java.util.Properties;
 
@@ -29,6 +31,7 @@ import log.Log;
 import net.miginfocom.swing.MigLayout;
 import ui.CommonUIActions;
 import ui.Progress;
+import utilities.streamAndParallelization.PStreams;
 
 public class SymbolClassificationNeuralNetCreationPanel extends AbstractApplicationTab{
 	
@@ -138,7 +141,7 @@ public class SymbolClassificationNeuralNetCreationPanel extends AbstractApplicat
 		    int numOutputs = DatasetCreator.getNumberOfOutputsFrom(inputFile);
 		    
 		    
-		    int[] hiddenNodes = Arrays.stream(hiddenNodesField.getText().split("x")).mapToInt(Integer::parseInt).toArray();
+		    int[] hiddenNodes = Arrays.stream(hiddenNodesField.getText().toLowerCase().split("x")).mapToInt(Integer::parseInt).toArray();
 		    double learningRate = ((Double)learningRateSpinner.getValue()).doubleValue();
 		    int batchSize = ((Integer)batchSizeSpinner.getValue()).intValue();
 		    int nEpochs = ((Integer)epocheNumberSpinner.getValue()).intValue();
@@ -152,6 +155,11 @@ public class SymbolClassificationNeuralNetCreationPanel extends AbstractApplicat
 					MultiLayerNetwork model = SCModelCreator.createAndTrainModel(fileNameTrain, nEpochs, iterationCount,
 							numInputs, numOutputs, hiddenNodes, learningRate, batchSize, progress -> setProgress(progress));
 					ModelSerializer.writeModel(model, new File(modelOutputFolder, modelName), false);
+					
+					try(FileInputStream input = new FileInputStream(new File(DatasetCreator.getMetaFileName(fileNameTrain)));
+							FileOutputStream output = new FileOutputStream(new File(modelOutputFolder,SCModelCreator.modelMetaDataFileName(modelName)))){
+						PStreams.copy(input,output);
+					}
 					return model;
 				}
 			};

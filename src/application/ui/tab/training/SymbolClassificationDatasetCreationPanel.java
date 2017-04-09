@@ -163,7 +163,7 @@ public class SymbolClassificationDatasetCreationPanel extends AbstractApplicatio
 			Map<String, Integer> requestedSymbolMap = parseRequest(requestedSymbolAsString);
 			
 			File outputFile = new File(outputFolder, DatasetCreator.createCSVFileName(fileName, precision, requestedSymbolMap));
-			File metaOutputFile = new File(outputFolder,DatasetCreator.createMetaFileName(outputFile));
+			File metaOutputFile = new File(outputFolder,DatasetCreator.getMetaFileName(outputFile.getName()));
 			
 			Log.addMessage("Creating output file: " + outputFile, Log.Type.Plain);
 			try(PrintStream outputPrintStream = new PrintStream(new FileOutputStream(outputFile));

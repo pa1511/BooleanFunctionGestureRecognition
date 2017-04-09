@@ -76,8 +76,8 @@ public class DatasetCreator {
 	}
 
 
-	public static @Nonnull String createMetaFileName(File outputFile) {
-		String metaFileName = outputFile.getName().replaceAll(".csv", "")+".metadata";
+	public static @Nonnull String getMetaFileName(String outputFileName) {
+		String metaFileName = outputFileName.replaceAll(".csv", "")+".metadata";
 		return metaFileName;
 	}	
 
