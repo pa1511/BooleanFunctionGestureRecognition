@@ -42,8 +42,8 @@ public class ModelTesting extends AbstractApplicationTab{
 	private @CheckForNull SCModelOutputInterpreter modelOutputInterpreter = null;
 	private ClearCanvasAction clearAction;
 	
-	public ModelTesting(String name) {
-		super(name);
+	public ModelTesting() {
+		super("Neural net testing");
 
 		setLayout(new MigLayout("","[][][][grow]","[]10[][grow][]"));
 		String modelFolder = Application.getInstance().getProperties().getProperty(SCInKeys.TRAINING_MODEl_OUTPUT_KEY);

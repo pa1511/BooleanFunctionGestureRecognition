@@ -45,9 +45,9 @@ public class DatasetCreationPanel extends AbstractApplicationTab{
 	private @CheckForNull File outputFolder = null;
 
 	
-	public DatasetCreationPanel(String tabName) {
+	public DatasetCreationPanel() {
 
-		super(tabName);
+		super("Dataset creation");
 		
 		symbolsField = new JTextField();
 		JLabel instructionLabel = new JLabel("<html>Input the symbols you whish the system to use like this: \"A:10,B:20\".</br> The meaning is use the symbol and this amount of learning examples.</html>");

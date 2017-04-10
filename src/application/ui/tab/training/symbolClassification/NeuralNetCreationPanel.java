@@ -49,9 +49,9 @@ public class NeuralNetCreationPanel extends AbstractApplicationTab{
 	private @CheckForNull File inputFile;
 	private @CheckForNull File modelOutputFolder;
 	
-	public NeuralNetCreationPanel(String tabName) {
+	public NeuralNetCreationPanel() {
  		
-		super(tabName);
+		super("Neural net training");
 		
 		Properties properties = Application.getInstance().getProperties();
 		

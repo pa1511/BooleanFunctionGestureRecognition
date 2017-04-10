@@ -3,7 +3,6 @@ package application.ui;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Toolkit;
-import java.util.Properties;
 
 import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
@@ -13,7 +12,6 @@ import javax.swing.WindowConstants;
 import application.AApplicationFrame;
 import application.AbstractApplicationTab;
 import application.Application;
-import generalfactory.Factory;
 
 public class ApplicationFrame extends AApplicationFrame {
 	
@@ -29,7 +27,7 @@ public class ApplicationFrame extends AApplicationFrame {
 		JTabbedPane tabbedPane = new JTabbedPane();
 		tabbedPane.setTabPlacement(JTabbedPane.LEFT);
 		tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
-		tabs = loadApplicationTabs();
+		tabs = AApplicationFrame.loadApplicationTabs(Application.UI_TAB_PATH_KEY,Application.UI_TAB_NAMES_KEY);
 		for(AbstractApplicationTab tab:tabs)
 			tabbedPane.addTab(tab.getTabName(), tab);
 
@@ -38,23 +36,6 @@ public class ApplicationFrame extends AApplicationFrame {
 		
 		//
 		setWindowSizeAndLocation();
-	}
-
-	@SuppressWarnings("hiding")
-	private @Nonnull AbstractApplicationTab[] loadApplicationTabs() throws Exception {
-		
-		Properties properties = Application.getInstance().getProperties();
-		
-		String tabsPath = properties.getProperty(Application.UI_TAB_PATH_KEY);
-		String[] tabNames = properties.getProperty(Application.UI_TAB_NAMES_KEY).split(";");
-
-		AbstractApplicationTab[] tabs = new AbstractApplicationTab[tabNames.length];
-
-		for(int i=0; i<tabNames.length; i++){
-			tabs[i] = Factory.getInstance(tabNames[i], tabsPath); 
-		}
-		
-		return tabs;
 	}
 
 	/**
