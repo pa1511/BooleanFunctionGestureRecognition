@@ -51,6 +51,10 @@ public class Expression extends AIdentifiable {
 		return symbolicForm;
 	}
 	
+	public boolean isComplex() {
+		return symbols.size()>1;
+	}
+	
 	@Override
 	public String toString() {
 		return symbolicForm;

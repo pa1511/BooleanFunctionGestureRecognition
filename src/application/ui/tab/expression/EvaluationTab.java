@@ -17,7 +17,7 @@ import application.parse.syntactic.node.IBooleanExpressionNode;
 import application.ui.action.EvaluateAction;
 import application.ui.table.ExpressionEvaluationTableModel;
 
-public class ExpressionEvaluationTab extends AbstractApplicationTab{
+public class EvaluationTab extends AbstractApplicationTab{
 
 	@Nonnull JTextField expressionInputField;
 	private @Nonnull JButton evaluateButton;
@@ -27,7 +27,7 @@ public class ExpressionEvaluationTab extends AbstractApplicationTab{
 	private @CheckForNull IBooleanExpressionNode expression;
 	private @CheckForNull VariableValueProvider variableValueProvider;
 	
-	public ExpressionEvaluationTab() {
+	public EvaluationTab() {
 		super("Evaluation");
 		
 		//setting tab layout

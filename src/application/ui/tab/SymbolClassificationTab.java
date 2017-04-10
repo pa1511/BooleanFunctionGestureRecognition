@@ -6,9 +6,9 @@ import javax.annotation.Nonnull;
 import javax.swing.JTabbedPane;
 
 import application.AbstractApplicationTab;
-import application.ui.tab.training.SymbolClassificationDatasetCreationPanel;
-import application.ui.tab.training.SymbolClassificationModelTesting;
-import application.ui.tab.training.SymbolClassificationNeuralNetCreationPanel;
+import application.ui.tab.training.symbolClassification.DatasetCreationPanel;
+import application.ui.tab.training.symbolClassification.ModelTesting;
+import application.ui.tab.training.symbolClassification.NeuralNetCreationPanel;
 
 public class SymbolClassificationTab extends AbstractApplicationTab{	
 	
@@ -21,9 +21,9 @@ public class SymbolClassificationTab extends AbstractApplicationTab{
 		
 		//TODO: these tabs could be loaded in a better way
 		tabs = new AbstractApplicationTab[]{
-				new SymbolClassificationDatasetCreationPanel("Dataset creation"),
-				new SymbolClassificationNeuralNetCreationPanel("Neural net training"),
-				new SymbolClassificationModelTesting("Neural net testing")
+				new DatasetCreationPanel("Dataset creation"),
+				new NeuralNetCreationPanel("Neural net training"),
+				new ModelTesting("Neural net testing")
 		};
 		
 		setLayout(new BorderLayout());

@@ -38,7 +38,7 @@ import application.ui.draw.RectangleRepresentationView;
 import dataModels.Pair;
 import log.Log;
 
-public class ExpressionDrawingTab extends AbstractApplicationTab{
+public class DrawingTab extends AbstractApplicationTab{
 	
 	private final @Nonnull JTextField conceptDescriptionField;
 		
@@ -58,7 +58,7 @@ public class ExpressionDrawingTab extends AbstractApplicationTab{
 	private final @Nonnull ConceptFieldListener conceptFieldListener;
 	private final @Nonnull CanvasObserver canvasObserver;
 	
-	public ExpressionDrawingTab() {
+	public DrawingTab() {
 		super("Drawing");
 		
 		//set tab  layout
@@ -275,6 +275,8 @@ public class ExpressionDrawingTab extends AbstractApplicationTab{
 				String expressionSymbolicForm = BooleanParser.expressionPreprocessing(text);
 				Expression expression = ExpressionFactory.getExpressionFor(expressionSymbolicForm,canvas.getData());
 				Application.getInstance().getDataSource().store(expression);
+				JOptionPane.showMessageDialog(null, "Expression successfully stored", "Info", JOptionPane.INFORMATION_MESSAGE);
+				Log.addMessage("Expression stored", Log.Type.Plain);
 			} catch(IllegalArgumentException e1){
 				Log.addMessage(e1.getMessage(),Log.Type.Warning);
 				JOptionPane.showMessageDialog(null, e1.getMessage(), "Warning", JOptionPane.WARNING_MESSAGE);
@@ -282,9 +284,6 @@ public class ExpressionDrawingTab extends AbstractApplicationTab{
 				Log.addError(e1);
 				JOptionPane.showMessageDialog(null, "A critical error has occured during storage attempt." + e1.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
 			}
-			
-			JOptionPane.showMessageDialog(null, "Expression successfully stored", "Info", JOptionPane.INFORMATION_MESSAGE);
-			Log.addMessage("Expression stored", Log.Type.Plain);
 		}
 		
 	}

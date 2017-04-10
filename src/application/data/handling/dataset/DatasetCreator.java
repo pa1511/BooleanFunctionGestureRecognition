@@ -44,7 +44,11 @@ public class DatasetCreator {
 			
 			List<Symbol> symbolSamples = dataSource.getSymbols(symbol,symbolEntry.getValue());
 			for(Symbol sample:symbolSamples){
+				
 				double[] rawSample = SymbolTransformer.getRawSymbolRepresentation(sample, pointCount);
+				if(rawSample==null){
+					System.out.println();
+				}
 				
 				samples[sampleIndex] = rawSample;
 				samplesOutput[sampleIndex][symbolEntryId] = 1.0;

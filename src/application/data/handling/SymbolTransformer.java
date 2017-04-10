@@ -37,7 +37,7 @@ public class SymbolTransformer {
 
 			int destPos = 0;
 			for(double[] rawGesture:rawGestures){
-				System.arraycopy(rawGestures, 0, rawForm, destPos, rawGesture.length);
+				System.arraycopy(rawGesture, 0, rawForm, destPos, rawGesture.length);
 				destPos += rawGesture.length;
 			}
 			

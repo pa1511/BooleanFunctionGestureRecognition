@@ -45,6 +45,7 @@ public final class H2Database implements IDataSource {
 	private static final @Nonnull String geSymbolColumn = "ID_SY";
 	private static final @Nonnull String geExPositionColumn = "EX_POSITION";
 	private static final @Nonnull String gePointsColumn = "POINTS";
+	private static final @Nonnull String geExComplexColumn = "EX_COMPLEX";
 
 	// Database connection
 	private final @Nonnull Supplier<Connection> dbConnection;
@@ -70,7 +71,7 @@ public final class H2Database implements IDataSource {
 
 				if (!didDbExistPriorToThis) {
 					Log.addMessage("Initializing database tables", Log.Type.Plain);
-					initializeDBTables();
+					initializeDBTables(connection);
 				}
 
 				return connection;
@@ -83,20 +84,22 @@ public final class H2Database implements IDataSource {
 
 	}
 
-	private void initializeDBTables() throws SQLException {
+	private void initializeDBTables(Connection connection) throws SQLException {
 
-		try(Connection connection = dbConnection.get()){
-
-			try(Statement statement = connection.createStatement()){
+		try(Statement statement = connection.createStatement()){
+		
+			statement.execute("CREATE TABLE IF NOT EXISTS " + expressionTable + "(" + exIdColumn + " "
+					+ "INT AUTO_INCREMENT PRIMARY KEY, " + exWrittenFormColumn + " " + "VARCHAR(255)" + ")");
 			
-				statement.execute("CREATE TABLE IF NOT EXISTS " + expressionTable + "(" + exIdColumn + " "
-						+ "INT AUTO_INCREMENT PRIMARY KEY, " + exWrittenFormColumn + " " + "VARCHAR(255)" + ")");
-				
-				statement.execute("CREATE TABLE IF NOT EXISTS " + gestureTable + "(" + geIdColumn + " "
-						+ "INT AUTO_INCREMENT PRIMARY KEY, " + geFIdExColumn + " " + "INT, " + geSymbolColumn + " "
-						+ "CHAR, " + geExPositionColumn + " " + "INT, " + gePointsColumn + " " + "ARRAY, "
-						+ "FOREIGN KEY(" + geFIdExColumn + ") REFERENCES " + expressionTable + "(ID), " + ")");
-			}
+			statement.execute(
+					"CREATE TABLE IF NOT EXISTS " + gestureTable + "(" + 
+							geIdColumn + " " + "INT AUTO_INCREMENT PRIMARY KEY, " + 
+							geFIdExColumn + " " + "INT, " + 
+							geSymbolColumn + " "+ "CHAR, " + 
+							geExPositionColumn + " " + "INT, " + 
+							gePointsColumn + " " + "ARRAY, " + 
+							geExComplexColumn + " " + "BOOLEAN,"
+							+ "FOREIGN KEY(" + geFIdExColumn + ") REFERENCES " + expressionTable + "(ID), " + ")");
 		}
 		
 	}
@@ -128,7 +131,7 @@ public final class H2Database implements IDataSource {
 			}
 
 			String insertGestureSql = "INSERT INTO " + gestureTable + " ( " + geFIdExColumn + "," + geSymbolColumn + ","
-					+ geExPositionColumn + "," + gePointsColumn + " ) VALUES( ?,?,?,? )";
+					+ geExPositionColumn + "," + gePointsColumn + "," + geExComplexColumn + " ) VALUES( ?,?,?,?,? )";
 
 			try (PreparedStatement statement = connection.prepareStatement(insertGestureSql)) {
 				for (Symbol symbol : expression.getSymbols()) {
@@ -140,6 +143,7 @@ public final class H2Database implements IDataSource {
 						statement.setString(2, symbol.getSymbolAsString());
 						statement.setInt(3, i);
 						statement.setObject(4, GestureTransformer.gestureToArray(gesture));
+						statement.setBoolean(5, expression.isComplex());
 						statement.addBatch();
 					}
 				}
@@ -225,7 +229,7 @@ public final class H2Database implements IDataSource {
 					}
 				}
 			}
-			try(PreparedStatement statement = connection.prepareStatement("DELETE FROm " + expressionTable + " WHERE " + exIdColumn + " = ?")){
+			try(PreparedStatement statement = connection.prepareStatement("DELETE FROM " + expressionTable + " WHERE " + exIdColumn + " = ?")){
 				statement.setInt(1, expression.getId());
 				statement.execute();
 			}

@@ -1,4 +1,4 @@
-package application.ui.tab.training;
+package application.ui.tab.training.symbolClassification;
 
 import java.awt.Dimension;
 import java.awt.Font;
@@ -32,7 +32,7 @@ import log.Log;
 import net.miginfocom.swing.MigLayout;
 import ui.CommonUIActions;
 
-public class SymbolClassificationDatasetCreationPanel extends AbstractApplicationTab{
+public class DatasetCreationPanel extends AbstractApplicationTab{
 	
 	private static final @Nonnegative int numberOfRowsToShow = 8;
 		
@@ -45,7 +45,7 @@ public class SymbolClassificationDatasetCreationPanel extends AbstractApplicatio
 	private @CheckForNull File outputFolder = null;
 
 	
-	public SymbolClassificationDatasetCreationPanel(String tabName) {
+	public DatasetCreationPanel(String tabName) {
 
 		super(tabName);
 		
@@ -56,7 +56,7 @@ public class SymbolClassificationDatasetCreationPanel extends AbstractApplicatio
 		JButton selectOutputFolderButton = new JButton(new SelectDirectoryAction());
 		JLabel outputLabel = new JLabel("output folder: " );		
 		String outputFolderLocation = 
-				Application.getInstance().getProperties().getProperty(SymbolClassificationIn.TRAINING_DATA_OUTPUT_KEY);
+				Application.getInstance().getProperties().getProperty(SCInKeys.TRAINING_DATA_OUTPUT_KEY);
 		outputFolder = new File(outputFolderLocation);
 		outputFolderField = new JTextField(outputFolder.getAbsolutePath());
 		

@@ -15,12 +15,12 @@ import application.ui.draw.Canvas;
 import application.ui.table.AExpressionManagementObserver;
 import application.ui.table.ExpressionManagementTable;
 
-public class ExpressionManagementTab extends AbstractApplicationTab{
+public class ManagementTab extends AbstractApplicationTab{
 
 	private final @Nonnull ExpressionManagementTable expressionTable;
 	private final @Nonnull Canvas canvas;
 	
-	public ExpressionManagementTab() {
+	public ManagementTab() {
 		super("Management");
 		
 		setLayout(new BorderLayout());

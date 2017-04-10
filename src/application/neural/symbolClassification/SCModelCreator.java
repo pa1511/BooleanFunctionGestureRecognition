@@ -74,9 +74,9 @@ public class SCModelCreator {
 	    
 	    for ( int n = 0; n < nEpochs; n++) {
 	        model.fit(trainIter);
-	        if(model.gradientAndScore().getSecond().doubleValue()<scoreLimit){
-	        	break;
-	        }
+//	        if(model.gradientAndScore().getSecond().doubleValue()<scoreLimit){
+//	        	break;
+//	        }
 	        progressReporter.accept(100*n/nEpochs);
 	    }
 	    progressReporter.accept(100);

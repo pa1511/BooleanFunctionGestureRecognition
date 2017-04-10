@@ -6,9 +6,9 @@ import javax.annotation.Nonnull;
 import javax.swing.JTabbedPane;
 
 import application.AbstractApplicationTab;
-import application.ui.tab.expression.ExpressionDrawingTab;
-import application.ui.tab.expression.ExpressionManagementTab;
-import application.ui.tab.expression.ExpressionEvaluationTab;
+import application.ui.tab.expression.DrawingTab;
+import application.ui.tab.expression.ManagementTab;
+import application.ui.tab.expression.EvaluationTab;
 
 public class ExpressionTab extends AbstractApplicationTab{
 
@@ -20,9 +20,9 @@ public class ExpressionTab extends AbstractApplicationTab{
 		
 		//TODO: which ones to load could be configured from a custom .properties file
 		tabs = new AbstractApplicationTab[]{
-				new ExpressionDrawingTab(),
-				new ExpressionManagementTab(),
-				new ExpressionEvaluationTab()
+				new DrawingTab(),
+				new ManagementTab(),
+				new EvaluationTab()
 		};
 		
 		setLayout(new BorderLayout());

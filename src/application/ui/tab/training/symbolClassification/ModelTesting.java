@@ -1,4 +1,4 @@
-package application.ui.tab.training;
+package application.ui.tab.training.symbolClassification;
 
 import java.awt.FlowLayout;
 import java.awt.Font;
@@ -31,7 +31,7 @@ import log.Log;
 import net.miginfocom.swing.MigLayout;
 import ui.CommonUIActions;
 
-public class SymbolClassificationModelTesting extends AbstractApplicationTab{
+public class ModelTesting extends AbstractApplicationTab{
 
 	private final @Nonnull JTextField currentModelName;
 	private final @Nonnull JTextField predictedSymbolField;
@@ -42,11 +42,11 @@ public class SymbolClassificationModelTesting extends AbstractApplicationTab{
 	private @CheckForNull SCModelOutputInterpreter modelOutputInterpreter = null;
 	private ClearCanvasAction clearAction;
 	
-	public SymbolClassificationModelTesting(String name) {
+	public ModelTesting(String name) {
 		super(name);
 
 		setLayout(new MigLayout("","[][][][grow]","[]10[][grow][]"));
-		String modelFolder = Application.getInstance().getProperties().getProperty(SymbolClassificationIn.TRAINING_MODEl_OUTPUT_KEY);
+		String modelFolder = Application.getInstance().getProperties().getProperty(SCInKeys.TRAINING_MODEl_OUTPUT_KEY);
 		
 		//Row 1
 		JLabel modelNameLabel = new JLabel("current model: ");

@@ -1,4 +1,4 @@
-package application.ui.tab.training;
+package application.ui.tab.training.symbolClassification;
 
 import java.awt.Font;
 import java.awt.event.ActionEvent;
@@ -33,7 +33,7 @@ import ui.CommonUIActions;
 import ui.Progress;
 import utilities.streamAndParallelization.PStreams;
 
-public class SymbolClassificationNeuralNetCreationPanel extends AbstractApplicationTab{
+public class NeuralNetCreationPanel extends AbstractApplicationTab{
 	
 	private final @Nonnull JTextField inputFileField;
 	private final @Nonnull JTextField outputFolderField;
@@ -49,20 +49,20 @@ public class SymbolClassificationNeuralNetCreationPanel extends AbstractApplicat
 	private @CheckForNull File inputFile;
 	private @CheckForNull File modelOutputFolder;
 	
-	public SymbolClassificationNeuralNetCreationPanel(String tabName) {
+	public NeuralNetCreationPanel(String tabName) {
  		
 		super(tabName);
 		
 		Properties properties = Application.getInstance().getProperties();
 		
 		
-		String inputFileLocation = properties.getProperty(SymbolClassificationIn.TRAINING_DATA_OUTPUT_KEY);
+		String inputFileLocation = properties.getProperty(SCInKeys.TRAINING_DATA_OUTPUT_KEY);
 		JButton inputFileSelectionButton = new JButton(new SelectInputFileAction("Select",inputFileLocation));
 		inputFile = (inputFileLocation==null || inputFileLocation.isEmpty()) ? null : new File(inputFileLocation+File.separator+"output-50-5.csv");
 		inputFileField = new JTextField((inputFile!=null) ? inputFile.getAbsolutePath() : "");
 		inputFileField.setEditable(false);
 		
-		String outputFolderLocation = properties.getProperty(SymbolClassificationIn.TRAINING_MODEl_OUTPUT_KEY);
+		String outputFolderLocation = properties.getProperty(SCInKeys.TRAINING_MODEl_OUTPUT_KEY);
 		JButton outputFileSelectionButton = new JButton(new SelectOutputDirectoryAction("Select"));
 		modelOutputFolder = (outputFolderLocation==null || outputFolderLocation.isEmpty()) ? null : new File(outputFolderLocation);
 		outputFolderField = new JTextField((modelOutputFolder!=null) ? modelOutputFolder.getAbsolutePath() : "");
