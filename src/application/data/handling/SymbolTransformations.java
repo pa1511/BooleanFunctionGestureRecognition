@@ -2,18 +2,26 @@ package application.data.handling;
 
 import java.util.List;
 import java.util.Random;
+import java.util.stream.Collectors;
 
 import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
 
 import application.data.model.Gesture;
 import application.data.model.Symbol;
+import application.data.model.geometry.RelativePoint;
 import utilities.random.RNGProvider;
 
-public class SymbolTransformer {
+public class SymbolTransformations {
 
-	private SymbolTransformer() {}
+	private SymbolTransformations() {}
 	
+	
+	/**
+	 * Returns a raw representation of the symbol. <br>
+	 * A raw representation is set of points which define the symbol. <br>
+	 * The representation will have pointCount points. <br>
+	 */
 	public static @Nonnull double[] getRawSymbolRepresentation(@Nonnull Symbol symbol, @Nonnegative int pointCount){
 		List<Gesture> gestures = symbol.getGestures();
 		return getRawSymbolRepresentation(gestures,pointCount);
@@ -26,7 +34,7 @@ public class SymbolTransformer {
 		int gesturePosition = 0;
 		int totalSymbolLength = 0;
 		for(Gesture gesture:gestures){
-			double[] rawGesture = GestureTransformer.getRawGestureRepresentation(gesture);
+			double[] rawGesture = GestureTransformations.getRawGestureRepresentation(gesture);
 			totalSymbolLength+=rawGesture.length;
 			rawGestures[gesturePosition] = rawGesture;
 			gesturePosition++;
@@ -114,5 +122,18 @@ public class SymbolTransformer {
 		
 				
 		return rawForm;
+	}
+
+
+	/**
+	 * Returns a rectangle representation of the given symbol. <br>
+	 */
+	public static @Nonnull double[] getRectangleRepresentation(@Nonnull Symbol symbol) {
+		List<RelativePoint> relativePoints = symbol.getGestures()
+				.stream()
+				.map(Gesture::getPoints)
+				.flatMap(points->points.stream())
+				.collect(Collectors.toList());
+		return RelativePointTransformations.getRectangleRepresentation(relativePoints);
 	}
 }

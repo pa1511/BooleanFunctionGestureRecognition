@@ -10,6 +10,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
 import application.AbstractApplicationTab;
+import application.data.handling.ExpressionTransformations;
 import application.data.model.Expression;
 import application.ui.draw.Canvas;
 import application.ui.table.AExpressionManagementObserver;
@@ -33,7 +34,7 @@ public class ManagementTab extends AbstractApplicationTab{
 			@Override
 			public void update(Expression exp) throws Exception {
 				canvas.clear();
-				canvas.show(exp.getCanvasForm());
+				canvas.show(ExpressionTransformations.getCanvasForm(exp));
 			}
 			
 			@Override

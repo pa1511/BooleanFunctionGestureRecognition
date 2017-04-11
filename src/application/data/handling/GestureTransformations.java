@@ -8,9 +8,13 @@ import javax.annotation.Nonnull;
 import application.data.model.Gesture;
 import application.data.model.geometry.RelativePoint;
 
-public class GestureTransformer {
+public class GestureTransformations {
 
-	private GestureTransformer() {}
+	private GestureTransformations() {}
+	
+	public static @Nonnull double[] getRectangleRepresentation(@Nonnull Gesture gesture){
+		return RelativePointTransformations.getRectangleRepresentation(gesture.getPoints());
+	}
 	
 	/**
 	 * Accepts a array of object, but assumes the array has Double objects inside of it. <br>

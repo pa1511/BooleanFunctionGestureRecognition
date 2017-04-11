@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+import javax.annotation.CheckForNull;
 import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
 import javax.swing.AbstractAction;
@@ -18,6 +19,7 @@ import javax.swing.table.AbstractTableModel;
 
 import application.Application;
 import application.data.model.Expression;
+import application.data.model.ExpressionType;
 import log.Log;
 import observer.StrictObservationManager;
 import utilities.lazy.UnsafeLazy;
@@ -31,6 +33,11 @@ public class ExpressionManagementTable extends JTable implements AutoCloseable{
 	private final @Nonnull ListSelectionListener selectionListener;
 	
 	private final @Nonnull Action[] standardActions;
+	public static final @Nonnull String ACTION_RELOAD = "Reload";
+	public static final @Nonnull String ACTION_DELETE = "Delete";
+	
+	private @CheckForNull ExpressionType filter = null;
+	
 	
 	public ExpressionManagementTable() {
 		model = new Model();
@@ -49,18 +56,18 @@ public class ExpressionManagementTable extends JTable implements AutoCloseable{
 		
 		//Initialize standard management actions
 		standardActions = new Action[]{
-				new AbstractAction("Reload") {
+				new AbstractAction(ACTION_RELOAD) {
 					
 					@Override
-					public void actionPerformed(ActionEvent arg0) {
+					public void actionPerformed(@CheckForNull ActionEvent arg0) {
 						model.expressions.reset();
-						Log.addMessage("Reloaded expressions from db.", Log.Type.Plain);
-						
+						model.expressions.getOrThrow().removeIf(ex->ex.getType()!=filter);
+						Log.addMessage("Reloaded expressions from db.", Log.Type.Plain);						
 						revalidate();
 						repaint();
 					}
 				},
-				new AbstractAction("Delete") {
+				new AbstractAction(ACTION_DELETE) {
 					
 					@Override
 					public void actionPerformed(ActionEvent e) {
@@ -95,9 +102,22 @@ public class ExpressionManagementTable extends JTable implements AutoCloseable{
 
 	}
 	
-
-	public Action[] getManagementActions() {
+	public void filter(@Nonnull ExpressionType exType) {
+		this.filter = exType;
+		getStandardAction(ACTION_RELOAD).actionPerformed(null);
+	}
+	
+	public @Nonnull Action[] getManagementActions() {
 		return standardActions;
+	}
+	
+	public @CheckForNull Action getStandardAction(@Nonnull String actionName){
+		for(Action action:standardActions){
+			if(action.getValue(Action.NAME).equals(actionName)){
+				return action;
+			}
+		}
+		return null;
 	}
 
 	@Override
@@ -152,5 +172,6 @@ public class ExpressionManagementTable extends JTable implements AutoCloseable{
 		}
 
 	}
+
 
 }

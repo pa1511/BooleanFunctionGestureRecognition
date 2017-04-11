@@ -63,7 +63,7 @@ public class DatasetCreationPanel extends AbstractApplicationTab{
 		//
 		fileNameField = new JTextField("output");
 		JButton createOutputFileButton = new JButton(new CreateOutputFileAction());
-		precisionField = new JSpinner(new SpinnerNumberModel(50, 10, 200, 1));
+		precisionField = new JSpinner(new SpinnerNumberModel(50, 10, 200, 1));		
 		
 		//========================================================================================
 		//Symbol table

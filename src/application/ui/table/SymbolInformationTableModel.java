@@ -31,6 +31,7 @@ public class SymbolInformationTableModel extends AbstractTableModel {
 			}
 			return Collections.emptyList();
 		});
+		
 	}
 	
 	@Override

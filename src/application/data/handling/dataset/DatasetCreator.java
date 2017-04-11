@@ -11,7 +11,7 @@ import javax.annotation.Nonnull;
 import application.Application;
 import application.data.datasource.IDataSource;
 import application.data.handling.SymbolDataNormalizer;
-import application.data.handling.SymbolTransformer;
+import application.data.handling.SymbolTransformations;
 import application.data.model.Symbol;
 import dataset.ClassificationDataSet;
 
@@ -45,7 +45,7 @@ public class DatasetCreator {
 			List<Symbol> symbolSamples = dataSource.getSymbols(symbol,symbolEntry.getValue());
 			for(Symbol sample:symbolSamples){
 				
-				double[] rawSample = SymbolTransformer.getRawSymbolRepresentation(sample, pointCount);
+				double[] rawSample = SymbolTransformations.getRawSymbolRepresentation(sample, pointCount);
 				if(rawSample==null){
 					System.out.println();
 				}

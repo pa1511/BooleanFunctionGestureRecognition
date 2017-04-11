@@ -12,7 +12,7 @@ import org.nd4j.linalg.factory.Nd4j;
 
 import application.data.handling.GestureFactory;
 import application.data.handling.SymbolDataNormalizer;
-import application.data.handling.SymbolTransformer;
+import application.data.handling.SymbolTransformations;
 import application.data.model.Gesture;
 import application.data.model.geometry.MouseClickType;
 import application.data.model.geometry.RelativePoint;
@@ -30,7 +30,7 @@ public class SCLogic {
 		int precision = layer.getNIn();
 		
 		List<Gesture> gestures = GestureFactory.getLeftClickGestures(symbolData);
-		double[] rawSample = SymbolTransformer.getRawSymbolRepresentation(gestures, precision);
+		double[] rawSample = SymbolTransformations.getRawSymbolRepresentation(gestures, precision);
 		SymbolDataNormalizer.normalizeSample(rawSample);
 
 		INDArray inputArray = Nd4j.create(rawSample);			

@@ -119,7 +119,6 @@ public class ModelTesting extends AbstractApplicationTab{
 			}
 			
 			try{
-				
 				int[] prediction = SCLogic.performSymbolClassification(classificationModel,testingCanvas.getData());
 				predictedSymbolField.setText(modelOutputInterpreter.apply(prediction[0]));				
 			}

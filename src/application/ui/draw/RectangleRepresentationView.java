@@ -10,6 +10,7 @@ import javax.annotation.Nonnull;
 import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 
+import application.data.handling.RelativePointTransformations;
 import application.data.model.geometry.RelativePoint;
 import dataModels.Pair;
 
@@ -41,21 +42,8 @@ public class RectangleRepresentationView extends JPanel {
 	}
 
 	public void createRectangle(@Nonnull List<RelativePoint> points, @Nonnull Color color){		
-		double maxX = Double.MIN_VALUE;
-		double minX = Double.MAX_VALUE;
-		double maxY = Double.MIN_VALUE;
-		double minY = Double.MAX_VALUE;
-		
-		for(RelativePoint relativePoint:points){
-			
-			maxX = Math.max(maxX, relativePoint.x);
-			minX = Math.min(minX, relativePoint.x);
-			
-			maxY = Math.max(maxY, relativePoint.y);
-			minY = Math.min(minY, relativePoint.y);
-		}
-
-		createRectangle(minX, minY, maxX-minX, maxY-minY,color);
+		double[] rectangle = RelativePointTransformations.getRectangleRepresentation(points);
+		createRectangle(rectangle, color);
 	}
 
 	/**
@@ -71,8 +59,16 @@ public class RectangleRepresentationView extends JPanel {
 	}
 
 	public void createRectangle(double x, double y, double width, double height,@Nonnull Color color){	
+		createRectangle(new double[]{x, y, width, height}, color);
+	}
+	
+	public void createRectangle(double[] syRec) {
+		createRectangle(syRec, defaultColor);
+	}
+
+	public void createRectangle(double[] rec,@Nonnull Color color){	
 		undoneDescriptions.clear();
-		rectangleDescriptions.push(Pair.of(color, new double[]{x, y, width, height}));
+		rectangleDescriptions.push(Pair.of(color, rec));
 		repaint();
 	}
 

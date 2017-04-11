@@ -15,7 +15,7 @@ import java.util.function.Supplier;
 
 import javax.annotation.Nonnull;
 
-import application.data.handling.GestureTransformer;
+import application.data.handling.GestureTransformations;
 import application.data.model.Expression;
 import application.data.model.Gesture;
 import application.data.model.Symbol;
@@ -142,7 +142,7 @@ public final class H2Database implements IDataSource {
 						statement.setInt(1, expressionId);
 						statement.setString(2, symbol.getSymbolAsString());
 						statement.setInt(3, i);
-						statement.setObject(4, GestureTransformer.gestureToArray(gesture));
+						statement.setObject(4, GestureTransformations.gestureToArray(gesture));
 						statement.setBoolean(5, expression.isComplex());
 						statement.addBatch();
 					}
@@ -201,7 +201,7 @@ public final class H2Database implements IDataSource {
 										symbols.put(symbolAsString, symbol);
 									}
 									
-									symbol.addGesture(GestureTransformer.getPointsAsGesture(geId, points));
+									symbol.addGesture(GestureTransformations.getPointsAsGesture(geId, points));
 								}
 							}
 						}
@@ -298,7 +298,7 @@ public final class H2Database implements IDataSource {
 							//TODO: symbol id is not unique
 							current  = new Symbol(symbolAsChar, exPosition);
 						}
-						Gesture gesture = GestureTransformer.getPointsAsGesture(geId, points);
+						Gesture gesture = GestureTransformations.getPointsAsGesture(geId, points);
 						current.addGesture(gesture);
 												
 					}
