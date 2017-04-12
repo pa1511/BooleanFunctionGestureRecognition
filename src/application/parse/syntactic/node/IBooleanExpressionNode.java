@@ -15,6 +15,8 @@ public interface IBooleanExpressionNode {
 	
 	public void addChild(@Nonnull IBooleanExpressionNode child, @Nonnegative int index);
 	
+	public boolean isConnected();
+	
 	@Override
 	public @Nonnull String toString();
 	

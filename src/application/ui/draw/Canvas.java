@@ -100,7 +100,14 @@ public class Canvas extends JPanel implements AutoCloseable{
 	
 
 	public @Nonnull List<Pair<MouseClickType, List<RelativePoint>>> getData() {
-		return new ArrayList<>(pointGroups);
+		
+		List<Pair<MouseClickType,List<RelativePoint>>> data = new ArrayList<>();
+		
+		while(!pointGroups.isEmpty()){
+			data.add(pointGroups.removeLast());
+		}
+		
+		return data;
 	}
 
 	

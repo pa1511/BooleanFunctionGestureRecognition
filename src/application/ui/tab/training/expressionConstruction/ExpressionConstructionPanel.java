@@ -4,6 +4,8 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnegative;
@@ -25,6 +27,7 @@ import application.data.model.Expression;
 import application.data.model.ExpressionType;
 import application.data.model.Symbol;
 import application.parse.BooleanParser;
+import application.parse.BooleanSpatialParser;
 import application.parse.VariableValueProvider;
 import application.parse.syntactic.node.IBooleanExpressionNode;
 import application.ui.draw.Canvas;
@@ -32,6 +35,8 @@ import application.ui.draw.RectangleRepresentationView;
 import application.ui.table.AExpressionManagementObserver;
 import application.ui.table.ExpressionEvaluationTableModel;
 import application.ui.table.ExpressionManagementTable;
+import dataModels.Pair;
+import log.Log;
 
 public class ExpressionConstructionPanel extends AbstractApplicationTab{
 
@@ -132,8 +137,12 @@ public class ExpressionConstructionPanel extends AbstractApplicationTab{
 			canvas.clear();
 			canvas.show(ExpressionTransformations.getCanvasForm(expression));
 			rectangleView.clear();
-			for(Symbol symbol:expression.getSymbols()){
+			
+			List<Symbol> symbols = expression.getSymbols();
+			List<Pair<Symbol, double[]>> syRectPair = new ArrayList<>();
+			for(Symbol symbol:symbols){
 				double[] syRec = SymbolTransformations.getRectangleRepresentation(symbol);
+				syRectPair.add(Pair.of(symbol, syRec));
 				rectangleView.createRectangle(syRec);
 			}
 			
@@ -145,8 +154,17 @@ public class ExpressionConstructionPanel extends AbstractApplicationTab{
 			evaluationSyFormTable.setModel(expressionSyFormEvaluationTableModel);
 			detectedExpressionSyFormField.setText(symbolicForm);
 			
-			//TODO: call symbolic grouping detection
-			
+			//Symbolic grouping detection
+			try{
+				IBooleanExpressionNode decodedTopNode = BooleanSpatialParser.parse(syRectPair);
+				VariableValueProvider decodedVariableValueProvider = new VariableValueProvider(decodedTopNode);
+				expressionSyGroupingEvaluationTableModel = new ExpressionEvaluationTableModel(decodedVariableValueProvider, decodedTopNode);
+				evaluationSyGroupingTable.setModel(expressionSyGroupingEvaluationTableModel);
+				detectedExpressionSyGroupingField.setText(decodedTopNode.toString());
+			}
+			catch(Exception e){
+				Log.addError(e);
+			}
 		}
 
 		@Override

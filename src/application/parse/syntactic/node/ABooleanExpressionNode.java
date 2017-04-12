@@ -29,5 +29,16 @@ public abstract class ABooleanExpressionNode implements IBooleanExpressionNode{
 		children[j] = child;
 	}
 
+	@Override
+	public boolean isConnected() {
+		boolean connected = true;
+		for(int i=0; i<children.length; i++){
+			if(children[i]==null){
+				connected = false;
+				break;
+			}
+		}		
+		return connected;
+	}
 
 }
