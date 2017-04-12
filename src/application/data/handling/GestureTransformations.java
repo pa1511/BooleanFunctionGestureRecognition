@@ -7,12 +7,13 @@ import javax.annotation.Nonnull;
 
 import application.data.model.Gesture;
 import application.data.model.geometry.RelativePoint;
+import application.data.model.geometry.RelativeRectangle;
 
 public class GestureTransformations {
 
 	private GestureTransformations() {}
 	
-	public static @Nonnull double[] getRectangleRepresentation(@Nonnull Gesture gesture){
+	public static @Nonnull RelativeRectangle getRectangleRepresentation(@Nonnull Gesture gesture){
 		return RelativePointTransformations.getRectangleRepresentation(gesture.getPoints());
 	}
 	
@@ -39,8 +40,8 @@ public class GestureTransformations {
 
 		for (int i = 0; i < pointsCount; i++) {
 			RelativePoint point = points.get(i);
-			array[2 * i] = point.getX();
-			array[2 * i + 1] = point.getY();
+			array[2 * i] = point.x;
+			array[2 * i + 1] = point.y;
 		}
 
 		return array;
@@ -55,8 +56,8 @@ public class GestureTransformations {
 
 		for (int i = 0; i < pointsCount; i++) {
 			RelativePoint point = points.get(i);
-			array[2 * i] = Double.valueOf(point.getX());
-			array[2 * i + 1] = Double.valueOf(point.getY());
+			array[2 * i] = Double.valueOf(point.x);
+			array[2 * i + 1] = Double.valueOf(point.y);
 		}
 
 		return array;

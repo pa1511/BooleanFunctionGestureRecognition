@@ -10,6 +10,7 @@ import javax.annotation.Nonnull;
 import application.data.model.Gesture;
 import application.data.model.Symbol;
 import application.data.model.geometry.RelativePoint;
+import application.data.model.geometry.RelativeRectangle;
 import utilities.random.RNGProvider;
 
 public class SymbolTransformations {
@@ -128,7 +129,7 @@ public class SymbolTransformations {
 	/**
 	 * Returns a rectangle representation of the given symbol. <br>
 	 */
-	public static @Nonnull double[] getRectangleRepresentation(@Nonnull Symbol symbol) {
+	public static @Nonnull RelativeRectangle getRectangleRepresentation(@Nonnull Symbol symbol) {
 		List<RelativePoint> relativePoints = symbol.getGestures()
 				.stream()
 				.map(Gesture::getPoints)

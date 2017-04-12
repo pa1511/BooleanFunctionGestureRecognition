@@ -26,6 +26,7 @@ import application.data.handling.SymbolTransformations;
 import application.data.model.Expression;
 import application.data.model.ExpressionType;
 import application.data.model.Symbol;
+import application.data.model.geometry.RelativeRectangle;
 import application.parse.BooleanParser;
 import application.parse.BooleanSpatialParser;
 import application.parse.VariableValueProvider;
@@ -139,9 +140,9 @@ public class ExpressionConstructionPanel extends AbstractApplicationTab{
 			rectangleView.clear();
 			
 			List<Symbol> symbols = expression.getSymbols();
-			List<Pair<Symbol, double[]>> syRectPair = new ArrayList<>();
+			List<Pair<Symbol, RelativeRectangle>> syRectPair = new ArrayList<>();
 			for(Symbol symbol:symbols){
-				double[] syRec = SymbolTransformations.getRectangleRepresentation(symbol);
+				RelativeRectangle syRec = SymbolTransformations.getRectangleRepresentation(symbol);
 				syRectPair.add(Pair.of(symbol, syRec));
 				rectangleView.createRectangle(syRec);
 			}

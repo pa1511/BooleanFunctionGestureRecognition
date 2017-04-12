@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 
 import application.data.model.Symbol;
+import application.data.model.geometry.RelativeRectangle;
 import application.parse.lexic.LexicalAnalyzer;
 import application.parse.lexic.token.LexicalToken;
 import application.parse.syntactic.SyntacticAnalyzer;
@@ -24,8 +25,8 @@ public class BooleanSpatialParser {
 	private static final @Nonnull LexicalAnalyzer lexicalAnalizer = new LexicalAnalyzer();
 	private static final @Nonnull SyntacticAnalyzer syntacticAnalizer = new SyntacticAnalyzer();
 	
-	public static @Nonnull IBooleanExpressionNode parse(@Nonnull List<Pair<Symbol,double[]>> symbols){
-		List<Pair<IBooleanExpressionNode,double[]>> symbolsAsToken = symbols.stream()
+	public static @Nonnull IBooleanExpressionNode parse(@Nonnull List<Pair<Symbol,RelativeRectangle>> symbols){
+		List<Pair<IBooleanExpressionNode,RelativeRectangle>> symbolsAsToken = symbols.stream()
 				.map(symbol -> {
 					Symbol sy = symbol.left();
 					LexicalToken lt = lexicalAnalizer.decodeToken(sy.getSymbol());
@@ -35,7 +36,7 @@ public class BooleanSpatialParser {
 		return innerParse(symbolsAsToken).left();
 	}
 
-	private static @Nonnull Pair<IBooleanExpressionNode,double[]> innerParse(@Nonnull List<Pair<IBooleanExpressionNode,double[]>> nodes) {
+	private static @Nonnull Pair<IBooleanExpressionNode,RelativeRectangle> innerParse(@Nonnull List<Pair<IBooleanExpressionNode,RelativeRectangle>> nodes) {
 		
 		int nodeCount = nodes.size();
 		if(nodeCount==1)
@@ -43,7 +44,7 @@ public class BooleanSpatialParser {
 		
 		
 		//finding negation
-		Pair<IBooleanExpressionNode,double[]> negation;
+		Pair<IBooleanExpressionNode,RelativeRectangle> negation;
 		do{
 			
 			negation = nodes.stream().filter(pair->{
@@ -53,16 +54,16 @@ public class BooleanSpatialParser {
 			
 			if(negation!=null){
 				
-				List<Pair<IBooleanExpressionNode,double[]>> underNegation = nodes.stream().filter(xAboveY.apply(negation)).collect(Collectors.toList());
-				Pair<IBooleanExpressionNode,double[]> nodeUnderNegation = innerParse(underNegation);
+				List<Pair<IBooleanExpressionNode,RelativeRectangle>> underNegation = nodes.stream().filter(xAboveY.apply(negation)).collect(Collectors.toList());
+				Pair<IBooleanExpressionNode,RelativeRectangle> nodeUnderNegation = innerParse(underNegation);
 				nodes.removeAll(underNegation);
 				negation.left().addChild(nodeUnderNegation.left(), 0);
-				negation.setRight(joinRectangles(negation.right(),nodeUnderNegation.right()));
+				negation.setRight(RelativeRectangle.joinRectangles(negation.right(),nodeUnderNegation.right()));
 			}
 		}while(negation!=null);
 		
 		//operation reduction
-		Pair<IBooleanExpressionNode,double[]> and;
+		Pair<IBooleanExpressionNode,RelativeRectangle> and;
 		do{
 			
 			and = nodes.stream().filter(pair->{
@@ -86,29 +87,27 @@ public class BooleanSpatialParser {
 	
 	//TODO: there are a log of magic numbers here
 	
-	private static double[] joinRectangles(double[] rec1, double[] rec2) {
-		return new double[]{
-				Math.min(rec1[0], rec2[0]),
-				Math.min(rec1[1], rec2[1]),
-				Math.max(rec1[0]+rec1[2], rec2[0]+rec2[2]),
-				Math.max(rec1[1]+rec1[3], rec2[1]+rec2[3])
-			};
-	}
+	private static final @Nonnull Function<Pair<IBooleanExpressionNode, RelativeRectangle>, Predicate<Pair<IBooleanExpressionNode, RelativeRectangle>>> xAboveY = x -> y -> {
+		
+//		System.out.println("X: " + x.left());
+//		System.out.println("Y: " + y.left());
+		
+		RelativeRectangle recx = x.right();
+		RelativeRectangle recy = y.right();
+		
+		double bottomx = recx.y+recx.height;
+		double topy = recy.y;
 
-	private static final @Nonnull Function<Pair<IBooleanExpressionNode, double[]>, Predicate<Pair<IBooleanExpressionNode, double[]>>> xAboveY = x -> y -> {
+		double leftx = recx.x;
+		double rightx = recx.x+recx.width;
+		double lefty = recy.x;
+		double righty = recy.x+recy.width;
+//		double topx = recx[1];
+//		double bottomy = recy[1]+recy[3];
 		
-		System.out.println("X: " + x.left());
-		System.out.println("Y: " + y.left());
+		double tolerance = 0.01;
 		
-		double[] recx = x.right();
-		double[] recy = y.right();
-		
-		double topx = recx[1];
-		double bottomx = recx[1]+recx[3];
-		double topy = recy[1];
-		double bottomy = recy[1]+recy[3];
-		
-		return bottomx<topy; //|| (recx[1]+recx[3]>recy[1] && recx[1]+recx[3]<recy[1]+recy[3]);
+		return bottomx<topy && (leftx-tolerance<=lefty && rightx+tolerance>=righty);
 	};
 
 }
