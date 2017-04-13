@@ -10,6 +10,16 @@ import org.datavec.api.records.reader.RecordReader;
 import org.datavec.api.records.reader.impl.csv.CSVRecordReader;
 import org.datavec.api.split.FileSplit;
 import org.deeplearning4j.datasets.datavec.RecordReaderDataSetIterator;
+import org.deeplearning4j.earlystopping.EarlyStoppingConfiguration;
+import org.deeplearning4j.earlystopping.EarlyStoppingResult;
+import org.deeplearning4j.earlystopping.scorecalc.DataSetLossCalculator;
+import org.deeplearning4j.earlystopping.termination.BestScoreEpochTerminationCondition;
+import org.deeplearning4j.earlystopping.termination.EpochTerminationCondition;
+import org.deeplearning4j.earlystopping.termination.InvalidScoreIterationTerminationCondition;
+import org.deeplearning4j.earlystopping.termination.MaxEpochsTerminationCondition;
+import org.deeplearning4j.earlystopping.termination.MaxTimeIterationTerminationCondition;
+import org.deeplearning4j.earlystopping.termination.ScoreImprovementEpochTerminationCondition;
+import org.deeplearning4j.earlystopping.trainer.EarlyStoppingTrainer;
 import org.deeplearning4j.nn.api.OptimizationAlgorithm;
 import org.deeplearning4j.nn.conf.MultiLayerConfiguration;
 import org.deeplearning4j.nn.conf.NeuralNetConfiguration;
@@ -20,34 +30,42 @@ import org.deeplearning4j.nn.conf.layers.OutputLayer;
 import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
 import org.deeplearning4j.nn.weights.WeightInit;
 import org.deeplearning4j.optimize.listeners.ScoreIterationListener;
+import org.deeplearning4j.optimize.terminations.TerminationConditions;
 import org.nd4j.linalg.activations.Activation;
 import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
 import org.nd4j.linalg.factory.Nd4j;
 import org.nd4j.linalg.lossfunctions.LossFunctions.LossFunction;
 
-public class SCModelCreator {
+public class SCModelCreator implements ISCModelCreator {
 
-	private static final @Nonnull WeightInit weightInit  = WeightInit.XAVIER;
-	private static final @Nonnull Activation activationMethod = Activation.SOFTMAX;
-	private static final @Nonnull LossFunction lossFunction = LossFunction.SQUARED_LOSS;
+	private final @Nonnull WeightInit weightInit;
+	private final @Nonnull Activation activationMethod;
+	private final @Nonnull Activation outputActivationMethod;
+	private final @Nonnull LossFunction lossFunction;
 
-	public static @Nonnull MultiLayerNetwork createAndTrainModel(@Nonnull String trainDataFileName, 
+	public SCModelCreator() {
+		weightInit  = WeightInit.XAVIER;
+		activationMethod = Activation.SIGMOID;
+		outputActivationMethod = Activation.SOFTMAX;
+		lossFunction = LossFunction.RECONSTRUCTION_CROSSENTROPY;
+	}
+	
+	@Override
+	public @Nonnull MultiLayerNetwork createAndTrainModel(@Nonnull String trainDataFileName, 
 			@Nonnegative int nEpochs, 
 			@Nonnegative int iterationCount,
 			@Nonnegative int numInputs,@Nonnegative int numOutputs,@Nonnegative int[] hiddenNodes, 
 			@Nonnegative double scoreLimit,
 			@Nonnegative double learningRate, @Nonnegative int batchSize,
 			@Nonnull IntConsumer progressReporter) throws Exception{
-		
-		//TODO: limit optimization when a certain score is reached
-			    
+					    
 	    Nd4j.ENFORCE_NUMERICAL_STABILITY = false;
 		
 	    ListBuilder builder =  new NeuralNetConfiguration.Builder()
 	            .iterations(iterationCount)
 	            .optimizationAlgo(OptimizationAlgorithm.STOCHASTIC_GRADIENT_DESCENT)
 	            .learningRate(learningRate)
-	            .updater(Updater.NESTEROVS).momentum(0.95)
+	            .updater(Updater.ADAM)
 	            .list();
 	    
 	    for(int i=0; i<hiddenNodes.length; i++){
@@ -63,43 +81,54 @@ public class SCModelCreator {
 	            
 	    MultiLayerNetwork model = new MultiLayerNetwork(conf);
 	    model.init();
-	    model.setListeners(new ScoreIterationListener(nEpochs*iterationCount));    
+	   // model.setListeners(new ScoreIterationListener(nEpochs*iterationCount));    
 	    
 		//Load the training data:
+	    	    
 	    DataSetIterator trainIter;
 	    try(RecordReader rr = new CSVRecordReader()){
 			rr.initialize(new FileSplit(new File(trainDataFileName)));
 		    trainIter = new RecordReaderDataSetIterator(rr,batchSize,0,numOutputs);
 	    }
 	    
-	    for ( int n = 0; n < nEpochs; n++) {
-	        model.fit(trainIter);
+		//
+		EarlyStoppingConfiguration<MultiLayerNetwork> esConf = new EarlyStoppingConfiguration.Builder<MultiLayerNetwork>()
+				.epochTerminationConditions(new MaxEpochsTerminationCondition(nEpochs), new BestScoreEpochTerminationCondition(scoreLimit))
+				.iterationTerminationConditions(new InvalidScoreIterationTerminationCondition())
+				.scoreCalculator(new DataSetLossCalculator(trainIter, true))
+				.evaluateEveryNEpochs(1).build();
+
+		EarlyStoppingTrainer trainer = new EarlyStoppingTrainer(esConf, model, trainIter);
+		// Conduct early stopping training:
+		EarlyStoppingResult<MultiLayerNetwork> result = trainer.fit();
+		model = result.getBestModel();
+
+//		 //
+//	    for ( int n = 0; n < nEpochs; n++) {
+//	        model.fit(trainIter);
 //	        if(model.gradientAndScore().getSecond().doubleValue()<scoreLimit){
 //	        	break;
 //	        }
-	        progressReporter.accept(100*n/nEpochs);
-	    }
+//	        progressReporter.accept(100*n/nEpochs);
+//	    }
 	    progressReporter.accept(100);
 	    
 		return model;
 	}
 
-	private static DenseLayer getLayer(@Nonnegative int numInputs,@Nonnegative int numHiddenNodes) {
+	private DenseLayer getLayer(@Nonnegative int numInputs,@Nonnegative int numHiddenNodes) {
 		return new DenseLayer.Builder().nIn(numInputs).nOut(numHiddenNodes)
 		        .weightInit(weightInit)
 		        .activation(activationMethod)
 		        .build();
 	}
 
-	private static OutputLayer getOutputLayer(@Nonnegative int numOutputs,@Nonnegative int numHiddenNodes) {
+	private OutputLayer getOutputLayer(@Nonnegative int numOutputs,@Nonnegative int numHiddenNodes) {
 		return new OutputLayer.Builder(lossFunction)
 		        .weightInit(weightInit)
-		        .activation(activationMethod)
+		        .activation(outputActivationMethod)
 		        .nIn(numHiddenNodes).nOut(numOutputs).build();
 	}
 	
-	public static String modelMetaDataFileName(@Nonnull String modelName){
-		return modelName+".metadata";
-	}
 	
 }

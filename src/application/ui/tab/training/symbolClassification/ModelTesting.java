@@ -24,8 +24,8 @@ import org.deeplearning4j.util.ModelSerializer;
 import application.AbstractApplicationTab;
 import application.Application;
 import application.neural.symbolClassification.SCLogic;
-import application.neural.symbolClassification.SCModelCreator;
 import application.neural.symbolClassification.SCModelOutputInterpreter;
+import application.neural.symbolClassification.SCUtilities;
 import application.ui.draw.Canvas;
 import log.Log;
 import net.miginfocom.swing.MigLayout;
@@ -139,7 +139,7 @@ public class ModelTesting extends AbstractApplicationTab{
 		public void doWithSelectedDirectory(@Nonnull File selectedFile) {
 			try {
 				classificationModel = ModelSerializer.restoreMultiLayerNetwork(selectedFile);
-				modelOutputInterpreter = new SCModelOutputInterpreter(selectedFile.getParent()+File.separator+SCModelCreator.modelMetaDataFileName(selectedFile.getName()));
+				modelOutputInterpreter = new SCModelOutputInterpreter(selectedFile.getParent()+File.separator+SCUtilities.modelMetaDataFileName(selectedFile.getName()));
 				currentModelName.setText(selectedFile.getName());
 				testModelAction.setEnabled(true);
 			} catch (IOException e) {

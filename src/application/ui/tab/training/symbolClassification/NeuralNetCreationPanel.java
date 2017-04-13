@@ -26,7 +26,9 @@ import org.deeplearning4j.util.ModelSerializer;
 import application.AbstractApplicationTab;
 import application.Application;
 import application.data.handling.dataset.DatasetCreator;
-import application.neural.symbolClassification.SCModelCreator;
+import application.neural.symbolClassification.ISCModelCreator;
+import application.neural.symbolClassification.SCUtilities;
+import generalfactory.Factory;
 import log.Log;
 import net.miginfocom.swing.MigLayout;
 import ui.CommonUIActions;
@@ -49,12 +51,17 @@ public class NeuralNetCreationPanel extends AbstractApplicationTab{
 	private @CheckForNull File inputFile;
 	private @CheckForNull File modelOutputFolder;
 	
-	public NeuralNetCreationPanel() {
+	private final @Nonnull ISCModelCreator modelCreator;
+	
+	public NeuralNetCreationPanel() throws Exception {
  		
 		super("Neural net training");
-		
+				
 		Properties properties = Application.getInstance().getProperties();
 		
+		String modelPath = properties.getProperty(SCInKeys.TRAINING_MODEL_IMPL_PATH);
+		String modelName = properties.getProperty(SCInKeys.TRAINING_MODEL_IMPL_NAME);
+		modelCreator = Factory.getInstance(modelName, modelPath);
 		
 		String inputFileLocation = properties.getProperty(SCInKeys.TRAINING_DATA_OUTPUT_KEY);
 		JButton inputFileSelectionButton = new JButton(new SelectInputFileAction("Select",inputFileLocation));
@@ -70,11 +77,11 @@ public class NeuralNetCreationPanel extends AbstractApplicationTab{
 		
 		modelNameField = new JTextField("model");
 		
-		scoreLimitSpinner = new JSpinner(new SpinnerNumberModel(0.01, 0, 1, 0.001));
-		learningRateSpinner = new JSpinner(new SpinnerNumberModel(0.02, 0, 1, 0.001));
+		scoreLimitSpinner = new JSpinner(new SpinnerNumberModel(0.1, 0, 1, 0.001));
+		learningRateSpinner = new JSpinner(new SpinnerNumberModel(0.001, 0, 1, 0.001));
 		batchSizeSpinner = new JSpinner(new SpinnerNumberModel(5, 1, 100, 1));
 		epocheNumberSpinner = new JSpinner(new SpinnerNumberModel(1000, 1, 50000, 1));
-		iterationNumberSpinner = new JSpinner(new SpinnerNumberModel(50, 1, 50000, 1));
+		iterationNumberSpinner = new JSpinner(new SpinnerNumberModel(1, 1, 50000, 1));
 		hiddenNodesField = new JTextField();
 		
 		JButton trainNetworkButton = new JButton(new TrainAction("Train"));
@@ -110,7 +117,7 @@ public class NeuralNetCreationPanel extends AbstractApplicationTab{
 		add(epocheNumberSpinner,"span, wrap");
 		
 		//Row 5
-		JLabel hiddenNodesToolTipLabel = new JLabel("Specify the hidden nodes architecture. Example: 10x10x2");
+		JLabel hiddenNodesToolTipLabel = new JLabel("Specify the hidden nodes architecture. Example: 16x16");
 		hiddenNodesToolTipLabel.setFont(hiddenNodesToolTipLabel.getFont().deriveFont(Font.ITALIC));
 		add(hiddenNodesToolTipLabel,"span, growx, wrap");
 		add(hiddenNodesField, "span, growx, wrap");
@@ -157,12 +164,12 @@ public class NeuralNetCreationPanel extends AbstractApplicationTab{
 
 				@Override
 				protected MultiLayerNetwork doInBackground() throws Exception {
-					MultiLayerNetwork model = SCModelCreator.createAndTrainModel(fileNameTrain, nEpochs, iterationCount,
+					MultiLayerNetwork model = modelCreator.createAndTrainModel(fileNameTrain, nEpochs, iterationCount,
 							numInputs, numOutputs, hiddenNodes, scoreLimit, learningRate, batchSize, progress -> setProgress(progress));
 					ModelSerializer.writeModel(model, new File(modelOutputFolder, modelName), false);
 					
 					try(FileInputStream input = new FileInputStream(new File(DatasetCreator.getMetaFileName(fileNameTrain)));
-							FileOutputStream output = new FileOutputStream(new File(modelOutputFolder,SCModelCreator.modelMetaDataFileName(modelName)))){
+							FileOutputStream output = new FileOutputStream(new File(modelOutputFolder,SCUtilities.modelMetaDataFileName(modelName)))){
 						PStreams.copy(input,output);
 					}
 					return model;

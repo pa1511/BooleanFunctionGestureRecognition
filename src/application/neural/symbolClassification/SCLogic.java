@@ -25,6 +25,7 @@ public class SCLogic {
 	
 	public static @Nonnull int[] performSymbolClassification(@Nonnull MultiLayerNetwork classificationModel,
 			@Nonnull List<Pair<MouseClickType, List<RelativePoint>>> symbolData) {
+		
 		NeuralNetConfiguration config = classificationModel.getLayerWiseConfigurations().getConf(0);
 		DenseLayer layer = (DenseLayer) config.getLayer();
 		int precision = layer.getNIn();

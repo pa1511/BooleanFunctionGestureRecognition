@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.IntSupplier;
 
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnegative;
@@ -132,6 +133,7 @@ public class ExpressionManagementTable extends JTable implements AutoCloseable{
 
 		private final @Nonnull String[] columnNames;
 		private final @Nonnull UnsafeLazy<List<Expression>> expressions;
+		private final @Nonnull IntSupplier expressionCount;
 
 		public Model() {
 
@@ -140,12 +142,29 @@ public class ExpressionManagementTable extends JTable implements AutoCloseable{
 				try {
 					return Application.getInstance().getDataSource().getExpressions();
 				} catch (Exception e) {
-					Log.addError(e);
-					JOptionPane.showMessageDialog(null, "Error reading expressions from the database", "Error",
-							JOptionPane.ERROR_MESSAGE);
+					handleException(e);
 				}
 				return Collections.emptyList();
 			});
+			expressionCount = ()->{
+				if(expressions.isLoaded()){
+					return expressions.get().size();
+				}
+				
+				try {
+					return Application.getInstance().getDataSource().getExpressionCount();
+				} catch (Exception e) {
+					handleException(e);
+				}
+				
+				return 0;
+			};
+		}
+
+		private void handleException(Exception e) {
+			Log.addError(e);
+			JOptionPane.showMessageDialog(null, "Error reading expressions from the database", "Error",
+					JOptionPane.ERROR_MESSAGE);
 		}
 
 		@Override
@@ -160,7 +179,7 @@ public class ExpressionManagementTable extends JTable implements AutoCloseable{
 
 		@Override
 		public int getRowCount() {
-			return expressions.getOrThrow().size();
+			return expressionCount.getAsInt();
 		}
 
 		@Override
