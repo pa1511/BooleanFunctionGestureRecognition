@@ -20,6 +20,7 @@ public abstract class ACanvasObserver  extends AbstractObserver<Canvas>{
 
 	/**
 	 * Called when a new input to the canvas is made. <br>
+	 * @param input - new data
 	 */
 	public void newInputUpdate(@Nonnull Pair<MouseClickType,List<RelativePoint>> input){
 		
@@ -27,6 +28,7 @@ public abstract class ACanvasObserver  extends AbstractObserver<Canvas>{
 
 	/**
 	 * Called when a undo action is performed on the canvas <br>
+	 * @param input - new data
 	 */
 	public void undoUpdate(@Nonnull Pair<MouseClickType, List<RelativePoint>> input){
 		

@@ -182,6 +182,7 @@ public final class H2Database implements IDataSource {
 						Expression expression = new Expression(resultSet.getString(2), id);
 						expressions.add(expression);
 
+						//FIXME: this can't be like this because wat if the same symbol appears more then once!!!
 						Map<String, Symbol> symbols = new HashMap<>();
 						try (Statement innerStatement = connection.createStatement()) {
 							try (ResultSet innerResultSet = innerStatement.executeQuery(

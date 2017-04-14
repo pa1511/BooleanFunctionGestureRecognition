@@ -24,6 +24,7 @@ import application.data.model.ExpressionType;
 import log.Log;
 import observer.StrictObservationManager;
 import utilities.lazy.UnsafeLazy;
+import utilities.lazy.UnsafeLazyInt;
 
 public class ExpressionManagementTable extends JTable implements AutoCloseable{
 	
@@ -62,7 +63,7 @@ public class ExpressionManagementTable extends JTable implements AutoCloseable{
 					@Override
 					public void actionPerformed(@CheckForNull ActionEvent arg0) {
 						model.expressions.reset();
-						model.expressions.getOrThrow().removeIf(ex->ex.getType()!=filter);
+						model.expressions.getOrThrow().removeIf(ex->filter!=null && ex.getType()!=filter);
 						Log.addMessage("Reloaded expressions from db.", Log.Type.Plain);						
 						revalidate();
 						repaint();
@@ -146,18 +147,26 @@ public class ExpressionManagementTable extends JTable implements AutoCloseable{
 				}
 				return Collections.emptyList();
 			});
-			expressionCount = ()->{
-				if(expressions.isLoaded()){
-					return expressions.get().size();
-				}
+			expressionCount = new IntSupplier() {
 				
-				try {
-					return Application.getInstance().getDataSource().getExpressionCount();
-				} catch (Exception e) {
-					handleException(e);
+				private UnsafeLazyInt estimate = new UnsafeLazyInt(()->{
+					try {
+						return Application.getInstance().getDataSource().getExpressionCount();
+					} catch (Exception e) {
+						handleException(e);
+					}
+
+					return 0;
+				});
+
+				@Override
+				public int getAsInt() {
+					if (expressions.isLoaded()) {
+						return expressions.get().size();
+					}
+
+					return estimate.getAsInt();
 				}
-				
-				return 0;
 			};
 		}
 
