@@ -94,9 +94,10 @@ public class SCModelCreator implements ISCModelCreator {
 				.epochTerminationConditions(new MaxEpochsTerminationCondition(nEpochs), new BestScoreEpochTerminationCondition(scoreLimit))
 				.iterationTerminationConditions(new InvalidScoreIterationTerminationCondition())
 				.scoreCalculator(new DataSetLossCalculator(trainIter, true))
-				.evaluateEveryNEpochs(1).build();
+				.evaluateEveryNEpochs((int)(0.01*nEpochs)).build();
 
 		EarlyStoppingTrainer trainer = new EarlyStoppingTrainer(esConf, model, trainIter);
+		
 		// Conduct early stopping training:
 		trainer.setListener(new EarlyStoppingListener<MultiLayerNetwork>() {
 			
