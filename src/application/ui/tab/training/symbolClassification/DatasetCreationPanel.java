@@ -67,7 +67,8 @@ public class DatasetCreationPanel extends AbstractApplicationTab{
 		
 		//========================================================================================
 		//Symbol table
-		symbolTable = new JTable(new SymbolInformationTableModel());
+		SymbolInformationTableModel symbolInformationTableModel = new SymbolInformationTableModel();
+		symbolTable = new JTable(symbolInformationTableModel);
 		Dimension preferred = symbolTable.getPreferredSize();
 		preferred.height = symbolTable.getRowHeight()*numberOfRowsToShow;
 		symbolTable.setPreferredScrollableViewportSize(preferred);
@@ -100,6 +101,9 @@ public class DatasetCreationPanel extends AbstractApplicationTab{
 		
 		//Row 7
 		add(new JScrollPane(symbolTable),"span, grow, wrap");
+		
+		//Row 8
+		add(new JButton(symbolInformationTableModel.getStandardAction(SymbolInformationTableModel.ACTION_RELOAD)), "span, alignx right, wrap");
 		
 	}
 	

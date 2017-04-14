@@ -6,6 +6,7 @@ import application.parse.exception.BooleanExpressionSyntacticExceptiona;
 import application.parse.lexic.token.LexicalToken;
 import application.parse.syntactic.node.leaf.AndNode;
 import application.parse.syntactic.node.leaf.BracketsNode;
+import application.parse.syntactic.node.leaf.BracketsNode.Type;
 import application.parse.syntactic.node.leaf.FalseNode;
 import application.parse.syntactic.node.leaf.NotNode;
 import application.parse.syntactic.node.leaf.OrNode;
@@ -46,10 +47,11 @@ public class BooleanNodeFactory {
 			node = new VariableNode(symbolAsString);
 			break;
 		case LEFT_BRACKET:
-			node = new BracketsNode(LexicalToken.Type.LEFT_BRACKET.getSymbolAsString(), LexicalToken.Type.RIGHT_BRACKET.getSymbolAsString());
+			node = new BracketsNode(LexicalToken.Type.LEFT_BRACKET.getSymbolAsString(), LexicalToken.Type.RIGHT_BRACKET.getSymbolAsString(),Type.LEFT);
 			break;
 		case RIGHT_BRACKET:
-			throw new InternalError("Should never be asked for the right bracket node.");
+			node = new BracketsNode(LexicalToken.Type.LEFT_BRACKET.getSymbolAsString(), LexicalToken.Type.RIGHT_BRACKET.getSymbolAsString(),Type.RIGHT);
+			break;
 			
 		default:
 			throw new BooleanExpressionSyntacticExceptiona("Unknown syntactic node requested: " + token);

@@ -38,7 +38,7 @@ public class LexicalToken {
 			NOT.nextPossibleTypes = new Type[]{TRUE,FALSE,VARIABLE,LEFT_BRACKET,NOT};
 			AND.nextPossibleTypes = new Type[]{TRUE,FALSE,VARIABLE,LEFT_BRACKET,NOT};
 			OR.nextPossibleTypes = new Type[]{TRUE,FALSE,VARIABLE,LEFT_BRACKET,NOT};
-			LEFT_BRACKET.nextPossibleTypes = new Type[]{TRUE,FALSE,VARIABLE,LEFT_BRACKET};
+			LEFT_BRACKET.nextPossibleTypes = new Type[]{TRUE,FALSE,VARIABLE,LEFT_BRACKET,NOT};
 			RIGHT_BRACKET.nextPossibleTypes = new Type[]{AND,OR,RIGHT_BRACKET};
 		}
 		

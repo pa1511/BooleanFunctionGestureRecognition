@@ -1,10 +1,14 @@
 package application.ui.table;
 
+import java.awt.event.ActionEvent;
 import java.util.Collections;
 import java.util.List;
 
+import javax.annotation.CheckForNull;
 import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
+import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.JOptionPane;
 import javax.swing.table.AbstractTableModel;
 
@@ -17,6 +21,10 @@ public class SymbolInformationTableModel extends AbstractTableModel {
 
 	private final @Nonnull String[] columnNames;
 	private final @Nonnull UnsafeLazy<List<SymbolSamplesInformation>> symbolsInfo;
+	
+	private final @Nonnull Action[] standardActions;
+	public static final @Nonnull String ACTION_RELOAD = "Reload";
+
 	
 	public SymbolInformationTableModel() {
 		//TODO: count
@@ -32,7 +40,30 @@ public class SymbolInformationTableModel extends AbstractTableModel {
 			return Collections.emptyList();
 		});
 		
+		standardActions = new Action[]{
+				new AbstractAction(ACTION_RELOAD) {
+					
+					@Override
+					public void actionPerformed(@CheckForNull ActionEvent arg0) {
+						symbolsInfo.reset();
+						Log.addMessage("Reloaded symbol info from db.", Log.Type.Plain);						
+						fireTableDataChanged();
+					}
+				}
+		};
+
+		
 	}
+	
+	public @CheckForNull Action getStandardAction(@Nonnull String actionName){
+		for(Action action:standardActions){
+			if(action.getValue(Action.NAME).equals(actionName)){
+				return action;
+			}
+		}
+		return null;
+	}
+
 	
 	@Override
 	public int getColumnCount() {
