@@ -25,7 +25,7 @@ import org.deeplearning4j.util.ModelSerializer;
 
 import application.AbstractApplicationTab;
 import application.Application;
-import application.data.handling.dataset.DatasetCreator;
+import application.data.handling.dataset.DatasetShuffleCreator;
 import application.neural.symbolClassification.ISCModelCreator;
 import application.neural.symbolClassification.SCUtilities;
 import generalfactory.Factory;
@@ -148,8 +148,8 @@ public class NeuralNetCreationPanel extends AbstractApplicationTab{
 			}
 			
 		    String fileNameTrain = inputFile.getAbsolutePath();
-		    int numInputs = DatasetCreator.getNumberOfInputsFrom(inputFile);
-		    int numOutputs = DatasetCreator.getNumberOfOutputsFrom(inputFile);
+		    int numInputs = DatasetShuffleCreator.getNumberOfInputsFrom(inputFile);
+		    int numOutputs = DatasetShuffleCreator.getNumberOfOutputsFrom(inputFile);
 		    
 		    
 		    int[] hiddenNodes = Arrays.stream(hiddenNodesField.getText().toLowerCase().split("x")).mapToInt(Integer::parseInt).toArray();
@@ -168,7 +168,7 @@ public class NeuralNetCreationPanel extends AbstractApplicationTab{
 							numInputs, numOutputs, hiddenNodes, scoreLimit, learningRate, batchSize, progress -> setProgress(progress));
 					ModelSerializer.writeModel(model, new File(modelOutputFolder, modelName), false);
 					
-					try(FileInputStream input = new FileInputStream(new File(DatasetCreator.getMetaFileName(fileNameTrain)));
+					try(FileInputStream input = new FileInputStream(new File(DatasetShuffleCreator.getMetaFileName(fileNameTrain)));
 							FileOutputStream output = new FileOutputStream(new File(modelOutputFolder,SCUtilities.modelMetaDataFileName(modelName)))){
 						PStreams.copy(input,output);
 					}

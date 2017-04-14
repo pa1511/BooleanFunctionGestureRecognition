@@ -6,8 +6,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
-import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 import javax.swing.AbstractAction;
 import javax.swing.JButton;
@@ -27,6 +28,7 @@ import application.neural.symbolClassification.SCLogic;
 import application.neural.symbolClassification.SCModelOutputInterpreter;
 import application.neural.symbolClassification.SCUtilities;
 import application.ui.draw.Canvas;
+import dataModels.Pair;
 import log.Log;
 import net.miginfocom.swing.MigLayout;
 import ui.CommonUIActions;
@@ -38,13 +40,14 @@ public class ModelTesting extends AbstractApplicationTab{
 	private final @Nonnull Canvas testingCanvas;
 	private final @Nonnull TestModelAction testModelAction;
 	
-	private @CheckForNull MultiLayerNetwork classificationModel = null;
-	private @CheckForNull SCModelOutputInterpreter modelOutputInterpreter = null;
+	private final @Nonnull List<Pair<MultiLayerNetwork,SCModelOutputInterpreter>> modelList;
 	private ClearCanvasAction clearAction;
 	
 	public ModelTesting() {
 		super("Neural net testing");
 
+		modelList = new ArrayList<>();
+		
 		setLayout(new MigLayout("","[][][][grow]","[]10[][grow][]"));
 		String modelFolder = Application.getInstance().getProperties().getProperty(SCInKeys.TRAINING_MODEl_OUTPUT_KEY);
 		
@@ -70,11 +73,13 @@ public class ModelTesting extends AbstractApplicationTab{
 		add(testingCanvas, "span, grow, wrap");
 
 		//Row 4
-		testModelAction = new TestModelAction("Test",classificationModel!=null);
+		testModelAction = new TestModelAction("Test",!modelList.isEmpty());
+		ClearModelAction clearModelAction = new ClearModelAction();
 		clearAction = new ClearCanvasAction();
 		
 		JPanel commandPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
 		commandPanel.add(new JButton(clearAction));
+		commandPanel.add(new JButton(clearModelAction));
 		commandPanel.add(new JButton(testModelAction));
 		add(commandPanel,"span, growx, wrap");
 		
@@ -88,6 +93,20 @@ public class ModelTesting extends AbstractApplicationTab{
 		component.registerKeyboardAction(clearAction, 
 				KeyStroke.getKeyStroke(KeyEvent.VK_C, KeyEvent.CTRL_DOWN_MASK + KeyEvent.SHIFT_DOWN_MASK), JComponent.WHEN_FOCUSED);
 	}
+
+	private final class ClearModelAction extends AbstractAction {
+		private ClearModelAction() {
+			super("Clear model");
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent arg0) {
+			modelList.clear();
+			currentModelName.setText("");
+			predictedSymbolField.setText("");
+		}
+	}
+
 
 	private final class ClearCanvasAction extends AbstractAction {
 		
@@ -112,15 +131,20 @@ public class ModelTesting extends AbstractApplicationTab{
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
 
-			if(classificationModel == null){
+			if(modelList.isEmpty()){
 				Log.addMessage("Testing with no model present. ", Log.Type.Error);
 				JOptionPane.showMessageDialog(null, "No model present.", "Error", JOptionPane.ERROR_MESSAGE);
 				return;
 			}
 			
 			try{
-				int[] prediction = SCLogic.performSymbolClassification(classificationModel,testingCanvas.getData());
-				predictedSymbolField.setText(modelOutputInterpreter.apply(prediction[0]));				
+				predictedSymbolField.setText("");
+				StringBuilder sb = new StringBuilder();
+				for(Pair<MultiLayerNetwork, SCModelOutputInterpreter> modelAndInterpreter:modelList){
+					int[] prediction = SCLogic.performSymbolClassification(modelAndInterpreter.left(),testingCanvas.getData());
+					sb.append("||").append(modelAndInterpreter.right().apply(prediction[0]));
+				}
+				predictedSymbolField.setText(sb.toString());
 			}
 			catch (Exception e) {
 				Log.addError(e);
@@ -138,9 +162,10 @@ public class ModelTesting extends AbstractApplicationTab{
 		@Override
 		public void doWithSelectedDirectory(@Nonnull File selectedFile) {
 			try {
-				classificationModel = ModelSerializer.restoreMultiLayerNetwork(selectedFile);
-				modelOutputInterpreter = new SCModelOutputInterpreter(selectedFile.getParent()+File.separator+SCUtilities.modelMetaDataFileName(selectedFile.getName()));
-				currentModelName.setText(selectedFile.getName());
+				MultiLayerNetwork classificationModel = ModelSerializer.restoreMultiLayerNetwork(selectedFile);
+				SCModelOutputInterpreter modelOutputInterpreter = new SCModelOutputInterpreter(selectedFile.getParent()+File.separator+SCUtilities.modelMetaDataFileName(selectedFile.getName()));
+				modelList.add(Pair.of(classificationModel, modelOutputInterpreter));
+				currentModelName.setText(currentModelName.getText()+"||"+selectedFile.getName());
 				testModelAction.setEnabled(true);
 			} catch (IOException e) {
 				Log.addError(e);

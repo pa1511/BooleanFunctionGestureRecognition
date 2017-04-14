@@ -2,6 +2,7 @@ package application.parse;
 
 import java.util.List;
 import java.util.function.BiConsumer;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -26,10 +27,7 @@ public class BooleanSpatialParser {
 
 	//TODO: load in a better way
 	private static final @Nonnull LexicalAnalyzer lexicalAnalizer = new LexicalAnalyzer();
-	
-	//TODO: this could be a bit fuzzy && magic numbers !!!
-	private static final double tolerance = 0.02;
-	
+		
 	private static final @Nonnull Function<Class<? extends IBooleanExpressionNode>, Predicate<Pair<IBooleanExpressionNode,RelativeRectangle>>> classNonConnectedNodeFilter = clazz -> pair -> {
 		IBooleanExpressionNode node = pair.left();
 		return clazz.isInstance(node) && !node.isConnected();
@@ -58,7 +56,6 @@ public class BooleanSpatialParser {
 		if(nodeCount==1)
 			return nodes.get(0);
 		
-		//TODO: brackets
 		Pair<IBooleanExpressionNode,RelativeRectangle> leftBracketNode = null;
 		Pair<IBooleanExpressionNode,RelativeRectangle> rightBracketNode = null;
 		do{
@@ -80,7 +77,6 @@ public class BooleanSpatialParser {
 			}
 			
 			if(leftBracketNode!=null && rightBracketNode!=null){
-				//TODO
 				List<Pair<IBooleanExpressionNode,RelativeRectangle>> nodesBetween = getNodesBetween(leftBracketNode, rightBracketNode, nodes);
 
 				//
@@ -92,7 +88,6 @@ public class BooleanSpatialParser {
 						RelativeRectangle.joinRectangles(leftBracketNode.right(),nodeInBrackets.right()), 
 						rightBracketNode.right()));
 			}
-			//TODO
 		}while(leftBracketNode!=null && rightBracketNode!=null);
 		
 		
@@ -121,32 +116,22 @@ public class BooleanSpatialParser {
 		final RelativeRectangle leftRec = leftBracketNode.right();
 		final RelativeRectangle rightRec = rightBracketNode.right();
 
-		
-		return nodes.stream().filter(node->{
-			//TODO
-			if(node==leftBracketNode || node==rightBracketNode)
-				return false;
-			
-			RelativeRectangle nodeRec = node.right();
-			
-			return leftRec.centerX<nodeRec.centerX && nodeRec.centerX<rightRec.centerX;
-		}).collect(Collectors.toList());
+		return nodes.stream().filter(xinsideLeftRight.apply(leftRec, rightRec)).collect(Collectors.toList());
 	}
-	
-	//TODO: radije koristi centar mase
 
 	private static void reduceOperation(Class<? extends IBooleanExpressionNode> clazz,List<Pair<IBooleanExpressionNode, RelativeRectangle>> nodes,
 			BiConsumer<List<Pair<IBooleanExpressionNode, RelativeRectangle>>,Pair<IBooleanExpressionNode, RelativeRectangle>> reducer) {
 		Pair<IBooleanExpressionNode,RelativeRectangle> operationNode;
 		do {
 
-			operationNode = nodes.stream().filter(
-					classNonConnectedNodeFilter.apply(clazz)
-			).findAny().orElse(null);
-
+			operationNode = nodes.stream()
+					.filter(classNonConnectedNodeFilter.apply(clazz))
+					.findAny().orElse(null);
+			
 			if (operationNode != null) {
 				reducer.accept(nodes, operationNode);
 			}
+			
 		} while (operationNode != null);
 	}
 	
@@ -219,28 +204,23 @@ public class BooleanSpatialParser {
 				minRight = rightDistance;
 				right = neighbour;
 			}
-
-			
-//			double leftDistance = nodeRec.ulX+tolerance - neighbourRec.lrX;
-//			double rightDistance = neighbourRec.ulX+tolerance - nodeRec.lrX;
-//			
-//			if(minLeft>leftDistance && leftDistance>-tolerance){
-//				//Left
-//				minLeft = leftDistance;
-//				left = neighbour;
-//			}
-//			
-//			if(minRight>rightDistance && rightDistance>-tolerance){
-//				//Right
-//				minRight = rightDistance;
-//				right = neighbour;
-//			}
 			
 		}
 		
 		
 		return Pair.of(left, right);
 	}
+	
+	private static final @Nonnull BiFunction<RelativeRectangle, RelativeRectangle, Predicate<Pair<IBooleanExpressionNode, RelativeRectangle>>> xinsideLeftRight = (left, right) -> x ->{
+		RelativeRectangle nodeRec = x.right();
+		
+		if(nodeRec==left || nodeRec==right)
+			return false;
+		
+		
+		return left.centerX<nodeRec.centerX && nodeRec.centerX<right.centerX && 
+				!(left.ulX>nodeRec.ulX && right.lrX<nodeRec.lrX);
+	};
 	
 	private static final @Nonnull Function<Pair<IBooleanExpressionNode, RelativeRectangle>, Predicate<Pair<IBooleanExpressionNode, RelativeRectangle>>> xAboveY = x -> y -> {
 		if(x==y)
@@ -252,9 +232,6 @@ public class BooleanSpatialParser {
 		
 		boolean isLower = recx.centerY<recy.centerY;
 		boolean isUnder = (recx.ulX<=recy.centerX && recx.lrX>=recy.centerX);
-
-//		boolean isLower = recx.lrY-recy.ulY<=tolerance;
-//		boolean isUnder = (recx.ulX-tolerance<=recy.ulX && recx.lrX+tolerance>=recy.lrX);
 		
 		return  isLower && isUnder;
 	};

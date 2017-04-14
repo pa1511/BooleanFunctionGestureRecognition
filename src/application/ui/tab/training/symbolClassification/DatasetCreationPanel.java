@@ -8,6 +8,7 @@ import java.io.FileOutputStream;
 import java.io.PrintStream;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnegative;
@@ -24,10 +25,11 @@ import javax.swing.SpinnerNumberModel;
 
 import application.AbstractApplicationTab;
 import application.Application;
-import application.data.handling.dataset.DatasetCreator;
+import application.data.handling.dataset.ADatasetCreator;
 import application.ui.table.SymbolInformationTableModel;
 import dataset.ClassificationDataSet;
 import dataset.handeling.DataSetDepositers;
+import generalfactory.Factory;
 import log.Log;
 import net.miginfocom.swing.MigLayout;
 import ui.CommonUIActions;
@@ -43,11 +45,18 @@ public class DatasetCreationPanel extends AbstractApplicationTab{
 	private final @Nonnull JTable symbolTable;
 
 	private @CheckForNull File outputFolder = null;
-
 	
-	public DatasetCreationPanel() {
+	private final @Nonnull ADatasetCreator datasetCreator;
+	
+	public DatasetCreationPanel() throws Exception {
 
 		super("Dataset creation");
+		
+		Properties properties = Application.getInstance().getProperties();
+		
+		String dataCreatorPath = properties.getProperty(SCInKeys.DATA_CREATION_IMPL_PATH);
+		String dataCreatorName = properties.getProperty(SCInKeys.DATA_CREATION_IMPL_NAME);
+		datasetCreator = Factory.getInstance(dataCreatorName, dataCreatorPath);
 		
 		symbolsField = new JTextField();
 		JLabel instructionLabel = new JLabel("<html>Input the symbols you whish the system to use like this: \"A:10,B:20\".</br> The meaning is use the symbol and this amount of learning examples.</html>");
@@ -55,8 +64,7 @@ public class DatasetCreationPanel extends AbstractApplicationTab{
 		instructionLabel.setFont(instructionFont);
 		JButton selectOutputFolderButton = new JButton(new SelectDirectoryAction());
 		JLabel outputLabel = new JLabel("output folder: " );		
-		String outputFolderLocation = 
-				Application.getInstance().getProperties().getProperty(SCInKeys.TRAINING_DATA_OUTPUT_KEY);
+		String outputFolderLocation = properties.getProperty(SCInKeys.TRAINING_DATA_OUTPUT_KEY);
 		outputFolder = new File(outputFolderLocation);
 		outputFolderField = new JTextField(outputFolder.getAbsolutePath());
 		
@@ -166,13 +174,13 @@ public class DatasetCreationPanel extends AbstractApplicationTab{
 			
 			Map<String, Integer> requestedSymbolMap = parseRequest(requestedSymbolAsString);
 			
-			File outputFile = new File(outputFolder, DatasetCreator.createCSVFileName(fileName, precision, requestedSymbolMap));
-			File metaOutputFile = new File(outputFolder,DatasetCreator.getMetaFileName(outputFile.getName()));
+			File outputFile = new File(outputFolder, ADatasetCreator.createCSVFileName(fileName, precision, requestedSymbolMap));
+			File metaOutputFile = new File(outputFolder,ADatasetCreator.getMetaFileName(outputFile.getName()));
 			
 			Log.addMessage("Creating output file: " + outputFile, Log.Type.Plain);
 			try(PrintStream outputPrintStream = new PrintStream(new FileOutputStream(outputFile));
 				PrintStream metaOutputPrintStream = new PrintStream(new FileOutputStream(metaOutputFile))){
-				ClassificationDataSet dataSet = DatasetCreator.createSymbolClassificationDataset(requestedSymbolMap,precision);
+				ClassificationDataSet dataSet = datasetCreator.createSymbolClassificationDataset(requestedSymbolMap,precision);
 				DataSetDepositers.depositToCSV(dataSet, outputPrintStream, false);
 				DataSetDepositers.depositClassificationMeta(dataSet,metaOutputPrintStream, false);
 			} catch (Exception e1) {

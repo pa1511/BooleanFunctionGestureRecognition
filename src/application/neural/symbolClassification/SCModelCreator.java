@@ -12,13 +12,11 @@ import org.datavec.api.split.FileSplit;
 import org.deeplearning4j.datasets.datavec.RecordReaderDataSetIterator;
 import org.deeplearning4j.earlystopping.EarlyStoppingConfiguration;
 import org.deeplearning4j.earlystopping.EarlyStoppingResult;
+import org.deeplearning4j.earlystopping.listener.EarlyStoppingListener;
 import org.deeplearning4j.earlystopping.scorecalc.DataSetLossCalculator;
 import org.deeplearning4j.earlystopping.termination.BestScoreEpochTerminationCondition;
-import org.deeplearning4j.earlystopping.termination.EpochTerminationCondition;
 import org.deeplearning4j.earlystopping.termination.InvalidScoreIterationTerminationCondition;
 import org.deeplearning4j.earlystopping.termination.MaxEpochsTerminationCondition;
-import org.deeplearning4j.earlystopping.termination.MaxTimeIterationTerminationCondition;
-import org.deeplearning4j.earlystopping.termination.ScoreImprovementEpochTerminationCondition;
 import org.deeplearning4j.earlystopping.trainer.EarlyStoppingTrainer;
 import org.deeplearning4j.nn.api.OptimizationAlgorithm;
 import org.deeplearning4j.nn.conf.MultiLayerConfiguration;
@@ -29,12 +27,12 @@ import org.deeplearning4j.nn.conf.layers.DenseLayer;
 import org.deeplearning4j.nn.conf.layers.OutputLayer;
 import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
 import org.deeplearning4j.nn.weights.WeightInit;
-import org.deeplearning4j.optimize.listeners.ScoreIterationListener;
-import org.deeplearning4j.optimize.terminations.TerminationConditions;
 import org.nd4j.linalg.activations.Activation;
 import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
 import org.nd4j.linalg.factory.Nd4j;
 import org.nd4j.linalg.lossfunctions.LossFunctions.LossFunction;
+
+import log.Log;
 
 public class SCModelCreator implements ISCModelCreator {
 
@@ -100,18 +98,27 @@ public class SCModelCreator implements ISCModelCreator {
 
 		EarlyStoppingTrainer trainer = new EarlyStoppingTrainer(esConf, model, trainIter);
 		// Conduct early stopping training:
+		trainer.setListener(new EarlyStoppingListener<MultiLayerNetwork>() {
+			
+			@Override
+			public void onStart(EarlyStoppingConfiguration<MultiLayerNetwork> esConfig, MultiLayerNetwork net) {
+				Log.addMessage("Started model training", Log.Type.Plain);
+			}
+			
+			@Override
+			public void onEpoch(int epochNum, double score, EarlyStoppingConfiguration<MultiLayerNetwork> esConfig,
+					MultiLayerNetwork net) {
+		        progressReporter.accept(100*epochNum/nEpochs);
+			}
+			
+			@Override
+			public void onCompletion(EarlyStoppingResult<MultiLayerNetwork> esResult) {
+				Log.addMessage("Finished model training", Log.Type.Plain);
+			    progressReporter.accept(100);
+			}
+		});
 		EarlyStoppingResult<MultiLayerNetwork> result = trainer.fit();
 		model = result.getBestModel();
-
-//		 //
-//	    for ( int n = 0; n < nEpochs; n++) {
-//	        model.fit(trainIter);
-//	        if(model.gradientAndScore().getSecond().doubleValue()<scoreLimit){
-//	        	break;
-//	        }
-//	        progressReporter.accept(100*n/nEpochs);
-//	    }
-	    progressReporter.accept(100);
 	    
 		return model;
 	}
