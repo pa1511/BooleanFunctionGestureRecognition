@@ -1,4 +1,4 @@
-package application.data.datasource;
+package application.data.source;
 
 import java.sql.Connection;
 import java.sql.DriverManager;

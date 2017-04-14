@@ -28,6 +28,9 @@ import utilities.lazy.UnsafeLazyInt;
 
 public class ExpressionManagementTable extends JTable implements AutoCloseable{
 	
+	public static final @Nonnull String ACTION_RELOAD = "Reload";
+	public static final @Nonnull String ACTION_DELETE = "Delete";
+	
 	public final @Nonnull StrictObservationManager<Expression,AExpressionManagementObserver> observationManager;
 	private final @Nonnull Function<Expression, Consumer<AExpressionManagementObserver>> delete = exp -> o -> o.expressionDelete(exp);
 	
@@ -35,8 +38,6 @@ public class ExpressionManagementTable extends JTable implements AutoCloseable{
 	private final @Nonnull ListSelectionListener selectionListener;
 	
 	private final @Nonnull Action[] standardActions;
-	public static final @Nonnull String ACTION_RELOAD = "Reload";
-	public static final @Nonnull String ACTION_DELETE = "Delete";
 		
 	public ExpressionManagementTable() {
 		model = new Model();

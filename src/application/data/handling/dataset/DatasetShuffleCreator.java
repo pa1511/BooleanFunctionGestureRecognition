@@ -9,10 +9,10 @@ import java.util.Map;
 import javax.annotation.Nonnull;
 
 import application.Application;
-import application.data.datasource.IDataSource;
 import application.data.handling.SymbolDataNormalizer;
 import application.data.handling.SymbolTransformations;
 import application.data.model.Symbol;
+import application.data.source.IDataSource;
 import dataset.ClassificationDataSet;
 
 public class DatasetShuffleCreator extends ADatasetCreator {
