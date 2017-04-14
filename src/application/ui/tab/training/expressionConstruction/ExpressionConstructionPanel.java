@@ -13,6 +13,7 @@ import javax.annotation.Nonnull;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
@@ -165,6 +166,7 @@ public class ExpressionConstructionPanel extends AbstractApplicationTab{
 			}
 			catch(Exception e){
 				Log.addError(e);
+				JOptionPane.showMessageDialog(null, "An error occured during spacial parisng.", "Error", JOptionPane.ERROR_MESSAGE);
 			}
 		}
 

@@ -80,7 +80,7 @@ public class RectangleRepresentationView extends JPanel {
 
 			RelativeRectangle rectangle = rectangleDescription.right();
 			
-			g.drawRect((int)(rectangle.x*componentWidth), (int)(rectangle.y*componentHeight),
+			g.drawRect((int)(rectangle.ulX*componentWidth), (int)(rectangle.ulY*componentHeight),
 					(int)(rectangle.width*componentWidth), (int)(rectangle.height*componentHeight));
 		}
 		g.setColor(oldColor);

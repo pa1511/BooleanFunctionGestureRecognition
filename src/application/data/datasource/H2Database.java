@@ -20,6 +20,7 @@ import application.data.model.Expression;
 import application.data.model.Gesture;
 import application.data.model.Symbol;
 import application.data.model.SymbolSamplesInformation;
+import dataModels.Pair;
 import database.H2DatabaseSupport;
 import log.Log;
 
@@ -42,7 +43,9 @@ public final class H2Database implements IDataSource {
 	private static final @Nonnull String gestureTable = "GESTURE";
 	private static final @Nonnull String geIdColumn = "ID";
 	private static final @Nonnull String geFIdExColumn = "ID_EX";
-	private static final @Nonnull String geSymbolColumn = "ID_SY";
+	private static final @Nonnull String geSymbolSyColumn = "ID_SY";
+	private static final @Nonnull String geSymbolIDColumn = "ID_SY_POSITION";
+	
 	private static final @Nonnull String geExPositionColumn = "EX_POSITION";
 	private static final @Nonnull String gePointsColumn = "POINTS";
 	private static final @Nonnull String geExComplexColumn = "EX_COMPLEX";
@@ -93,12 +96,13 @@ public final class H2Database implements IDataSource {
 			
 			statement.execute(
 					"CREATE TABLE IF NOT EXISTS " + gestureTable + "(" + 
-							geIdColumn + " " + "INT AUTO_INCREMENT PRIMARY KEY, " + 
-							geFIdExColumn + " " + "INT, " + 
-							geSymbolColumn + " "+ "CHAR, " + 
-							geExPositionColumn + " " + "INT, " + 
-							gePointsColumn + " " + "ARRAY, " + 
-							geExComplexColumn + " " + "BOOLEAN,"
+							geIdColumn + " INT AUTO_INCREMENT PRIMARY KEY, " + 
+							geFIdExColumn + " INT, " + 
+							geSymbolSyColumn + " CHAR, " + 
+							geExPositionColumn + " INT, " + 
+							gePointsColumn + " ARRAY, " + 
+							geExComplexColumn + " BOOLEAN," + 
+							geSymbolIDColumn + " INT, " 
 							+ "FOREIGN KEY(" + geFIdExColumn + ") REFERENCES " + expressionTable + "(ID), " + ")");
 		}
 		
@@ -130,11 +134,13 @@ public final class H2Database implements IDataSource {
 
 			}
 
-			String insertGestureSql = "INSERT INTO " + gestureTable + " ( " + geFIdExColumn + "," + geSymbolColumn + ","
-					+ geExPositionColumn + "," + gePointsColumn + "," + geExComplexColumn + " ) VALUES( ?,?,?,?,? )";
+			String insertGestureSql = "INSERT INTO " + gestureTable + " ( " + geFIdExColumn + "," + geSymbolSyColumn + ","
+					+ geExPositionColumn + "," + gePointsColumn + "," + geExComplexColumn + "," + geSymbolIDColumn + " ) VALUES( ?,?,?,?,?,? )";
 
 			try (PreparedStatement statement = connection.prepareStatement(insertGestureSql)) {
-				for (Symbol symbol : expression.getSymbols()) {
+				List<Symbol> symbols = expression.getSymbols();
+				for (int j = 0, syLimit = symbols.size(); j<syLimit; j++ ) {
+					Symbol symbol = symbols.get(j);
 					List<Gesture> gestures = symbol.getGestures();
 					for (int i = 0, limit = gestures.size(); i < limit; i++) {
 						Gesture gesture = gestures.get(i);
@@ -144,6 +150,7 @@ public final class H2Database implements IDataSource {
 						statement.setInt(3, i);
 						statement.setObject(4, GestureTransformations.gestureToArray(gesture));
 						statement.setBoolean(5, expression.isComplex());
+						statement.setInt(6, j);
 						statement.addBatch();
 					}
 				}
@@ -182,11 +189,9 @@ public final class H2Database implements IDataSource {
 						Expression expression = new Expression(resultSet.getString(2), id);
 						expressions.add(expression);
 
-						//FIXME: this can't be like this because wat if the same symbol appears more then once!!!
-						Map<String, Symbol> symbols = new HashMap<>();
+						Map<Pair<String,Integer>, Symbol> symbols = new HashMap<>();
 						try (Statement innerStatement = connection.createStatement()) {
 							try (ResultSet innerResultSet = innerStatement.executeQuery(
-									// TODO: this can be injected!
 									"SELECT * FROM " + gestureTable + " WHERE " + geFIdExColumn + " = " + id)) {
 								while (innerResultSet.next()) {
 
@@ -194,12 +199,16 @@ public final class H2Database implements IDataSource {
 									String symbolAsString = innerResultSet.getString(3);
 									Object[] points = (Object[]) innerResultSet.getObject(5);
 
-									Symbol symbol = symbols.get(symbolAsString);
+									int syPosition = innerResultSet.getInt(7);
+									
+									Pair<String,Integer> identificationPair = Pair.of(symbolAsString, Integer.valueOf(syPosition));
+									
+									Symbol symbol = symbols.get(identificationPair);
 									if (symbol == null) {
-										int syId = innerResultSet.getInt(4);
+										int gePosition = innerResultSet.getInt(4);
 										//TODO: symbol id is not unique
-										symbol = new Symbol(symbolAsString.toCharArray()[0], syId);
-										symbols.put(symbolAsString, symbol);
+										symbol = new Symbol(symbolAsString.toCharArray()[0], gePosition);
+										symbols.put(identificationPair, symbol);
 									}
 									
 									symbol.addGesture(GestureTransformations.getPointsAsGesture(geId, points));
@@ -273,7 +282,7 @@ public final class H2Database implements IDataSource {
 		try(Connection connection = dbConnection.get()){
 			try(PreparedStatement statement = connection.prepareStatement(
 				"SELECT * FROM " + gestureTable +" " + 
-				"WHERE " + geSymbolColumn + " = ? " +
+				"WHERE " + geSymbolSyColumn + " = ? " +
 				"ORDER BY " + geFIdExColumn + ", " + geExPositionColumn
 				//TODO: can't limit like this because I am not limiting to n gestures but symbols samples !!!
 				
