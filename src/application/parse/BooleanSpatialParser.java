@@ -65,6 +65,8 @@ public class BooleanSpatialParser {
 
 		throw new RuntimeException("Ended with empty node list");
 	}
+	
+	//TODO: radije koristi centar mase
 
 	private static void negationReduce(List<Pair<IBooleanExpressionNode, RelativeRectangle>> nodes) {
 		Pair<IBooleanExpressionNode,RelativeRectangle> negation;
