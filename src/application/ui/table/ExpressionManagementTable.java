@@ -61,9 +61,9 @@ public class ExpressionManagementTable extends JTable implements AutoCloseable{
 					public void actionPerformed(@CheckForNull ActionEvent arg0) {
 						if(model.expressions.isLoaded()){
 							model.expressions.reset();
-							Log.addMessage("Reloaded expressions from db.", Log.Type.Plain);						
-							revalidate();
-							repaint();
+							model.expressions.getOrThrow();
+							Log.addMessage("Reloaded expressions from db.", Log.Type.Plain);
+							model.fireTableDataChanged();
 						}
 					}
 				},
