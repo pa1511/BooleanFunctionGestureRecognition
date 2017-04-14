@@ -33,6 +33,7 @@ public class LexicalAnalyzer implements ILexicalAnalyzer {
 		return tokens;
 	}
 
+	@Override
 	public LexicalToken decodeToken(char character) {
 		for(LexicalToken.Type tokenType:tokenTypes){
 			if(tokenType.matches(character)){

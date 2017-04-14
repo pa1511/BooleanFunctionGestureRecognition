@@ -1,6 +1,7 @@
 package application.ui.tab.expression;
 
 import java.awt.BorderLayout;
+import java.util.Properties;
 
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
@@ -12,30 +13,43 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 
 import application.AbstractApplicationTab;
+import application.Application;
+import application.parse.BooleanParser;
+import application.parse.ParserKeys;
 import application.parse.VariableValueProvider;
+import application.parse.lexic.ILexicalAnalyzer;
+import application.parse.syntactic.ISyntacticAnalyzer;
 import application.parse.syntactic.node.IBooleanExpressionNode;
 import application.ui.action.EvaluateAction;
 import application.ui.table.ExpressionEvaluationTableModel;
+import generalfactory.Factory;
 
 public class EvaluationTab extends AbstractApplicationTab{
 
-	@Nonnull JTextField expressionInputField;
+	private @Nonnull JTextField expressionInputField;
 	private @Nonnull JButton evaluateButton;
 	
 	private @Nonnull JTable truthTable;
 	
+	private final @Nonnull BooleanParser booleanParser;
 	private @CheckForNull IBooleanExpressionNode expression;
 	private @CheckForNull VariableValueProvider variableValueProvider;
 	
-	public EvaluationTab() {
+	public EvaluationTab() throws Exception {
 		super("Evaluation");
+		
+		Properties properties = Application.getInstance().getProperties();
+		ILexicalAnalyzer lexicalAnalyzer = Factory.getInstance(properties.getProperty(ParserKeys.LEXICAL_ANALYZER_KEY));
+		ISyntacticAnalyzer syntacticAnalyzer = Factory.getInstance(properties.getProperty(ParserKeys.SYNTACTIC_ANALYZER_KEY));
+
+		booleanParser = new BooleanParser(lexicalAnalyzer,syntacticAnalyzer);
 		
 		//setting tab layout
 		setLayout(new BorderLayout());
 		
 		//initializing tab UI
 		expressionInputField = new JTextField();
-		Action evaluateAction = new EvaluateAction(()->expressionInputField.getText(),node->setExpression(node));
+		Action evaluateAction = new EvaluateAction(()->expressionInputField.getText(),node->setExpression(node),booleanParser);
 		
 		expressionInputField.addActionListener(evaluateAction);
 		evaluateButton = new JButton(evaluateAction);

@@ -11,6 +11,8 @@ import javax.annotation.Nonnull;
 import org.junit.Rule;
 import org.junit.Test;
 
+import application.parse.lexic.LexicalAnalyzer;
+import application.parse.syntactic.SyntacticAnalyzer;
 import application.parse.syntactic.node.IBooleanExpressionNode;
 import src.utilities.PProperties;
 import testingHelp.TestLogWatchman;
@@ -46,43 +48,45 @@ public class BooleanParserTest {
 	@Test
 	public void testParse() throws Exception {
 		
+		BooleanParser booleanParser = new BooleanParser(new LexicalAnalyzer(), new SyntacticAnalyzer());
+		
 		//or test
-		IBooleanExpressionNode expressionHead = BooleanParser.parse("a+b");
+		IBooleanExpressionNode expressionHead = booleanParser.parse("a+b");
 		boolean[] solution = new boolean[]{false,true,true,true};
 		testExpression(expressionHead, solution);
 
 		//and test
-		expressionHead = BooleanParser.parse("ab");
+		expressionHead = booleanParser.parse("ab");
 		solution = new boolean[]{false,false,false,true};
 		testExpression(expressionHead, solution);
 		
 		//not test
-		expressionHead = BooleanParser.parse("!a");
+		expressionHead = booleanParser.parse("!a");
 		solution = new boolean[]{true,false};
 		testExpression(expressionHead, solution);
 		
 		//test brackets
-		expressionHead = BooleanParser.parse("!(ab)");
+		expressionHead = booleanParser.parse("!(ab)");
 		solution = new boolean[]{true,true,true,false};
 		testExpression(expressionHead, solution);
 
 		//test double negation
-		expressionHead = BooleanParser.parse("!!(ab)");
+		expressionHead = booleanParser.parse("!!(ab)");
 		solution = new boolean[]{false,false,false,true};
 		testExpression(expressionHead, solution);
 		
 		//test nested brackets
-		expressionHead = BooleanParser.parse("a+(ab+(b+a))");
+		expressionHead = booleanParser.parse("a+(ab+(b+a))");
 		solution = new boolean[]{false,true,true,true};
 		testExpression(expressionHead, solution);
 		
 		//test true constant
-		expressionHead = BooleanParser.parse("(ab+b*a+!(b+a))+1");
+		expressionHead = booleanParser.parse("(ab+b*a+!(b+a))+1");
 		solution = new boolean[]{true,true,true,true};
 		testExpression(expressionHead, solution);
 		
 		//test false constant
-		expressionHead = BooleanParser.parse("0+(a+b+1)*0");
+		expressionHead = booleanParser.parse("0+(a+b+1)*0");
 		solution = new boolean[]{false,false,false,false};
 		testExpression(expressionHead, solution);
 	}

@@ -59,17 +59,17 @@ public class NeuralNetCreationPanel extends AbstractApplicationTab{
 				
 		Properties properties = Application.getInstance().getProperties();
 		
-		String modelPath = properties.getProperty(SCInKeys.TRAINING_MODEL_IMPL_PATH);
-		String modelName = properties.getProperty(SCInKeys.TRAINING_MODEL_IMPL_NAME);
+		String modelPath = properties.getProperty(SCKeys.TRAINING_MODEL_IMPL_PATH);
+		String modelName = properties.getProperty(SCKeys.TRAINING_MODEL_IMPL_NAME);
 		modelCreator = Factory.getInstance(modelName, modelPath);
 		
-		String inputFileLocation = properties.getProperty(SCInKeys.TRAINING_DATA_OUTPUT_KEY);
+		String inputFileLocation = properties.getProperty(SCKeys.TRAINING_DATA_OUTPUT_KEY);
 		JButton inputFileSelectionButton = new JButton(new SelectInputFileAction("Select",inputFileLocation));
 		inputFile = (inputFileLocation==null || inputFileLocation.isEmpty()) ? null : new File(inputFileLocation+File.separator+"output-50-5.csv");
 		inputFileField = new JTextField((inputFile!=null) ? inputFile.getAbsolutePath() : "");
 		inputFileField.setEditable(false);
 		
-		String outputFolderLocation = properties.getProperty(SCInKeys.TRAINING_MODEl_OUTPUT_KEY);
+		String outputFolderLocation = properties.getProperty(SCKeys.TRAINING_MODEl_OUTPUT_KEY);
 		JButton outputFileSelectionButton = new JButton(new SelectOutputDirectoryAction("Select"));
 		modelOutputFolder = (outputFolderLocation==null || outputFolderLocation.isEmpty()) ? null : new File(outputFolderLocation);
 		outputFolderField = new JTextField((modelOutputFolder!=null) ? modelOutputFolder.getAbsolutePath() : "");

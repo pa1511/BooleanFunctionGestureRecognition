@@ -11,7 +11,7 @@ import javax.annotation.Nonnull;
 
 import application.data.model.Symbol;
 import application.data.model.geometry.RelativeRectangle;
-import application.parse.lexic.LexicalAnalyzer;
+import application.parse.lexic.ILexicalAnalyzer;
 import application.parse.lexic.token.LexicalToken;
 import application.parse.syntactic.node.BooleanNodeFactory;
 import application.parse.syntactic.node.IBooleanExpressionNode;
@@ -23,18 +23,13 @@ import dataModels.Pair;
 
 public class BooleanSpatialParser {
 
-	private BooleanSpatialParser() {}
-
-	//TODO: load in a better way
-	private static final @Nonnull LexicalAnalyzer lexicalAnalizer = new LexicalAnalyzer();
-		
-	private static final @Nonnull Function<Class<? extends IBooleanExpressionNode>, Predicate<Pair<IBooleanExpressionNode,RelativeRectangle>>> classNonConnectedNodeFilter = clazz -> pair -> {
-		IBooleanExpressionNode node = pair.left();
-		return clazz.isInstance(node) && !node.isConnected();
-	};
-
+	private final @Nonnull ILexicalAnalyzer lexicalAnalizer;
 	
-	public static @Nonnull IBooleanExpressionNode parse(@Nonnull List<Pair<Symbol,RelativeRectangle>> symbols) throws Exception{
+	public BooleanSpatialParser(ILexicalAnalyzer lexicalAnalyzer) {
+		this.lexicalAnalizer = lexicalAnalyzer;
+	}
+	
+	public @Nonnull IBooleanExpressionNode parse(@Nonnull List<Pair<Symbol,RelativeRectangle>> symbols) throws Exception{
 		List<Pair<IBooleanExpressionNode,RelativeRectangle>> symbolsAsToken = symbols.stream()
 				.map(symbol -> {
 					Symbol sy = symbol.left();
@@ -168,6 +163,13 @@ public class BooleanSpatialParser {
 		operation.setRight(RelativeRectangle.joinRectangles(operation.right(),
 				RelativeRectangle.joinRectangles(left.right(), right.right())));
 	}
+	
+	//=====================================================================================================================================
+	
+	private static final @Nonnull Function<Class<? extends IBooleanExpressionNode>, Predicate<Pair<IBooleanExpressionNode,RelativeRectangle>>> classNonConnectedNodeFilter = clazz -> pair -> {
+		IBooleanExpressionNode node = pair.left();
+		return clazz.isInstance(node) && !node.isConnected();
+	};
 
 	//=====================================================================================================================================
 	//Spatial check functions

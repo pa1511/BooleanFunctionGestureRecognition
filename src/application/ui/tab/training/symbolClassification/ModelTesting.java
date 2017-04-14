@@ -49,7 +49,7 @@ public class ModelTesting extends AbstractApplicationTab{
 		modelList = new ArrayList<>();
 		
 		setLayout(new MigLayout("","[][][][grow]","[]10[][grow][]"));
-		String modelFolder = Application.getInstance().getProperties().getProperty(SCInKeys.TRAINING_MODEl_OUTPUT_KEY);
+		String modelFolder = Application.getInstance().getProperties().getProperty(SCKeys.TRAINING_MODEl_OUTPUT_KEY);
 		
 		//Row 1
 		JLabel modelNameLabel = new JLabel("current model: ");

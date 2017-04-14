@@ -22,5 +22,7 @@ public interface ILexicalAnalyzer {
 	 * @throws BooleanExpressionLexicalException - thrown if the expression contains lexically invalid units 
 	 */
 	public @Nonnull LexicalToken[] analyze(@Nonnull String expression) throws BooleanExpressionLexicalException;
+
+	public @Nonnull LexicalToken decodeToken(char symbol);
 	
 }

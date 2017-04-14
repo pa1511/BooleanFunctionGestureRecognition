@@ -54,8 +54,8 @@ public class DatasetCreationPanel extends AbstractApplicationTab{
 		
 		Properties properties = Application.getInstance().getProperties();
 		
-		String dataCreatorPath = properties.getProperty(SCInKeys.DATA_CREATION_IMPL_PATH);
-		String dataCreatorName = properties.getProperty(SCInKeys.DATA_CREATION_IMPL_NAME);
+		String dataCreatorPath = properties.getProperty(SCKeys.DATA_CREATION_IMPL_PATH);
+		String dataCreatorName = properties.getProperty(SCKeys.DATA_CREATION_IMPL_NAME);
 		datasetCreator = Factory.getInstance(dataCreatorName, dataCreatorPath);
 		
 		symbolsField = new JTextField();
@@ -64,7 +64,7 @@ public class DatasetCreationPanel extends AbstractApplicationTab{
 		instructionLabel.setFont(instructionFont);
 		JButton selectOutputFolderButton = new JButton(new SelectDirectoryAction());
 		JLabel outputLabel = new JLabel("output folder: " );		
-		String outputFolderLocation = properties.getProperty(SCInKeys.TRAINING_DATA_OUTPUT_KEY);
+		String outputFolderLocation = properties.getProperty(SCKeys.TRAINING_DATA_OUTPUT_KEY);
 		outputFolder = new File(outputFolderLocation);
 		outputFolderField = new JTextField(outputFolder.getAbsolutePath());
 		

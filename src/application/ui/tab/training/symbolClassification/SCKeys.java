@@ -2,7 +2,7 @@ package application.ui.tab.training.symbolClassification;
 
 import javax.annotation.Nonnull;
 
-public class SCInKeys {
+public class SCKeys {
 
 	static final @Nonnull String TRAINING_DATA_OUTPUT_KEY = "classification.symbol.training.data.output.path";
 	static final @Nonnull String TRAINING_MODEl_OUTPUT_KEY = "classification.symbol.training.model.output.path";
@@ -12,5 +12,5 @@ public class SCInKeys {
 	static final @Nonnull String DATA_CREATION_IMPL_NAME = "classification.symbol.data.creation.impl.name";
 
 	
-	private SCInKeys() {}
+	private SCKeys() {}
 }

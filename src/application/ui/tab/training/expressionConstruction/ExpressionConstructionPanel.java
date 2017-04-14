@@ -6,6 +6,7 @@ import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnegative;
@@ -22,6 +23,7 @@ import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 
 import application.AbstractApplicationTab;
+import application.Application;
 import application.data.handling.ExpressionTransformations;
 import application.data.handling.SymbolTransformations;
 import application.data.model.Expression;
@@ -30,7 +32,10 @@ import application.data.model.Symbol;
 import application.data.model.geometry.RelativeRectangle;
 import application.parse.BooleanParser;
 import application.parse.BooleanSpatialParser;
+import application.parse.ParserKeys;
 import application.parse.VariableValueProvider;
+import application.parse.lexic.ILexicalAnalyzer;
+import application.parse.syntactic.ISyntacticAnalyzer;
 import application.parse.syntactic.node.IBooleanExpressionNode;
 import application.ui.draw.Canvas;
 import application.ui.draw.RectangleRepresentationView;
@@ -38,10 +43,15 @@ import application.ui.table.AExpressionManagementObserver;
 import application.ui.table.ExpressionEvaluationTableModel;
 import application.ui.table.ExpressionManagementTable;
 import dataModels.Pair;
+import generalfactory.Factory;
 import log.Log;
 
 public class ExpressionConstructionPanel extends AbstractApplicationTab{
 
+	private final @Nonnull BooleanParser booleanParser;
+	private final @Nonnull BooleanSpatialParser booleanSpatialParser;
+	
+	//UI elements
 	private final @Nonnull ExpressionManagementTable expressionManagementTable;
 	private final @Nonnull Canvas canvas;
 	private final @Nonnull RectangleRepresentationView rectangleView;
@@ -58,8 +68,16 @@ public class ExpressionConstructionPanel extends AbstractApplicationTab{
 	
 	private static final @Nonnegative int visibleRowCount = 6;
 	
-	public ExpressionConstructionPanel() {
+	public ExpressionConstructionPanel() throws Exception {
 		super("Construction testing");
+		
+		//
+		Properties properties = Application.getInstance().getProperties();
+		ILexicalAnalyzer lexicalAnalyzer = Factory.getInstance(properties.getProperty(ParserKeys.LEXICAL_ANALYZER_KEY));
+		ISyntacticAnalyzer syntacticAnalyzer = Factory.getInstance(properties.getProperty(ParserKeys.SYNTACTIC_ANALYZER_KEY));
+
+		booleanParser = new BooleanParser(lexicalAnalyzer,syntacticAnalyzer);
+		booleanSpatialParser = new BooleanSpatialParser(lexicalAnalyzer);
 		
 		//Initialize components
 		expressionManagementTable = new ExpressionManagementTable(ExpressionType.COMPLEX);
@@ -149,7 +167,7 @@ public class ExpressionConstructionPanel extends AbstractApplicationTab{
 			
 			//Detecting from symbolic form
 			String symbolicForm = expression.getSymbolicForm();
-			IBooleanExpressionNode topNode = BooleanParser.parse(symbolicForm);
+			IBooleanExpressionNode topNode = booleanParser.parse(symbolicForm);
 			VariableValueProvider variableValueProvider = new VariableValueProvider(topNode);
 			expressionSyFormEvaluationTableModel = new ExpressionEvaluationTableModel(variableValueProvider, topNode);
 			evaluationSyFormTable.setModel(expressionSyFormEvaluationTableModel);
@@ -157,7 +175,7 @@ public class ExpressionConstructionPanel extends AbstractApplicationTab{
 			
 			//Symbolic grouping detection
 			try{
-				IBooleanExpressionNode decodedTopNode = BooleanSpatialParser.parse(syRectPair);
+				IBooleanExpressionNode decodedTopNode = booleanSpatialParser.parse(syRectPair);
 				VariableValueProvider decodedVariableValueProvider = new VariableValueProvider(decodedTopNode);
 				expressionSyGroupingEvaluationTableModel = new ExpressionEvaluationTableModel(decodedVariableValueProvider, decodedTopNode);
 				evaluationSyGroupingTable.setModel(expressionSyGroupingEvaluationTableModel);

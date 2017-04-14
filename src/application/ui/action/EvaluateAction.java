@@ -18,11 +18,13 @@ public final class EvaluateAction extends AbstractAction {
 
 	private final @Nonnull Supplier<String> expressionSupplier;
 	private final @Nonnull Consumer<IBooleanExpressionNode> nodeConsumer;
+	private final @Nonnull BooleanParser booleanParser;
 
-	public EvaluateAction(@Nonnull Supplier<String> expressionSupplier, @Nonnull Consumer<IBooleanExpressionNode> newNodeConsumer) {
+	public EvaluateAction(@Nonnull Supplier<String> expressionSupplier, @Nonnull Consumer<IBooleanExpressionNode> newNodeConsumer, BooleanParser booleanParser) {
 		super("Evaluate");
 		this.expressionSupplier = expressionSupplier;
 		this.nodeConsumer = newNodeConsumer;
+		this.booleanParser = booleanParser;
 	}
 
 	@Override
@@ -34,7 +36,7 @@ public final class EvaluateAction extends AbstractAction {
 		
 		try{
 			long start = System.nanoTime();
-			nodeConsumer.accept(BooleanParser.parse(expression));
+			nodeConsumer.accept(booleanParser.parse(expression));
 			long end = System.nanoTime();
 			Log.addMessage("New expression successfully set. Evaluation time: " + (end-start)*1e-6 + " ms", Log.Type.Plain);
 		}

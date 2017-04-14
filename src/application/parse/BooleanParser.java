@@ -6,29 +6,22 @@ import javax.annotation.Nonnull;
 
 import application.parse.exception.BooleanExpressionParseException;
 import application.parse.lexic.ILexicalAnalyzer;
-import application.parse.lexic.LexicalAnalyzer;
 import application.parse.lexic.token.LexicalToken;
 import application.parse.syntactic.ISyntacticAnalyzer;
-import application.parse.syntactic.SyntacticAnalyzer;
 import application.parse.syntactic.node.IBooleanExpressionNode;
 import log.Log;
 
 public class BooleanParser {
-
-	private BooleanParser() {}
 	
-	private static final @Nonnull ILexicalAnalyzer lexicalAnalyzer;
-	private static final @Nonnull ISyntacticAnalyzer syntacticAnalyzer;
+	private final @Nonnull ILexicalAnalyzer lexicalAnalyzer;
+	private final @Nonnull ISyntacticAnalyzer syntacticAnalyzer;
 	
-	static{
-		
-		//TODO can make different creation
-		lexicalAnalyzer = new LexicalAnalyzer();
-		syntacticAnalyzer = new SyntacticAnalyzer();
-		
+	public BooleanParser(ILexicalAnalyzer lexicalAnalyzer, ISyntacticAnalyzer syntacticAnalyzer) throws Exception {
+		this.lexicalAnalyzer = lexicalAnalyzer;
+		this.syntacticAnalyzer = syntacticAnalyzer;
 	}
 	
-	public static @Nonnull IBooleanExpressionNode parse(@Nonnull String expression) throws BooleanExpressionParseException {
+	public @Nonnull IBooleanExpressionNode parse(@Nonnull String expression) throws BooleanExpressionParseException {
 
 		expression = expressionPreprocessing(expression);
 		Log.addMessage("Expression after preprocessing: " + expression, Log.Type.Plain);
