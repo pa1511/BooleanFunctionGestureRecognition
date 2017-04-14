@@ -37,10 +37,7 @@ public class ExpressionManagementTable extends JTable implements AutoCloseable{
 	private final @Nonnull Action[] standardActions;
 	public static final @Nonnull String ACTION_RELOAD = "Reload";
 	public static final @Nonnull String ACTION_DELETE = "Delete";
-	
-	private @CheckForNull ExpressionType filter = null;
-	
-	
+		
 	public ExpressionManagementTable() {
 		model = new Model();
 		setModel(model);
@@ -62,11 +59,12 @@ public class ExpressionManagementTable extends JTable implements AutoCloseable{
 					
 					@Override
 					public void actionPerformed(@CheckForNull ActionEvent arg0) {
-						model.expressions.reset();
-						model.expressions.getOrThrow().removeIf(ex->filter!=null && ex.getType()!=filter);
-						Log.addMessage("Reloaded expressions from db.", Log.Type.Plain);						
-						revalidate();
-						repaint();
+						if(model.expressions.isLoaded()){
+							model.expressions.reset();
+							Log.addMessage("Reloaded expressions from db.", Log.Type.Plain);						
+							revalidate();
+							repaint();
+						}
 					}
 				},
 				new AbstractAction(ACTION_DELETE) {
@@ -104,8 +102,13 @@ public class ExpressionManagementTable extends JTable implements AutoCloseable{
 
 	}
 	
+	public ExpressionManagementTable(ExpressionType filterOption) {
+		this();
+		filter(filterOption);
+	}
+
 	public void filter(@Nonnull ExpressionType exType) {
-		this.filter = exType;
+		model.setFilter(exType);
 		getStandardAction(ACTION_RELOAD).actionPerformed(null);
 	}
 	
@@ -135,13 +138,16 @@ public class ExpressionManagementTable extends JTable implements AutoCloseable{
 		private final @Nonnull String[] columnNames;
 		private final @Nonnull UnsafeLazy<List<Expression>> expressions;
 		private final @Nonnull IntSupplier expressionCount;
+		private @CheckForNull ExpressionType filter = null;
 
 		public Model() {
 
 			columnNames = new String[] { "Row#", "Symbolic form" };
 			expressions = new UnsafeLazy<>(() -> {
 				try {
-					return Application.getInstance().getDataSource().getExpressions();
+					List<Expression> expressionsList = Application.getInstance().getDataSource().getExpressions();
+					expressionsList.removeIf(ex->filter!=null && ex.getType()!=filter);
+					return expressionsList;
 				} catch (Exception e) {
 					handleException(e);
 				}
@@ -151,7 +157,7 @@ public class ExpressionManagementTable extends JTable implements AutoCloseable{
 				
 				private UnsafeLazyInt estimate = new UnsafeLazyInt(()->{
 					try {
-						return Application.getInstance().getDataSource().getExpressionCount();
+						return Application.getInstance().getDataSource().getExpressionCount(filter);
 					} catch (Exception e) {
 						handleException(e);
 					}
@@ -176,6 +182,10 @@ public class ExpressionManagementTable extends JTable implements AutoCloseable{
 					JOptionPane.ERROR_MESSAGE);
 		}
 
+		public void setFilter(ExpressionType filter) {
+			this.filter = filter;
+		}
+		
 		@Override
 		public int getColumnCount() {
 			return columnNames.length;

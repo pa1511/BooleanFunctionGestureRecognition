@@ -13,10 +13,12 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.function.Supplier;
 
+import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 
 import application.data.handling.GestureTransformations;
 import application.data.model.Expression;
+import application.data.model.ExpressionType;
 import application.data.model.Gesture;
 import application.data.model.Symbol;
 import application.data.model.SymbolSamplesInformation;
@@ -161,13 +163,24 @@ public final class H2Database implements IDataSource {
 	}
 
 	@Override
-	public int getExpressionCount() throws SQLException {
+	public int getExpressionCount(@CheckForNull ExpressionType type) throws SQLException {
 		try(Connection connection = dbConnection.get()){
 			try (Statement statement = connection.createStatement()) {
+				
+				String query = "SELECT COUNT(" + exIdColumn + ") FROM " + expressionTable;
+				if(type!=null){
+					if(type==ExpressionType.SIMPLE)
+						query += " WHERE LENGTH( " + exWrittenFormColumn + " ) = 1";
+					else
+						query += " WHERE LENGTH( " + exWrittenFormColumn + " ) > 1";
+				}
+				
 				try (ResultSet resultSet = statement
-						.executeQuery("SELECT COUNT(" + exIdColumn + ") FROM " + expressionTable)) {
-					if (resultSet.next())
-						return resultSet.getInt(1);
+						.executeQuery(query)) {
+					if (resultSet.next()){
+						int result = resultSet.getInt(1);
+						return result;
+					}
 				}
 			}
 			return 0;
@@ -273,6 +286,24 @@ public final class H2Database implements IDataSource {
 		return symbolSamplesInformations;
 	}
 
+	@Override
+	public int getDistinctSymbolCount(boolean includingComplex) throws Exception {
+		try(Connection connection = dbConnection.get()){
+			try (Statement statement = connection.createStatement()) {
+				
+				String query = "SELECT COUNT( DISTINCT( " + geSymbolSyColumn + ")) FROM " + gestureTable;
+				query = (includingComplex) ? query : (query + " WHERE " + geExComplexColumn + " = FALSE ");
+				try (ResultSet resultSet = statement
+						.executeQuery(query)) {
+					if (resultSet.next())
+						return resultSet.getInt(1);
+				}
+			}
+			return 0;
+		}
+
+	}
+	
 	@Override
 	public @Nonnull List<Symbol> getSymbols(@Nonnull String symbolAsString, @Nonnull Integer limit) throws Exception {
 		

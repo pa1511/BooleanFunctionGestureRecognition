@@ -3,6 +3,7 @@ package application.ui.table;
 import java.awt.event.ActionEvent;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.IntSupplier;
 
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnegative;
@@ -16,12 +17,14 @@ import application.Application;
 import application.data.model.SymbolSamplesInformation;
 import log.Log;
 import utilities.lazy.UnsafeLazy;
+import utilities.lazy.UnsafeLazyInt;
 
 public class SymbolInformationTableModel extends AbstractTableModel {
 
 	private final @Nonnull String[] columnNames;
 	private final @Nonnull UnsafeLazy<List<SymbolSamplesInformation>> symbolsInfo;
-	
+	private final @Nonnull IntSupplier symbolsInfoCount;
+
 	private final @Nonnull Action[] standardActions;
 	public static final @Nonnull String ACTION_RELOAD = "Reload";
 
@@ -39,6 +42,28 @@ public class SymbolInformationTableModel extends AbstractTableModel {
 			}
 			return Collections.emptyList();
 		});
+		
+		symbolsInfoCount = new IntSupplier() {
+			
+			private UnsafeLazyInt estimate = new UnsafeLazyInt(()->{
+				try {
+					return Application.getInstance().getDataSource().getDistinctSymbolCount(false);
+				} catch (Exception e) {
+					Log.addError(e);
+				}
+
+				return 0;
+			});
+
+			@Override
+			public int getAsInt() {
+				if (symbolsInfo.isLoaded()) {
+					return symbolsInfo.get().size();
+				}
+
+				return estimate.getAsInt();
+			}
+		};
 		
 		standardActions = new Action[]{
 				new AbstractAction(ACTION_RELOAD) {
@@ -77,7 +102,7 @@ public class SymbolInformationTableModel extends AbstractTableModel {
 
 	@Override
 	public @Nonnegative int getRowCount() {
-		return symbolsInfo.getOrThrow().size();
+		return symbolsInfoCount.getAsInt();
 	}
 
 	@Override

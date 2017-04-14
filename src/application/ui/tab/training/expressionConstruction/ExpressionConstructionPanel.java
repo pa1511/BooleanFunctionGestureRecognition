@@ -62,8 +62,7 @@ public class ExpressionConstructionPanel extends AbstractApplicationTab{
 		super("Construction testing");
 		
 		//Initialize components
-		expressionManagementTable = new ExpressionManagementTable();
-		expressionManagementTable.filter(ExpressionType.COMPLEX);
+		expressionManagementTable = new ExpressionManagementTable(ExpressionType.COMPLEX);
 		expressionManagementTable.observationManager.addObserver(new ExpressionSelectionObserver());
 		
 		canvas = new Canvas(true);
