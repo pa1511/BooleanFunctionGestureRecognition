@@ -5,9 +5,9 @@ import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 
 import javax.annotation.Nonnull;
 import javax.swing.AbstractAction;
@@ -19,16 +19,14 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 
-import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
-import org.deeplearning4j.util.ModelSerializer;
-
 import application.AbstractApplicationTab;
 import application.Application;
-import application.neural.symbolClassification.SCLogic;
-import application.neural.symbolClassification.SCModelOutputInterpreter;
-import application.neural.symbolClassification.SCUtilities;
+import application.data.handling.GestureFactory;
+import application.data.handling.dataset.ADatasetCreator;
+import application.data.model.Gesture;
+import application.neural.symbolClassification.SymbolClassifier;
 import application.ui.draw.Canvas;
-import dataModels.Pair;
+import generalfactory.Factory;
 import log.Log;
 import net.miginfocom.swing.MigLayout;
 import ui.CommonUIActions;
@@ -40,16 +38,20 @@ public class ModelTesting extends AbstractApplicationTab{
 	private final @Nonnull Canvas testingCanvas;
 	private final @Nonnull TestModelAction testModelAction;
 	
-	private final @Nonnull List<Pair<MultiLayerNetwork,SCModelOutputInterpreter>> modelList;
+	private final @Nonnull List<SymbolClassifier> modelList;
+	private final @Nonnull ADatasetCreator datasetCreator;
 	private ClearCanvasAction clearAction;
 	
-	public ModelTesting() {
+	public ModelTesting() throws Exception {
 		super("Neural net testing");
 
+		Properties properties = Application.getInstance().getProperties();
+		datasetCreator = Factory.getInstance(properties.getProperty(SCKeys.DATA_CREATION_IMPL_NAME), 
+				properties.getProperty(SCKeys.DATA_CREATION_IMPL_PATH));
 		modelList = new ArrayList<>();
-		
+		String modelFolder = properties.getProperty(SCKeys.TRAINING_MODEl_OUTPUT_KEY);
+
 		setLayout(new MigLayout("","[][][][grow]","[]10[][grow][]"));
-		String modelFolder = Application.getInstance().getProperties().getProperty(SCKeys.TRAINING_MODEl_OUTPUT_KEY);
 		
 		//Row 1
 		JLabel modelNameLabel = new JLabel("current model: ");
@@ -140,9 +142,11 @@ public class ModelTesting extends AbstractApplicationTab{
 			try{
 				predictedSymbolField.setText("");
 				StringBuilder sb = new StringBuilder();
-				for(Pair<MultiLayerNetwork, SCModelOutputInterpreter> modelAndInterpreter:modelList){
-					int[] prediction = SCLogic.performSymbolClassification(modelAndInterpreter.left(),testingCanvas.getData());
-					sb.append("||").append(modelAndInterpreter.right().apply(prediction[0]));
+				List<Gesture> gestures = GestureFactory.getLeftClickGestures(testingCanvas.getData());
+				for(SymbolClassifier model:modelList){
+					double[] rawSample = datasetCreator.getRawFormForSymbolClassification(gestures, model.getInputSize());
+					String predictedSymbol = model.predict(rawSample);
+					sb.append("||").append(predictedSymbol);
 				}
 				predictedSymbolField.setText(sb.toString());
 			}
@@ -162,12 +166,10 @@ public class ModelTesting extends AbstractApplicationTab{
 		@Override
 		public void doWithSelectedDirectory(@Nonnull File selectedFile) {
 			try {
-				MultiLayerNetwork classificationModel = ModelSerializer.restoreMultiLayerNetwork(selectedFile);
-				SCModelOutputInterpreter modelOutputInterpreter = new SCModelOutputInterpreter(selectedFile.getParent()+File.separator+SCUtilities.modelMetaDataFileName(selectedFile.getName()));
-				modelList.add(Pair.of(classificationModel, modelOutputInterpreter));
+				modelList.add(new SymbolClassifier(selectedFile));
 				currentModelName.setText(currentModelName.getText()+"||"+selectedFile.getName());
 				testModelAction.setEnabled(true);
-			} catch (IOException e) {
+			} catch (Exception e) {
 				Log.addError(e);
 				JOptionPane.showMessageDialog(null, "Could not load model", "Error", JOptionPane.ERROR_MESSAGE);
 			}

@@ -3,8 +3,6 @@ package application.ui.tab.training.symbolClassification;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.util.Arrays;
 import java.util.Properties;
 
@@ -20,20 +18,16 @@ import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingWorker;
 
-import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
-import org.deeplearning4j.util.ModelSerializer;
-
 import application.AbstractApplicationTab;
 import application.Application;
 import application.data.handling.dataset.DatasetShuffleCreator;
 import application.neural.symbolClassification.ISCModelCreator;
-import application.neural.symbolClassification.SCUtilities;
+import application.neural.symbolClassification.SymbolClassifier;
 import generalfactory.Factory;
 import log.Log;
 import net.miginfocom.swing.MigLayout;
 import ui.CommonUIActions;
 import ui.Progress;
-import utilities.streamAndParallelization.PStreams;
 
 public class NeuralNetCreationPanel extends AbstractApplicationTab{
 	
@@ -160,19 +154,14 @@ public class NeuralNetCreationPanel extends AbstractApplicationTab{
 		    int iterationCount = ((Integer)iterationNumberSpinner.getValue()).intValue();
 		    
 			//creating the data source
-			SwingWorker<MultiLayerNetwork, Object> task = new SwingWorker<MultiLayerNetwork, Object>() {
+			SwingWorker<Boolean, Object> task = new SwingWorker<Boolean, Object>() {
 
 				@Override
-				protected MultiLayerNetwork doInBackground() throws Exception {
-					MultiLayerNetwork model = modelCreator.createAndTrainModel(fileNameTrain, nEpochs, iterationCount,
+				protected Boolean doInBackground() throws Exception {
+					SymbolClassifier model = modelCreator.createAndTrainModel(new File(fileNameTrain), nEpochs, iterationCount,
 							numInputs, numOutputs, hiddenNodes, scoreLimit, learningRate, batchSize, progress -> setProgress(progress));
-					ModelSerializer.writeModel(model, new File(modelOutputFolder, modelName), false);
-					
-					try(FileInputStream input = new FileInputStream(new File(DatasetShuffleCreator.getMetaFileName(fileNameTrain)));
-							FileOutputStream output = new FileOutputStream(new File(modelOutputFolder,SCUtilities.modelMetaDataFileName(modelName)))){
-						PStreams.copy(input,output);
-					}
-					return model;
+					model.storeTo(modelName, modelOutputFolder);
+					return Boolean.TRUE;
 				}
 			};
 			
@@ -180,9 +169,9 @@ public class NeuralNetCreationPanel extends AbstractApplicationTab{
 			task.execute();
 			JOptionPane.showMessageDialog(null, progressPanel, "Progress", JOptionPane.INFORMATION_MESSAGE);
 			
-			;
 			try {
 				task.get();
+				JOptionPane.showMessageDialog(null, "Model successfully created.", "Info", JOptionPane.INFORMATION_MESSAGE);
 			} 
 			catch (Exception e1) {
 				Log.addError(e1);
@@ -190,8 +179,6 @@ public class NeuralNetCreationPanel extends AbstractApplicationTab{
 						JOptionPane.ERROR_MESSAGE);
 				return;
 			}		    
-					    
-		    JOptionPane.showMessageDialog(null, "Model successfully created.", "Info", JOptionPane.INFORMATION_MESSAGE);
 		}
 
 	}

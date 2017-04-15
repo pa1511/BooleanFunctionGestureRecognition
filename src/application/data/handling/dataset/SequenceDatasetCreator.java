@@ -4,11 +4,13 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
 
 import application.Application;
 import application.data.handling.SymbolDataNormalizer;
 import application.data.handling.SymbolTransformations;
+import application.data.model.Gesture;
 import application.data.model.Symbol;
 import application.data.source.IDataSource;
 import dataset.ClassificationDataSet;
@@ -55,4 +57,11 @@ public class SequenceDatasetCreator extends ADatasetCreator{
 		return new ClassificationDataSet(samples, samplesOutput, classToSampleOutput);
 	}
 
+	@Override
+	public @Nonnull double[] getRawFormForSymbolClassification(@Nonnull List<Gesture> gestures, @Nonnegative int precision){
+		double[] rawSample = SymbolTransformations.getRawSymbolRepresentation(gestures, precision);
+		SymbolDataNormalizer.normalizeSample(rawSample);
+		return rawSample;
+	}
+	
 }

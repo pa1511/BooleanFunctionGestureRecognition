@@ -49,7 +49,7 @@ public class SCModelCreator implements ISCModelCreator {
 	}
 	
 	@Override
-	public @Nonnull MultiLayerNetwork createAndTrainModel(@Nonnull String trainDataFileName, 
+	public @Nonnull SymbolClassifier createAndTrainModel(@Nonnull File trainDataFileName, 
 			@Nonnegative int nEpochs, 
 			@Nonnegative int iterationCount,
 			@Nonnegative int numInputs,@Nonnegative int numOutputs,@Nonnegative int[] hiddenNodes, 
@@ -85,7 +85,7 @@ public class SCModelCreator implements ISCModelCreator {
 	    	    
 	    DataSetIterator trainIter;
 	    try(RecordReader rr = new CSVRecordReader()){
-			rr.initialize(new FileSplit(new File(trainDataFileName)));
+			rr.initialize(new FileSplit(trainDataFileName));
 		    trainIter = new RecordReaderDataSetIterator(rr,batchSize,0,numOutputs);
 	    }
 	    
@@ -121,7 +121,11 @@ public class SCModelCreator implements ISCModelCreator {
 		EarlyStoppingResult<MultiLayerNetwork> result = trainer.fit();
 		model = result.getBestModel();
 	    
-		return model;
+		
+		SCModelOutputInterpreter modelOutputInterpreter = new SCModelOutputInterpreter(trainDataFileName.getParent()+File.separator+
+				SCUtilities.modelMetaDataFileNameFromTrainFile(trainDataFileName.getName()));
+		
+		return new SymbolClassifier(model, modelOutputInterpreter);
 	}
 
 	private DenseLayer getLayer(@Nonnegative int numInputs,@Nonnegative int numHiddenNodes) {

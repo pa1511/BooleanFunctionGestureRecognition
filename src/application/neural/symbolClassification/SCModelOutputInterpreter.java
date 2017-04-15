@@ -1,6 +1,8 @@
 package application.neural.symbolClassification;
 
+import java.io.File;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
@@ -33,6 +35,15 @@ public class SCModelOutputInterpreter implements IntFunction<String>{
 	
 	public @Nonnull String[] getInterpretations() {
 		return interpretationMap;
+	}
+
+
+	public void store(@Nonnull File outputFile) throws Exception{
+		try(PrintStream printStream = new PrintStream(outputFile)){
+			for(int i=0; i<interpretationMap.length; i++){
+				printStream.println(interpretationMap[i] + "=" + i);
+			}
+		}
 	}
 
 }

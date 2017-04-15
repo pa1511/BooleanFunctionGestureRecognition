@@ -10,5 +10,9 @@ public class SCUtilities {
 		return modelName+".metadata";
 	}
 
+	public static String modelMetaDataFileNameFromTrainFile(@Nonnull String modelTrainFileName){
+		return modelTrainFileName.replace(".csv", "")+".metadata";
+	}
+
 	
 }
