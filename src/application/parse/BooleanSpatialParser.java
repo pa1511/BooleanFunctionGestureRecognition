@@ -1,5 +1,7 @@
 package application.parse;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
@@ -24,6 +26,12 @@ import dataModels.Pair;
 public class BooleanSpatialParser {
 
 	private final @Nonnull ILexicalAnalyzer lexicalAnalizer;
+	private final @Nonnull Comparator<Pair<IBooleanExpressionNode,RelativeRectangle>> leftToRight = (c1,c2)->{
+		RelativeRectangle rec1 = c1.right();
+		RelativeRectangle rec2 = c2.right();
+		return Double.compare(rec1.centerX, rec2.centerX);
+	};
+	
 	
 	public BooleanSpatialParser(ILexicalAnalyzer lexicalAnalyzer) {
 		this.lexicalAnalizer = lexicalAnalyzer;
@@ -37,6 +45,9 @@ public class BooleanSpatialParser {
 					IBooleanExpressionNode node = BooleanNodeFactory.getNodeFor(lt);
 					return Pair.of(node, symbol.right());
 				}).collect(Collectors.toList());
+		
+		Collections.sort(symbolsAsToken, leftToRight);
+		
 		return innerParse(symbolsAsToken).left();
 	}
 

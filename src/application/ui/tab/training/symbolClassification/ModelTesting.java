@@ -24,7 +24,8 @@ import application.Application;
 import application.data.handling.GestureFactory;
 import application.data.handling.dataset.ADatasetCreator;
 import application.data.model.Gesture;
-import application.neural.symbolClassification.SymbolClassifier;
+import application.neural.symbolClassification.CompositeSymbolClassifier;
+import application.neural.symbolClassification.ISCModelCreator;
 import application.ui.draw.Canvas;
 import generalfactory.Factory;
 import log.Log;
@@ -38,8 +39,12 @@ public class ModelTesting extends AbstractApplicationTab{
 	private final @Nonnull Canvas testingCanvas;
 	private final @Nonnull TestModelAction testModelAction;
 	
-	private final @Nonnull List<SymbolClassifier> modelList;
+	//
+	private final ISCModelCreator modelCreator;
 	private final @Nonnull ADatasetCreator datasetCreator;
+	private final @Nonnull CompositeSymbolClassifier modelList;
+	
+	//
 	private ClearCanvasAction clearAction;
 	
 	public ModelTesting() throws Exception {
@@ -48,7 +53,11 @@ public class ModelTesting extends AbstractApplicationTab{
 		Properties properties = Application.getInstance().getProperties();
 		datasetCreator = Factory.getInstance(properties.getProperty(SCKeys.DATA_CREATION_IMPL_NAME), 
 				properties.getProperty(SCKeys.DATA_CREATION_IMPL_PATH));
-		modelList = new ArrayList<>();
+		
+		modelCreator = Factory.getInstance(properties.getProperty(SCKeys.TRAINING_MODEL_IMPL_NAME),
+				properties.getProperty(SCKeys.TRAINING_MODEL_IMPL_PATH));
+		
+		modelList = new CompositeSymbolClassifier(new ArrayList<>());
 		String modelFolder = properties.getProperty(SCKeys.TRAINING_MODEl_OUTPUT_KEY);
 
 		setLayout(new MigLayout("","[][][][grow]","[]10[][grow][]"));
@@ -75,7 +84,7 @@ public class ModelTesting extends AbstractApplicationTab{
 		add(testingCanvas, "span, grow, wrap");
 
 		//Row 4
-		testModelAction = new TestModelAction("Test",!modelList.isEmpty());
+		testModelAction = new TestModelAction("Test",modelList.classifierCount()!=0);
 		ClearModelAction clearModelAction = new ClearModelAction();
 		clearAction = new ClearCanvasAction();
 		
@@ -106,6 +115,7 @@ public class ModelTesting extends AbstractApplicationTab{
 			modelList.clear();
 			currentModelName.setText("");
 			predictedSymbolField.setText("");
+			testModelAction.setEnabled(false);
 		}
 	}
 
@@ -133,7 +143,7 @@ public class ModelTesting extends AbstractApplicationTab{
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
 
-			if(modelList.isEmpty()){
+			if(modelList.classifierCount()==0){
 				Log.addMessage("Testing with no model present. ", Log.Type.Error);
 				JOptionPane.showMessageDialog(null, "No model present.", "Error", JOptionPane.ERROR_MESSAGE);
 				return;
@@ -141,14 +151,9 @@ public class ModelTesting extends AbstractApplicationTab{
 			
 			try{
 				predictedSymbolField.setText("");
-				StringBuilder sb = new StringBuilder();
 				List<Gesture> gestures = GestureFactory.getLeftClickGestures(testingCanvas.getData());
-				for(SymbolClassifier model:modelList){
-					double[] rawSample = datasetCreator.getRawFormForSymbolClassification(gestures, model.getInputSize());
-					String predictedSymbol = model.predict(rawSample);
-					sb.append("||").append(predictedSymbol);
-				}
-				predictedSymbolField.setText(sb.toString());
+				String prediction = modelList.predict(datasetCreator, gestures);
+				predictedSymbolField.setText(prediction);
 			}
 			catch (Exception e) {
 				Log.addError(e);
@@ -166,7 +171,7 @@ public class ModelTesting extends AbstractApplicationTab{
 		@Override
 		public void doWithSelectedDirectory(@Nonnull File selectedFile) {
 			try {
-				modelList.add(new SymbolClassifier(selectedFile));
+				modelList.addClassifier(modelCreator.loadSymbolClassifierFrom(selectedFile));
 				currentModelName.setText(currentModelName.getText()+"||"+selectedFile.getName());
 				testModelAction.setEnabled(true);
 			} catch (Exception e) {

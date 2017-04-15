@@ -22,7 +22,7 @@ import application.AbstractApplicationTab;
 import application.Application;
 import application.data.handling.dataset.DatasetShuffleCreator;
 import application.neural.symbolClassification.ISCModelCreator;
-import application.neural.symbolClassification.SymbolClassifier;
+import application.neural.symbolClassification.ISymbolClassifier;
 import generalfactory.Factory;
 import log.Log;
 import net.miginfocom.swing.MigLayout;
@@ -158,7 +158,7 @@ public class NeuralNetCreationPanel extends AbstractApplicationTab{
 
 				@Override
 				protected Boolean doInBackground() throws Exception {
-					SymbolClassifier model = modelCreator.createAndTrainModel(new File(fileNameTrain), nEpochs, iterationCount,
+					ISymbolClassifier model = modelCreator.createAndTrainModel(new File(fileNameTrain), nEpochs, iterationCount,
 							numInputs, numOutputs, hiddenNodes, scoreLimit, learningRate, batchSize, progress -> setProgress(progress));
 					model.storeTo(modelName, modelOutputFolder);
 					return Boolean.TRUE;

@@ -34,7 +34,7 @@ import org.nd4j.linalg.lossfunctions.LossFunctions.LossFunction;
 
 import log.Log;
 
-public class SCModelCreator implements ISCModelCreator {
+class SCModelCreator implements ISCModelCreator {
 
 	private final @Nonnull WeightInit weightInit;
 	private final @Nonnull Activation activationMethod;
@@ -49,7 +49,7 @@ public class SCModelCreator implements ISCModelCreator {
 	}
 	
 	@Override
-	public @Nonnull SymbolClassifier createAndTrainModel(@Nonnull File trainDataFileName, 
+	public @Nonnull ISymbolClassifier createAndTrainModel(@Nonnull File trainDataFileName, 
 			@Nonnegative int nEpochs, 
 			@Nonnegative int iterationCount,
 			@Nonnegative int numInputs,@Nonnegative int numOutputs,@Nonnegative int[] hiddenNodes, 
@@ -126,6 +126,11 @@ public class SCModelCreator implements ISCModelCreator {
 				SCUtilities.modelMetaDataFileNameFromTrainFile(trainDataFileName.getName()));
 		
 		return new SymbolClassifier(model, modelOutputInterpreter);
+	}
+
+	@Override
+	public ISymbolClassifier loadSymbolClassifierFrom(File selectedFile) throws Exception {
+		return new SymbolClassifier(selectedFile);
 	}
 
 	private DenseLayer getLayer(@Nonnegative int numInputs,@Nonnegative int numHiddenNodes) {

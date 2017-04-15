@@ -2,7 +2,7 @@ package application.neural.symbolClassification;
 
 import javax.annotation.Nonnull;
 
-public class SCUtilities {
+class SCUtilities {
 
 	private SCUtilities() {}
 	

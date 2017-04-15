@@ -1,8 +1,8 @@
 package application.neural.symbolClassification;
 
 import java.io.File;
+import java.util.List;
 
-import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
 
 import org.deeplearning4j.nn.conf.NeuralNetConfiguration;
@@ -12,10 +12,12 @@ import org.deeplearning4j.util.ModelSerializer;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.factory.Nd4j;
 
+import application.data.handling.dataset.ADatasetCreator;
+import application.data.model.Gesture;
 import utilities.lazy.UnsafeLazyInt;
 
 
-public class SymbolClassifier {
+class SymbolClassifier implements ISymbolClassifier {
 
 	private final @Nonnull MultiLayerNetwork modelNetwork;
 	private final @Nonnull SCModelOutputInterpreter modelOutputInterpreter;
@@ -36,20 +38,19 @@ public class SymbolClassifier {
 			return layer.getNIn();
 		});
 	}
-		
-	public @Nonnegative int getInputSize(){
-		return modelInputSize.getAsInt();
-	}
-	
-	public @Nonnull String predict(@Nonnull double[] rawSample){
-		INDArray inputArray = Nd4j.create(rawSample);			
-		int[] prediction = modelNetwork.predict(inputArray);
-		return modelOutputInterpreter.apply(prediction[0]);
-	}
-	
+			
+	@Override
 	public void storeTo(String modelName, File folder) throws Exception{
 		ModelSerializer.writeModel(this.modelNetwork, new File(folder, modelName), false);
 		modelOutputInterpreter.store(new File(folder,SCUtilities.modelMetaDataFileName(modelName)));
+	}
+
+	@Override
+	public String predict(ADatasetCreator datasetCreator, List<Gesture> gestures) {
+		double[] rawSample = datasetCreator.getRawFormForSymbolClassification(gestures, modelInputSize.getAsInt());
+		INDArray inputArray = Nd4j.create(rawSample);			
+		int[] prediction = modelNetwork.predict(inputArray);
+		return modelOutputInterpreter.apply(prediction[0]);
 	}
 	
 }

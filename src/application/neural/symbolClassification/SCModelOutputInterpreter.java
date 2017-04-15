@@ -10,7 +10,7 @@ import java.util.function.IntFunction;
 
 import javax.annotation.Nonnull;
 
-public class SCModelOutputInterpreter implements IntFunction<String>{
+class SCModelOutputInterpreter implements IntFunction<String>{
 
 	private final @Nonnull String[] interpretationMap;
 
