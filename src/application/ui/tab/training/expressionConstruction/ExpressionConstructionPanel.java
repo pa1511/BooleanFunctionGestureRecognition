@@ -153,6 +153,10 @@ public class ExpressionConstructionPanel extends AbstractApplicationTab{
 	private final class ExpressionSelectionObserver extends AExpressionManagementObserver {
 		@Override
 		public void update(Expression expression) throws Exception {
+			
+			if(expression==null)
+				return;
+			
 			canvas.clear();
 			canvas.show(ExpressionTransformations.getCanvasForm(expression));
 			rectangleView.clear();
