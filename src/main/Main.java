@@ -18,7 +18,7 @@ import log.Log;
 public class Main {
 
 	
-	/**
+	/*
 	 * Application entry point. <br>
 	 */
 	@SuppressWarnings("resource")
@@ -34,7 +34,7 @@ public class Main {
 				AApplication.getInstance().registerApplicationFrame(frame);
 				frame.setVisible(true);
 				long end = System.nanoTime();
-				System.out.println("Start up time: " + (end-start)*1e-6 + "ms" );
+				Log.addMessage("Start up time: " + (end-start)*1e-6 + "ms",Log.Type.Plain);
 			} catch (Exception e) {
 				Log.addError(e);
 				JOptionPane.showMessageDialog(null, "A critical error has occurred", "Error", JOptionPane.ERROR_MESSAGE);

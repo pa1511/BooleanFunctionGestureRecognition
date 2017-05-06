@@ -34,13 +34,13 @@ public class LexicalAnalyzer implements ILexicalAnalyzer {
 	}
 
 	@Override
-	public LexicalToken decodeToken(char character) {
+	public @Nonnull LexicalToken decodeToken(char character) {
 		for(LexicalToken.Type tokenType:tokenTypes){
 			if(tokenType.matches(character)){
 				return new LexicalToken(character, tokenType);
 			}
 		}
-		return null;
+		throw new IllegalArgumentException("Unknown lexical token requested.");
 	}
 
 }

@@ -135,6 +135,13 @@ public class NeuralNetCreationPanel extends AbstractApplicationTab{
 				return;
 			}
 			
+			if(modelOutputFolder==null){
+				JOptionPane.showMessageDialog(null, "No output folder provided", "Warning", JOptionPane.WARNING_MESSAGE);
+				return;
+			}
+			final File outputFolder = modelOutputFolder;
+			
+			
 			String modelName = modelNameField.getText();
 			if(modelName==null || modelName.isEmpty()){
 				JOptionPane.showMessageDialog(null, "No model name provided", "Warning", JOptionPane.WARNING_MESSAGE);
@@ -160,7 +167,7 @@ public class NeuralNetCreationPanel extends AbstractApplicationTab{
 				protected Boolean doInBackground() throws Exception {
 					ISymbolClassifier model = modelCreator.createAndTrainModel(new File(fileNameTrain), nEpochs, iterationCount,
 							numInputs, numOutputs, hiddenNodes, scoreLimit, learningRate, batchSize, progress -> setProgress(progress));
-					model.storeTo(modelName, modelOutputFolder);
+					model.storeTo(modelName, outputFolder);
 					return Boolean.TRUE;
 				}
 			};

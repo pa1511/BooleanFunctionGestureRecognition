@@ -58,7 +58,7 @@ public class SymbolInformationTableModel extends AbstractTableModel {
 			@Override
 			public int getAsInt() {
 				if (symbolsInfo.isLoaded()) {
-					return symbolsInfo.get().size();
+					return symbolsInfo.getOrThrow().size();
 				}
 
 				return estimate.getAsInt();

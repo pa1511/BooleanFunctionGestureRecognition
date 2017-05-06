@@ -117,13 +117,13 @@ public class ExpressionManagementTable extends JTable implements AutoCloseable{
 		return standardActions;
 	}
 	
-	public @CheckForNull Action getStandardAction(@Nonnull String actionName){
+	public @Nonnull Action getStandardAction(@Nonnull String actionName){
 		for(Action action:standardActions){
 			if(action.getValue(Action.NAME).equals(actionName)){
 				return action;
 			}
 		}
-		return null;
+		throw new IllegalArgumentException("Unknown action requested: " + actionName);
 	}
 
 	@Override
@@ -169,7 +169,7 @@ public class ExpressionManagementTable extends JTable implements AutoCloseable{
 				@Override
 				public int getAsInt() {
 					if (expressions.isLoaded()) {
-						return expressions.get().size();
+						return expressions.getOrThrow().size();
 					}
 
 					return estimate.getAsInt();
