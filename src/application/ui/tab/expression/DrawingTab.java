@@ -101,8 +101,8 @@ public class DrawingTab extends AbstractApplicationTab{
 		//Control panel
 		undoAction = new UndoAction();
 		redoAction = new RedoAction();
-		storeExpressionAction = new StoreExpressionAction();
 		clearCanvasAction = new ClearCanvasAction();
+		storeExpressionAction = new StoreExpressionAction();
 		
 		undoAction.setEnabled(false);
 		redoAction.setEnabled(false);
@@ -275,7 +275,7 @@ public class DrawingTab extends AbstractApplicationTab{
 				String expressionSymbolicForm = BooleanParser.expressionPreprocessing(text);
 				Expression expression = ExpressionFactory.getExpressionFor(expressionSymbolicForm,canvas.getData());
 				Application.getInstance().getDataSource().store(expression);
-				JOptionPane.showMessageDialog(null, "Expression successfully stored", "Info", JOptionPane.INFORMATION_MESSAGE);
+				//JOptionPane.showMessageDialog(null, "Expression successfully stored", "Info", JOptionPane.INFORMATION_MESSAGE);
 				Log.addMessage("Expression stored", Log.Type.Plain);
 			} catch(IllegalArgumentException e1){
 				Log.addMessage(e1.getMessage(),Log.Type.Warning);
@@ -284,6 +284,9 @@ public class DrawingTab extends AbstractApplicationTab{
 				Log.addError(e1);
 				JOptionPane.showMessageDialog(null, "A critical error has occured during storage attempt." + e1.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
 			}
+			
+			//TODO: remove
+			clearCanvasAction.actionPerformed(e);
 		}
 		
 	}

@@ -45,7 +45,7 @@ class SCModelCreator implements ISCModelCreator {
 	public SCModelCreator() {
 		weightInit  = WeightInit.XAVIER;
 		//TANH and SIGMOID have proven very good
-		activationMethod = Activation.TANH;//SIGMOID;
+		activationMethod = Activation.HARDTANH;
 		outputActivationMethod = Activation.SOFTMAX;
 		lossFunction = LossFunction.RECONSTRUCTION_CROSSENTROPY;
 	}
@@ -66,7 +66,7 @@ class SCModelCreator implements ISCModelCreator {
 	            .optimizationAlgo(OptimizationAlgorithm.STOCHASTIC_GRADIENT_DESCENT)
 	            .learningRate(learningRate)
 	            .updater(Updater.ADAM)
-	            .regularization(true).l2(1e-5)
+	            .regularization(true).l2(1e-3)
 	            .list();
 	    
 	    for(int i=0; i<hiddenNodes.length; i++){
@@ -94,7 +94,8 @@ class SCModelCreator implements ISCModelCreator {
 	    
 		//
 		EarlyStoppingConfiguration<MultiLayerNetwork> esConf = new EarlyStoppingConfiguration.Builder<MultiLayerNetwork>()
-				.epochTerminationConditions(new MaxEpochsTerminationCondition(nEpochs), new BestScoreEpochTerminationCondition(scoreLimit), new ScoreImprovementEpochTerminationCondition((int) (nEpochs*0.1)))
+				.epochTerminationConditions(new MaxEpochsTerminationCondition(nEpochs), new BestScoreEpochTerminationCondition(scoreLimit),
+						new ScoreImprovementEpochTerminationCondition((int) (nEpochs*0.01)))
 				.iterationTerminationConditions(new InvalidScoreIterationTerminationCondition())
 				.scoreCalculator(new DataSetLossCalculator(trainIter, true))
 				.evaluateEveryNEpochs((int)(0.01*nEpochs))
