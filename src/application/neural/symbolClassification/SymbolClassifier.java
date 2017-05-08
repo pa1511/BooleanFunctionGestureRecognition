@@ -22,14 +22,17 @@ class SymbolClassifier implements ISymbolClassifier {
 	private final @Nonnull MultiLayerNetwork modelNetwork;
 	private final @Nonnull SCModelOutputInterpreter modelOutputInterpreter;
 	private final @Nonnull UnsafeLazyInt modelInputSize;
+	private final @Nonnull String name;
 
 	public SymbolClassifier(@Nonnull File networkModelFile) throws Exception {
 		this(ModelSerializer.restoreMultiLayerNetwork(networkModelFile), 
-				new SCModelOutputInterpreter(networkModelFile.getParent()+File.separator+SCUtilities.modelMetaDataFileName(networkModelFile.getName())));
+				new SCModelOutputInterpreter(networkModelFile.getParent()+File.separator+SCUtilities.modelMetaDataFileName(networkModelFile.getName())),
+				networkModelFile.getName());
+		
 	}
 	
 	public SymbolClassifier(@Nonnull MultiLayerNetwork modelNetwork,
-			@Nonnull SCModelOutputInterpreter modelOutputInterpreter) {
+			@Nonnull SCModelOutputInterpreter modelOutputInterpreter,String name) {
 		this.modelNetwork = modelNetwork;
 		this.modelOutputInterpreter = modelOutputInterpreter;
 		modelInputSize = new UnsafeLazyInt(()->{
@@ -37,6 +40,7 @@ class SymbolClassifier implements ISymbolClassifier {
 			DenseLayer layer = (DenseLayer) config.getLayer();
 			return layer.getNIn();
 		});
+		this.name = name;
 	}
 			
 	@Override
@@ -52,5 +56,44 @@ class SymbolClassifier implements ISymbolClassifier {
 		int[] prediction = modelNetwork.predict(inputArray);
 		return modelOutputInterpreter.apply(prediction[0]);
 	}
+
+	
+	@Override
+	public String getName() {
+		return name;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((modelNetwork == null) ? 0 : modelNetwork.hashCode());
+		result = prime * result + ((modelOutputInterpreter == null) ? 0 : modelOutputInterpreter.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		SymbolClassifier other = (SymbolClassifier) obj;
+		if (modelNetwork == null) {
+			if (other.modelNetwork != null)
+				return false;
+		} else if (!modelNetwork.equals(other.modelNetwork))
+			return false;
+		if (modelOutputInterpreter == null) {
+			if (other.modelOutputInterpreter != null)
+				return false;
+		} else if (!modelOutputInterpreter.equals(other.modelOutputInterpreter))
+			return false;
+		return true;
+	}
+	
+	
 	
 }

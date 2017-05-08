@@ -43,6 +43,26 @@ public class CompositeSymbolClassifier implements ISymbolClassifier {
 		classifiers.clear();
 	}
 
+
+	public void predict(ADatasetCreator datasetCreator, String real, List<Gesture> gestures, StatisticsCalculator statisticsCalculator) {
+		Map<String, Integer> votes = new HashMap<>();
+
+		
+		for(ISymbolClassifier symbolClassifier:classifiers){
+			String predicted = symbolClassifier.predict(datasetCreator, gestures);
+			statisticsCalculator.updateStatistics(symbolClassifier, real, predicted);
+			
+			Integer count = votes.get(predicted);
+			if(count==null){
+				count = Integer.valueOf(0);
+			}
+			votes.put(predicted, Integer.valueOf(count.intValue()+1));
+		}
+		
+		Map.Entry<String, Integer> majorVote = votes.entrySet().stream().max(voteCount).orElse(null);
+		statisticsCalculator.updateStatistics(this, real, majorVote.getKey());
+	}
+
 	@Override
 	public String predict(ADatasetCreator datasetCreator, List<Gesture> gestures) {
 		
@@ -81,4 +101,37 @@ public class CompositeSymbolClassifier implements ISymbolClassifier {
 		}
 	}
 
+	@Override
+	public String getName() {
+		StringBuilder stringBuilder = new StringBuilder();
+		for(ISymbolClassifier symbolClassifier:classifiers)
+			stringBuilder.append(symbolClassifier.getName()).append("||");
+		return stringBuilder.toString();
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((classifiers == null) ? 0 : classifiers.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		CompositeSymbolClassifier other = (CompositeSymbolClassifier) obj;
+		if (classifiers == null) {
+			if (other.classifiers != null)
+				return false;
+		} else if (!classifiers.equals(other.classifiers))
+			return false;
+		return true;
+	}
+	
 }

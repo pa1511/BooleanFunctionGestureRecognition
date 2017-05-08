@@ -24,7 +24,6 @@ import application.data.handling.dataset.DatasetShuffleCreator;
 import application.neural.symbolClassification.ISCModelCreator;
 import application.neural.symbolClassification.ISymbolClassifier;
 import generalfactory.Factory;
-import log.Log;
 import net.miginfocom.swing.MigLayout;
 import ui.CommonUIActions;
 import ui.Progress;
@@ -168,24 +167,14 @@ public class NeuralNetCreationPanel extends AbstractApplicationTab{
 					ISymbolClassifier model = modelCreator.createAndTrainModel(new File(fileNameTrain), nEpochs, iterationCount,
 							numInputs, numOutputs, hiddenNodes, scoreLimit, learningRate, batchSize, progress -> setProgress(progress));
 					model.storeTo(modelName, outputFolder);
+					JOptionPane.showMessageDialog(null, "Model successfully created.", "Info", JOptionPane.INFORMATION_MESSAGE);
 					return Boolean.TRUE;
 				}
 			};
 			
 			JPanel progressPanel = Progress.createProgressPanel(task,"Creating model");
 			task.execute();
-			JOptionPane.showMessageDialog(null, progressPanel, "Progress", JOptionPane.INFORMATION_MESSAGE);
-			
-			try {
-				task.get();
-				JOptionPane.showMessageDialog(null, "Model successfully created.", "Info", JOptionPane.INFORMATION_MESSAGE);
-			} 
-			catch (Exception e1) {
-				Log.addError(e1);
-				JOptionPane.showMessageDialog(null, "An error occured during model creation and training.", "Error",
-						JOptionPane.ERROR_MESSAGE);
-				return;
-			}		    
+			JOptionPane.showMessageDialog(null, progressPanel, "Progress", JOptionPane.INFORMATION_MESSAGE);			
 		}
 
 	}

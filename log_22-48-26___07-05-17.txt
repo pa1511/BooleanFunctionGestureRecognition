@@ -1,0 +1,18 @@
+Time: 22-48-26___07-05-17 "Connecting to database" Type:Plain Thread: main
+Time: 22-48-26___07-05-17 "Connection to database established" Type:Plain Thread: main
+Time: 22-48-26___07-05-17 "Connecting to database" Type:Plain Thread: main
+Time: 22-48-26___07-05-17 "Connection to database established" Type:Plain Thread: main
+Time: 22-48-26___07-05-17 "Connecting to database" Type:Plain Thread: main
+Time: 22-48-26___07-05-17 "Connection to database established" Type:Plain Thread: main
+Time: 22-48-26___07-05-17 "Connecting to database" Type:Plain Thread: main
+Time: 22-48-26___07-05-17 "Connection to database established" Type:Plain Thread: main
+Time: 22-48-26___07-05-17 "Connecting to database" Type:Plain Thread: main
+Time: 22-48-27___07-05-17 "Connection to database established" Type:Plain Thread: main
+Time: 22-48-29___07-05-17 "Started model training" Type:Plain Thread: main
+Time: 22-48-29___07-05-17 "Started model training" Type:Plain Thread: ForkJoinPool.commonPool-worker-2
+Time: 22-48-29___07-05-17 "Started model training" Type:Plain Thread: ForkJoinPool.commonPool-worker-3
+Time: 22-48-29___07-05-17 "Started model training" Type:Plain Thread: ForkJoinPool.commonPool-worker-1
+Time: 23-56-04___07-05-17 "Finished model training" Type:Plain Thread: ForkJoinPool.commonPool-worker-1
+Time: 23-56-04___07-05-17 "Started model training" Type:Plain Thread: ForkJoinPool.commonPool-worker-1
+Time: 24-49-56___08-05-17 "Finished model training" Type:Plain Thread: ForkJoinPool.commonPool-worker-2
+Time: 24-49-56___08-05-17 "Started model training" Type:Plain Thread: ForkJoinPool.commonPool-worker-2

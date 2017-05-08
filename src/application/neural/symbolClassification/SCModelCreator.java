@@ -35,19 +35,23 @@ import org.nd4j.linalg.lossfunctions.LossFunctions.LossFunction;
 
 import log.Log;
 
-class SCModelCreator implements ISCModelCreator {
+public class SCModelCreator implements ISCModelCreator {
 
-	private final @Nonnull WeightInit weightInit;
-	private final @Nonnull Activation activationMethod;
-	private final @Nonnull Activation outputActivationMethod;
-	private final @Nonnull LossFunction lossFunction;
+	private @Nonnull WeightInit weightInit;
+	private @Nonnull Activation activationMethod;
+	private @Nonnull Activation outputActivationMethod;
+	private @Nonnull LossFunction lossFunction;
+	private @Nonnull OptimizationAlgorithm optimizationAlgorithm;
+	private @Nonnull Updater updater;
 
 	public SCModelCreator() {
 		weightInit  = WeightInit.XAVIER;
 		//TANH and SIGMOID have proven very good
-		activationMethod = Activation.HARDTANH;
+		activationMethod = Activation.SIGMOID;
 		outputActivationMethod = Activation.SOFTMAX;
 		lossFunction = LossFunction.RECONSTRUCTION_CROSSENTROPY;
+		optimizationAlgorithm = OptimizationAlgorithm.STOCHASTIC_GRADIENT_DESCENT;
+	    updater = Updater.ADAM;
 	}
 	
 	@Override
@@ -61,12 +65,12 @@ class SCModelCreator implements ISCModelCreator {
 					    
 	    Nd4j.ENFORCE_NUMERICAL_STABILITY = false;
 		
-	    ListBuilder builder =  new NeuralNetConfiguration.Builder()
+		ListBuilder builder =  new NeuralNetConfiguration.Builder()
 	            .iterations(iterationCount)
-	            .optimizationAlgo(OptimizationAlgorithm.STOCHASTIC_GRADIENT_DESCENT)
+	            .optimizationAlgo(optimizationAlgorithm)
 	            .learningRate(learningRate)
-	            .updater(Updater.ADAM)
-	            .regularization(true).l2(1e-3)
+	            .updater(updater)
+	            .regularization(true).l2(1e-4)
 	            .list();
 	    
 	    for(int i=0; i<hiddenNodes.length; i++){
@@ -130,7 +134,7 @@ class SCModelCreator implements ISCModelCreator {
 		SCModelOutputInterpreter modelOutputInterpreter = new SCModelOutputInterpreter(trainDataFileName.getParent()+File.separator+
 				SCUtilities.modelMetaDataFileNameFromTrainFile(trainDataFileName.getName()));
 		
-		return new SymbolClassifier(model, modelOutputInterpreter);
+		return new SymbolClassifier(model, modelOutputInterpreter,trainDataFileName.getName());
 	}
 
 	@Override
@@ -150,6 +154,32 @@ class SCModelCreator implements ISCModelCreator {
 		        .weightInit(weightInit)
 		        .activation(outputActivationMethod)
 		        .nIn(numHiddenNodes).nOut(numOutputs).build();
+	}
+	
+	//===============================================================================================================================
+
+	public void setWeightInit(WeightInit weightInit) {
+		this.weightInit = weightInit;
+	}
+
+	public void setActivationMethod(Activation activationMethod) {
+		this.activationMethod = activationMethod;
+	}
+
+	public void setOutputActivationMethod(Activation outputActivationMethod) {
+		this.outputActivationMethod = outputActivationMethod;
+	}
+
+	public void setLossFunction(LossFunction lossFunction) {
+		this.lossFunction = lossFunction;
+	}
+
+	public void setOptimizationAlgorithm(OptimizationAlgorithm optimizationAlgorithm) {
+		this.optimizationAlgorithm = optimizationAlgorithm;
+	}
+
+	public void setUpdater(Updater updater) {
+		this.updater = updater;
 	}
 	
 	

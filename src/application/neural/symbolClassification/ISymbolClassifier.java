@@ -14,4 +14,6 @@ public interface ISymbolClassifier {
 
 	public void storeTo(@Nonnull String modelName,@Nonnull File folder) throws Exception;
 
+	public String getName();
+
 }
