@@ -58,7 +58,7 @@ public class DatasetCreationPanel extends AbstractApplicationTab{
 		String dataCreatorName = properties.getProperty(SCKeys.DATA_CREATION_IMPL_NAME);
 		datasetCreator = Factory.getInstance(dataCreatorName, dataCreatorPath);
 		
-		symbolsField = new JTextField();
+		symbolsField = new JTextField("A:1000,B:1000,+:1000,*:1000,!:1000,1:1000,0:1000");
 		JLabel instructionLabel = new JLabel("<html>Input the symbols you whish the system to use like this: \"A:10,B:20\".</br> The meaning is use the symbol and this amount of learning examples.</html>");
 		Font instructionFont = instructionLabel.getFont().deriveFont(Font.ITALIC);
 		instructionLabel.setFont(instructionFont);

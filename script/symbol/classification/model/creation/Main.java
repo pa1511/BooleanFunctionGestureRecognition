@@ -30,20 +30,19 @@ public class Main {
 		
 		File statOutputFolder = new File(userDir,"symbol/statistics");
 		File outputFolder = new File(userDir, "training/symbol/model/output");
-		String fileNameTrain = "training/symbol/data/output/all_1000-24-5.csv";
+		String fileNameTrain = "training/symbol/data/output/1000_all-28-7.csv";
 		File inputFile = new File(userDir, fileNameTrain);
-		int nEpochs = 6000;
+		int nEpochs = 5000;
 		int iterationCount = 2;
 		double scoreLimit = 5e-4;
 		int numInputs = DatasetShuffleCreator.getNumberOfInputsFrom(inputFile);
 		int numOutputs = DatasetShuffleCreator.getNumberOfOutputsFrom(inputFile);
-		int[][] hidenNodesConfigs = new int[][] { { 28, 26 }, { 26, 24 }, { 24, 22 }, { 22, 20 } };
-		double[] learningRateConfigs = new double[] { 1e-3, 5e-3, 1e-2 };
+		int[][] hidenNodesConfigs = new int[][] { { 28, 26 }/*, { 26, 24 }, { 24, 22 }, { 22, 20 }*/ };
+		double[] learningRateConfigs = new double[] { /*1e-3,*/ 5e-3, 1e-2 };
 		int[] batchSizeConfigs = new int[] { 50, 100, 150 };
 
-		Activation[] activationMethodConfig = new Activation[] { Activation.SIGMOID, Activation.TANH,
-				Activation.RATIONALTANH };
-		Updater[] updaterConfig = new Updater[] { Updater.ADAM, Updater.ADAGRAD };
+		Activation[] activationMethodConfig = new Activation[] { /*Activation.SIGMOID, Activation.TANH,*/ Activation.RATIONALTANH };
+		Updater[] updaterConfig = new Updater[] { Updater.ADAM };
 		
 		List<Symbol> symbols = new ArrayList<>();
 
@@ -59,6 +58,8 @@ public class Main {
 			request.put("!", Integer.valueOf(200));
 			request.put("+", Integer.valueOf(200));
 			request.put("*", Integer.valueOf(200));
+			request.put("0", Integer.valueOf(200));
+			request.put("1", Integer.valueOf(200));
 		
 			for(Map.Entry<String, Integer> symbolEntry:request.entrySet()){
 				for(Symbol symbol:dataSource.getSymbols(symbolEntry.getKey(),symbolEntry.getValue())){
@@ -99,7 +100,7 @@ public class Main {
 
 							StatisticsCalculator.storeStatitstics(statOutputFolder, modelName + "statistics.txt",
 									statisticsCalculator);
-
+							
 						}
 					}
 				}

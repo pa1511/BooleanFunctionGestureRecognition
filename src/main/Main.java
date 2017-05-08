@@ -18,7 +18,7 @@ import log.Log;
 public class Main {
 
 	
-	/*
+	/**
 	 * Application entry point. <br>
 	 */
 	@SuppressWarnings("resource")
