@@ -49,8 +49,13 @@ public class ExpressionManagementTable extends JTable implements AutoCloseable{
 		setRowSelectionAllowed(true);
 		selectionModel.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		selectionListener = (e) -> 	{
-			if(!e.getValueIsAdjusting())
-					observationManager.updateObservers(model.expressions.get().get(getSelectedRow()));
+			if(!e.getValueIsAdjusting()){
+					int selectedRow = getSelectedRow();
+					if(selectedRow==-1) 
+						selectedRow = model.expressionCount.getAsInt()-1;
+					if(selectedRow!=-1)
+						observationManager.updateObservers(model.expressions.get().get(selectedRow));
+			}
 		};
 		selectionModel.addListSelectionListener(selectionListener);
 		

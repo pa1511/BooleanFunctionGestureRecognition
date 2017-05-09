@@ -20,7 +20,7 @@ public class ExpressionFactory {
 		char[] symbols = symbolicForm.toCharArray();
 		
 		int dataCount = data.size();
-		for(int i=0, dataPosition=0; i<symbols.length; i++){
+		for(int i=0, dataPosition=0; i<symbols.length && dataPosition<dataCount; i++){
 			char symbolChar = symbols[i];
 			Symbol symbol = new Symbol(symbolChar);
 			
@@ -33,6 +33,9 @@ public class ExpressionFactory {
 			
 			expression.addSymbol(symbol);
 		}
+		
+		if(expression.getSymbols().isEmpty())
+			throw new IllegalArgumentException("No symbols provided for expression");
 				
 		return expression;
 	}

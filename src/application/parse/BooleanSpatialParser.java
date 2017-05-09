@@ -89,10 +89,29 @@ public class BooleanSpatialParser {
 				nodes.removeAll(nodesBetween);
 				nodes.remove(rightBracketNode);
 				Pair<IBooleanExpressionNode,RelativeRectangle> nodeInBrackets = innerParse(nodesBetween);
-				leftBracketNode.left().addChild(nodeInBrackets.left(), 0);
-				leftBracketNode.setRight(RelativeRectangle.joinRectangles(
-						RelativeRectangle.joinRectangles(leftBracketNode.right(),nodeInBrackets.right()), 
-						rightBracketNode.right()));
+				IBooleanExpressionNode node = nodeInBrackets.left();
+				if(node instanceof NotNode){
+					
+					IBooleanExpressionNode negatedNode = node.getChildren()[0];
+
+					leftBracketNode.left().addChild(negatedNode, 0);
+					node.addChild(leftBracketNode.left(), 0);
+					
+					leftBracketNode.setLeft(node);
+					
+					leftBracketNode.setRight(RelativeRectangle.joinRectangles(
+							RelativeRectangle.joinRectangles(leftBracketNode.right(),nodeInBrackets.right()), 
+							rightBracketNode.right()));					
+
+				}
+				else{
+					//old code version
+					leftBracketNode.left().addChild(node, 0);
+					leftBracketNode.setRight(RelativeRectangle.joinRectangles(
+							RelativeRectangle.joinRectangles(leftBracketNode.right(),nodeInBrackets.right()), 
+							rightBracketNode.right()));					
+				}
+				
 			}
 		}while(leftBracketNode!=null && rightBracketNode!=null);
 		
