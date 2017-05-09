@@ -111,7 +111,7 @@ public class ModelTesting extends AbstractApplicationTab{
 		add(automaticLabel,"span, growx, wrap");
 		
 		//Row 6
-		examplesToLoadField = new JTextField("A:200,B:200,+:200,*:200,!:200");
+		examplesToLoadField = new JTextField("A:200,B:200,+:200,*:200,!:200,(:200,):200,1:200,0:200");
 		add(new JLabel("Examples to load (per symbol) : "),"span 2");
 		add(examplesToLoadField, "span, growx, wrap");
 

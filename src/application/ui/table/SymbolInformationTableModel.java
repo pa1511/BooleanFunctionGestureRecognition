@@ -23,7 +23,7 @@ public class SymbolInformationTableModel extends AbstractTableModel {
 
 	private final @Nonnull String[] columnNames;
 	private final @Nonnull UnsafeLazy<List<SymbolSamplesInformation>> symbolsInfo;
-	private final @Nonnull IntSupplier symbolsInfoCount;
+	private @Nonnull IntSupplier symbolsInfoCount;
 
 	private final @Nonnull Action[] standardActions;
 	public static final @Nonnull String ACTION_RELOAD = "Reload";
@@ -35,7 +35,9 @@ public class SymbolInformationTableModel extends AbstractTableModel {
 		
 		symbolsInfo = new UnsafeLazy<>(()->{
 			try {
-				return Application.getInstance().getDataSource().getSymbolSamplesInformation();
+				List<SymbolSamplesInformation> information = Application.getInstance().getDataSource().getSymbolSamplesInformation();
+				Collections.sort(information, (inf1,inf2) -> inf1.symbol.compareTo(inf2.symbol));
+				return information;
 			} catch (Exception e) {
 				Log.addError(e);
 				JOptionPane.showMessageDialog(null, "An error occured while trying to get symbol information.", "Error", JOptionPane.ERROR_MESSAGE);
@@ -43,7 +45,31 @@ public class SymbolInformationTableModel extends AbstractTableModel {
 			return Collections.emptyList();
 		});
 		
-		symbolsInfoCount = new IntSupplier() {
+		symbolsInfoCount = getSymbolsInfoCountSupplier();
+		
+		standardActions = new Action[]{
+				new AbstractAction(ACTION_RELOAD) {
+					
+					@Override
+					public void actionPerformed(@CheckForNull ActionEvent arg0) {
+						symbolsInfo.reset();
+						resetSymbolInfoCount();
+						Log.addMessage("Reloaded symbol info from db.", Log.Type.Plain);						
+						fireTableDataChanged();
+					}
+
+				}
+		};
+
+		
+	}
+	
+	private void resetSymbolInfoCount() {
+		symbolsInfoCount = getSymbolsInfoCountSupplier();
+	}
+
+	private IntSupplier getSymbolsInfoCountSupplier() {
+		return new IntSupplier() {
 			
 			private UnsafeLazyInt estimate = new UnsafeLazyInt(()->{
 				try {
@@ -64,20 +90,6 @@ public class SymbolInformationTableModel extends AbstractTableModel {
 				return estimate.getAsInt();
 			}
 		};
-		
-		standardActions = new Action[]{
-				new AbstractAction(ACTION_RELOAD) {
-					
-					@Override
-					public void actionPerformed(@CheckForNull ActionEvent arg0) {
-						symbolsInfo.reset();
-						Log.addMessage("Reloaded symbol info from db.", Log.Type.Plain);						
-						fireTableDataChanged();
-					}
-				}
-		};
-
-		
 	}
 	
 	public @CheckForNull Action getStandardAction(@Nonnull String actionName){

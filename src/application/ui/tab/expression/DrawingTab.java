@@ -275,6 +275,7 @@ public class DrawingTab extends AbstractApplicationTab{
 				String expressionSymbolicForm = BooleanParser.expressionPreprocessing(text);
 				Expression expression = ExpressionFactory.getExpressionFor(expressionSymbolicForm,canvas.getData());
 				Application.getInstance().getDataSource().store(expression);
+				//TODO: uncomment
 				//JOptionPane.showMessageDialog(null, "Expression successfully stored", "Info", JOptionPane.INFORMATION_MESSAGE);
 				Log.addMessage("Expression stored", Log.Type.Plain);
 			} catch(IllegalArgumentException e1){
