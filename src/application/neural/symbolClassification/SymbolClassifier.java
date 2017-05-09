@@ -1,7 +1,9 @@
 package application.neural.symbolClassification;
 
 import java.io.File;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Nonnull;
 
@@ -23,6 +25,9 @@ class SymbolClassifier implements ISymbolClassifier {
 	private final @Nonnull SCModelOutputInterpreter modelOutputInterpreter;
 	private final @Nonnull UnsafeLazyInt modelInputSize;
 	private final @Nonnull String name;
+	private final @Nonnull Map<String, Double> probabilitiesMap;
+	private final double[] probabilities;
+	private final int outputCount;
 
 	public SymbolClassifier(@Nonnull File networkModelFile) throws Exception {
 		this(ModelSerializer.restoreMultiLayerNetwork(networkModelFile), 
@@ -40,6 +45,11 @@ class SymbolClassifier implements ISymbolClassifier {
 			DenseLayer layer = (DenseLayer) config.getLayer();
 			return layer.getNIn();
 		});
+		
+		outputCount = modelOutputInterpreter.interpretationCount();
+		probabilities = new double[outputCount];
+		probabilitiesMap = new HashMap<>();
+
 		this.name = name;
 	}
 			
@@ -51,12 +61,41 @@ class SymbolClassifier implements ISymbolClassifier {
 
 	@Override
 	public String predict(ADatasetCreator datasetCreator, List<Gesture> gestures) {
+//		double[] rawSample = datasetCreator.getRawFormForSymbolClassification(gestures, modelInputSize.getAsInt());
+//		INDArray inputArray = Nd4j.create(rawSample);			
+//		int[] prediction = modelNetwork.predict(inputArray);		
+//		return modelOutputInterpreter.apply(prediction[0]);
+		return weightPredict(datasetCreator, gestures);
+	}
+	
+	@SuppressWarnings("boxing")
+	public String weightPredict(ADatasetCreator datasetCreator, List<Gesture> gestures){
 		double[] rawSample = datasetCreator.getRawFormForSymbolClassification(gestures, modelInputSize.getAsInt());
-		INDArray inputArray = Nd4j.create(rawSample);			
-		int[] prediction = modelNetwork.predict(inputArray);
-		return modelOutputInterpreter.apply(prediction[0]);
+		INDArray inputArray = Nd4j.create(rawSample);		
+		
+		INDArray output = modelNetwork.output(inputArray);
+		int prediction = 0;
+		
+		for(int i=0;i<outputCount;i++){
+			probabilities[i] = output.getDouble(i);
+			if(probabilities[prediction]<probabilities[i])
+				prediction = i;
+			
+			probabilitiesMap.put(modelOutputInterpreter.apply(i),probabilities[i]);
+		}
+		
+		return modelOutputInterpreter.apply(prediction);
 	}
 
+	@Override
+	public Map<String,Double> getProbabilities() {
+		return probabilitiesMap;
+	}
+	
+	@Override
+	public int getOutputCount() {
+		return outputCount;
+	}
 	
 	@Override
 	public String getName() {

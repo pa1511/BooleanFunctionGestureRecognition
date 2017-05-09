@@ -37,6 +37,9 @@ class SCModelOutputInterpreter implements IntFunction<String>{
 		return interpretationMap;
 	}
 
+	public int interpretationCount(){
+		return interpretationMap.length;
+	}
 
 	public void store(@Nonnull File outputFile) throws Exception{
 		try(PrintStream printStream = new PrintStream(outputFile)){

@@ -37,8 +37,8 @@ public class Main {
 		double[] scoreLimits = new double[]{1e-2/*,5e-3,1e-3,5e-4*/};
 		int numInputs = DatasetShuffleCreator.getNumberOfInputsFrom(inputFile);
 		int numOutputs = DatasetShuffleCreator.getNumberOfOutputsFrom(inputFile);
-		int[][] hidenNodesConfigs = new int[][] { { 28, 28 }/*, { 26, 24 }, { 24, 22 }, { 22, 20 } */};
-		double[] learningRateConfigs = new double[] { /*1e-3,*/ 5e-3, 1e-2 };
+		int[][] hidenNodesConfigs = new int[][] { { 34, 34 }/*, { 26, 24 }, { 24, 22 }, { 22, 20 } */};
+		double[] learningRateConfigs = new double[] { /*1e-3,*/ 5e-3, /*1e-2*/ };
 		int[] batchSizeConfigs = new int[] { 50, 100/*, 150*/};
 
 		Activation[] activationMethodConfig = new Activation[] { /*Activation.SIGMOID, Activation.TANH,*/  Activation.RATIONALTANH };
