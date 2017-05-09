@@ -30,18 +30,18 @@ public class Main {
 		
 		File statOutputFolder = new File(userDir,"symbol/statistics");
 		File outputFolder = new File(userDir, "training/symbol/model/output");
-		String fileNameTrain = "training/symbol/data/output/1000_all-28-9.csv";
+		String fileNameTrain = "training/symbol/data/output/1000_all-30-9.csv";
 		File inputFile = new File(userDir, fileNameTrain);
-		int nEpochs = 5000;
-		int iterationCount = 2;
-		double scoreLimit = 5e-4;
+		int nEpochs = 3500;
+		int iterationCount = 1;
+		double[] scoreLimits = new double[]{1e-2/*,5e-3,1e-3,5e-4*/};
 		int numInputs = DatasetShuffleCreator.getNumberOfInputsFrom(inputFile);
 		int numOutputs = DatasetShuffleCreator.getNumberOfOutputsFrom(inputFile);
-		int[][] hidenNodesConfigs = new int[][] { { 30, 28 }/*, { 26, 24 }, { 24, 22 }, { 22, 20 }*/ };
+		int[][] hidenNodesConfigs = new int[][] { { 28, 28 }/*, { 26, 24 }, { 24, 22 }, { 22, 20 } */};
 		double[] learningRateConfigs = new double[] { /*1e-3,*/ 5e-3, 1e-2 };
-		int[] batchSizeConfigs = new int[] { 50, 100, 150 };
+		int[] batchSizeConfigs = new int[] { 50, 100/*, 150*/};
 
-		Activation[] activationMethodConfig = new Activation[] { /*Activation.SIGMOID,*/ Activation.TANH, /* Activation.RATIONALTANH*/ };
+		Activation[] activationMethodConfig = new Activation[] { /*Activation.SIGMOID, Activation.TANH,*/  Activation.RATIONALTANH };
 		Updater[] updaterConfig = new Updater[] { Updater.ADAM };
 		
 		List<Symbol> symbols = new ArrayList<>();
@@ -79,30 +79,31 @@ public class Main {
 				for (Activation activationMethod : activationMethodConfig) {
 					for (int batchSize : batchSizeConfigs) {
 						for (double learningRate : learningRateConfigs) {
+							for(double scoreLimit:scoreLimits){
 
-							modelCreator.setActivationMethod(activationMethod);
-							modelCreator.setUpdater(updater);
-
-							ISymbolClassifier model = modelCreator.createAndTrainModel(new File(fileNameTrain), nEpochs,
-									iterationCount, numInputs, numOutputs, hiddenNodes, scoreLimit, learningRate,
-									batchSize, i -> {
-									});
-
-							String modelName = activationMethod + "-" + updater + "-sm-rce-"
-									+ Arrays.toString(hiddenNodes)+"-"+batchSize+"-"+learningRate;
-
-							model.storeTo(modelName, outputFolder);
-
-							StatisticsCalculator statisticsCalculator = new StatisticsCalculator();
-
-							for (Symbol symbol : symbols) {
-								String predicted = model.predict(datasetCreator, symbol.getGestures());
-								statisticsCalculator.updateStatistics(model, symbol.getSymbolAsString(), predicted);
+								modelCreator.setActivationMethod(activationMethod);
+								modelCreator.setUpdater(updater);
+	
+								ISymbolClassifier model = modelCreator.createAndTrainModel(new File(fileNameTrain), nEpochs,
+										iterationCount, numInputs, numOutputs, hiddenNodes, scoreLimit, learningRate,
+										batchSize, i -> {
+										});
+	
+								String modelName = activationMethod + "-" + updater + "-sm-rce-"
+										+ Arrays.toString(hiddenNodes)+"-"+batchSize+"-"+learningRate+"-"+scoreLimit;
+	
+								model.storeTo(modelName, outputFolder);
+	
+								StatisticsCalculator statisticsCalculator = new StatisticsCalculator();
+	
+								for (Symbol symbol : symbols) {
+									String predicted = model.predict(datasetCreator, symbol.getGestures());
+									statisticsCalculator.updateStatistics(model, symbol.getSymbolAsString(), predicted);
+								}
+	
+								StatisticsCalculator.storeStatitstics(statOutputFolder, modelName + "statistics.txt",
+										statisticsCalculator);
 							}
-
-							StatisticsCalculator.storeStatitstics(statOutputFolder, modelName + "statistics.txt",
-									statisticsCalculator);
-							
 						}
 					}
 				}
