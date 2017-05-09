@@ -100,7 +100,7 @@ public class StatisticsCalculator {
 		
 		@Override
 		public String toString() {
-			return "Percent: " + getStat() + "%" + " Hit: " + hit + " Total: " + totalCount;
+			return "Percent: " + getStat()*100 + "%" + " Hit: " + hit + " Total: " + totalCount;
 		}
 	}
 
