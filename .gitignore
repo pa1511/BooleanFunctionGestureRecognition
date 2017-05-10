@@ -2,4 +2,6 @@
 /target/
 /logs/
 /test_logs/
+/symbol
+/training/symbol/model
 /data
