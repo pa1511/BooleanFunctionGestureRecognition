@@ -4,7 +4,6 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
@@ -42,7 +41,6 @@ import application.ui.draw.RectangleRepresentationView;
 import application.ui.table.AExpressionManagementObserver;
 import application.ui.table.ExpressionEvaluationTableModel;
 import application.ui.table.ExpressionManagementTable;
-import dataModels.Pair;
 import generalfactory.Factory;
 import log.Log;
 
@@ -162,10 +160,8 @@ public class ExpressionConstructionPanel extends AbstractApplicationTab{
 			rectangleView.clear();
 			
 			List<Symbol> symbols = expression.getSymbols();
-			List<Pair<Symbol, RelativeRectangle>> syRectPair = new ArrayList<>();
 			for(Symbol symbol:symbols){
 				RelativeRectangle syRec = SymbolTransformations.getRectangleRepresentation(symbol);
-				syRectPair.add(Pair.of(symbol, syRec));
 				rectangleView.createRectangle(syRec);
 			}
 			
@@ -179,7 +175,7 @@ public class ExpressionConstructionPanel extends AbstractApplicationTab{
 			
 			//Symbolic grouping detection
 			try{
-				IBooleanExpressionNode decodedTopNode = booleanSpatialParser.parse(syRectPair);
+				IBooleanExpressionNode decodedTopNode = booleanSpatialParser.parse(symbols);
 				VariableValueProvider decodedVariableValueProvider = new VariableValueProvider(decodedTopNode);
 				expressionSyGroupingEvaluationTableModel = new ExpressionEvaluationTableModel(decodedVariableValueProvider, decodedTopNode);
 				evaluationSyGroupingTable.setModel(expressionSyGroupingEvaluationTableModel);

@@ -86,6 +86,7 @@ public class Canvas extends JPanel implements AutoCloseable {
 
 				RelativePoint point = RelativePoint.getAsRelative(e.getPoint(), getWidth(), getHeight());
 				Pair<MouseClickType, List<RelativePoint>> input = pointGroups.peek();
+				//TODO: seem to have exceltion beeing thrown here
 				input.right().add(point);
 				((CanvasObservationManager) observationManager).newInputUpdate(input);
 				repaint();

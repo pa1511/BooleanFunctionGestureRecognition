@@ -32,16 +32,16 @@ public class Main {
 		File outputFolder = new File(userDir, "training/symbol/model/output");
 		String fileNameTrain = "training/symbol/data/output/1000_all-30-9.csv";
 		File inputFile = new File(userDir, fileNameTrain);
-		int nEpochs = 3500;
-		int iterationCount = 1;
+		int nEpochs = 5000;
+		int iterationCount = 2;
 		double[] scoreLimits = new double[]{1e-2/*,5e-3,1e-3,5e-4*/};
 		int numInputs = DatasetShuffleCreator.getNumberOfInputsFrom(inputFile);
 		int numOutputs = DatasetShuffleCreator.getNumberOfOutputsFrom(inputFile);
-		int[][] hidenNodesConfigs = new int[][] { { 34, 34 }/*, { 26, 24 }, { 24, 22 }, { 22, 20 } */};
+		int[][] hidenNodesConfigs = new int[][] { { 28, 28, 20 }/*, { 26, 24 }, { 24, 22 }, { 22, 20 } */};
 		double[] learningRateConfigs = new double[] { /*1e-3,*/ 5e-3, /*1e-2*/ };
-		int[] batchSizeConfigs = new int[] { 50, 100/*, 150*/};
+		int[] batchSizeConfigs = new int[] { /*50,*/ 100 /*, 150*/};
 
-		Activation[] activationMethodConfig = new Activation[] { /*Activation.SIGMOID, Activation.TANH,*/  Activation.RATIONALTANH };
+		Activation[] activationMethodConfig = new Activation[] { Activation.SIGMOID, Activation.TANH/*,  Activation.RATIONALTANH*/ };
 		Updater[] updaterConfig = new Updater[] { Updater.ADAM };
 		
 		List<Symbol> symbols = new ArrayList<>();

@@ -5,7 +5,6 @@ import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.io.File;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,6 +30,7 @@ import application.data.model.Symbol;
 import application.data.source.IDataSource;
 import application.neural.symbolClassification.CompositeSymbolClassifier;
 import application.neural.symbolClassification.ISCModelCreator;
+import application.neural.symbolClassification.SCKeys;
 import application.neural.symbolClassification.StatisticsCalculator;
 import application.ui.draw.Canvas;
 import generalfactory.Factory;
@@ -69,7 +69,7 @@ public class ModelTesting extends AbstractApplicationTab{
 		modelCreator = Factory.getInstance(properties.getProperty(SCKeys.TRAINING_MODEL_IMPL_NAME),
 				properties.getProperty(SCKeys.TRAINING_MODEL_IMPL_PATH));
 		
-		compositeModel = new CompositeSymbolClassifier(new ArrayList<>());
+		compositeModel = new CompositeSymbolClassifier();
 		String modelFolder = properties.getProperty(SCKeys.TRAINING_MODEl_OUTPUT_KEY);
 
 		setLayout(new MigLayout("","[][][][grow]","[]10[][grow][]"));

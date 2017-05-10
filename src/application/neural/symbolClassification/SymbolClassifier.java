@@ -73,6 +73,7 @@ class SymbolClassifier implements ISymbolClassifier {
 		double[] rawSample = datasetCreator.getRawFormForSymbolClassification(gestures, modelInputSize.getAsInt());
 		INDArray inputArray = Nd4j.create(rawSample);		
 		
+		//sum to 1 probabilities
 		INDArray output = modelNetwork.output(inputArray);
 		int prediction = 0;
 		

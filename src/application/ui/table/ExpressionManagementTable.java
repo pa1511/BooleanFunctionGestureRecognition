@@ -211,8 +211,12 @@ public class ExpressionManagementTable extends JTable implements AutoCloseable{
 		public Object getValueAt(int rowIndex, int columnIndex) {
 			if (columnIndex == 0)
 				return Integer.valueOf(rowIndex + 1);
-
-			return expressions.getOrThrow().get(rowIndex);
+			
+			List<Expression> expressionsList = expressions.getOrThrow();
+			
+			if(rowIndex<expressionsList.size())
+				return expressionsList.get(rowIndex);
+			return null;
 		}
 
 	}

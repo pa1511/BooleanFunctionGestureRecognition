@@ -83,6 +83,7 @@ public final class Application extends AApplication {
 		else{
 			Log.setFileLocation(System.getProperty("user.dir") + File.separator + logLocation);
 		}
+		Log.addMessage("Log initialized", Log.Type.Plain);		
 	}
 
 	@Override

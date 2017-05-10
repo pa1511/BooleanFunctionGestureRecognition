@@ -26,6 +26,7 @@ import javax.swing.SpinnerNumberModel;
 import application.AbstractApplicationTab;
 import application.Application;
 import application.data.handling.dataset.ADatasetCreator;
+import application.neural.symbolClassification.SCKeys;
 import application.ui.table.SymbolInformationTableModel;
 import dataset.ClassificationDataSet;
 import dataset.handeling.DataSetDepositers;

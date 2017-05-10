@@ -4,22 +4,38 @@ import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.util.List;
+import java.util.Properties;
+import java.util.stream.Collectors;
 
+import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 import javax.swing.AbstractAction;
 import javax.swing.JButton;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 import javax.swing.SwingUtilities;
 
 import application.AbstractApplicationTab;
+import application.Application;
+import application.data.model.Expression;
+import application.data.model.Gesture;
+import application.data.model.Symbol;
 import application.data.model.geometry.MouseClickType;
 import application.data.model.geometry.RelativePoint;
+import application.gestureGrouping.GGKeys;
+import application.gestureGrouping.IGestureGrouper;
+import application.parse.BooleanParser;
+import application.parse.BooleanSpatialParser;
+import application.parse.ParserKeys;
+import application.parse.lexic.ILexicalAnalyzer;
+import application.parse.syntactic.node.IBooleanExpressionNode;
 import application.ui.draw.Canvas;
 import application.ui.draw.PerGestureView;
 import application.ui.draw.ACanvasObserver;
 import application.ui.draw.RectangleRepresentationView;
 import dataModels.Pair;
+import generalfactory.Factory;
 import log.Log;
 
 public class GestureDrawingTab extends AbstractApplicationTab{
@@ -33,14 +49,33 @@ public class GestureDrawingTab extends AbstractApplicationTab{
 	//Actions
 	private final @Nonnull UndoAction undoAction;
 	private final @Nonnull RedoAction redoAction;
-	private final @Nonnull GroupGesturesAction storeExpressionAction;
+	private final @Nonnull GroupGesturesAction groupGesturesAction;
 	private final @Nonnull ClearCanvasAction clearCanvasAction;
 	
 	//Listeners
 	private final @Nonnull CanvasObserver canvasObserver;
 	
-	public GestureDrawingTab() {
+	//Gesture grouper
+	private final @Nonnull IGestureGrouper gestureGrouper;
+	private @CheckForNull List<Symbol> lastGroupedSymbols;
+	
+	//Spatial parser
+	private final @Nonnull BooleanSpatialParser spatialParser;
+
+	
+	public GestureDrawingTab() throws Exception {
 		super("Drawing");
+		
+		Properties applicationProperties = Application.getInstance().getProperties();
+		ILexicalAnalyzer lexicalAnalyzer = Factory.getInstance(applicationProperties.getProperty(ParserKeys.LEXICAL_ANALYZER_KEY));
+
+		spatialParser = new BooleanSpatialParser(lexicalAnalyzer);
+
+		
+		String gestureGrouperClassName = applicationProperties.getProperty(GGKeys.GESTURE_GROUPING_IMPL_NAME);
+		String gestureGrouperPath = applicationProperties.getProperty(GGKeys.GESTURE_GROUPING_IMPL_PATH);
+		
+		gestureGrouper = Factory.getInstance(gestureGrouperClassName, gestureGrouperPath);
 		
 		//set tab  layout
 		setLayout(new BorderLayout());
@@ -62,7 +97,7 @@ public class GestureDrawingTab extends AbstractApplicationTab{
 		undoAction = new UndoAction();
 		redoAction = new RedoAction();
 		clearCanvasAction = new ClearCanvasAction();
-		storeExpressionAction = new GroupGesturesAction();
+		groupGesturesAction = new GroupGesturesAction();
 		
 		undoAction.setEnabled(false);
 		redoAction.setEnabled(false);
@@ -70,7 +105,8 @@ public class GestureDrawingTab extends AbstractApplicationTab{
 		JPanel controlPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
 		controlPanel.add(new JButton(undoAction));
 		controlPanel.add(new JButton(redoAction));
-		controlPanel.add(new JButton(storeExpressionAction));
+		controlPanel.add(new JButton(groupGesturesAction));
+		controlPanel.add(new JButton(new StoreLastGrouping()));
 		controlPanel.add(new JButton(clearCanvasAction));
 		add(controlPanel,BorderLayout.SOUTH);
 		
@@ -98,6 +134,9 @@ public class GestureDrawingTab extends AbstractApplicationTab{
 		public void clearUpdate() {
 			rectangleRepresentationView.clear();
 			perGestureView.clear();
+			if(lastGroupedSymbols!=null)
+				lastGroupedSymbols.clear();
+
 			
 			undoAction.setEnabled(false);
 			redoAction.setEnabled(false);
@@ -110,6 +149,9 @@ public class GestureDrawingTab extends AbstractApplicationTab{
 			
 			List<RelativePoint> points = relativePoints.right();
 			rectangleRepresentationView.createRectangle(points);
+			perGestureView.clear();
+			if(lastGroupedSymbols!=null)
+				lastGroupedSymbols.clear();
 						
 			undoAction.setEnabled(true);
 			
@@ -119,10 +161,11 @@ public class GestureDrawingTab extends AbstractApplicationTab{
 		@Override
 		public void redoUpdate(@Nonnull Pair<MouseClickType, List<RelativePoint>> input) {
 			
-			perGestureView.redo();
-						
 			rectangleRepresentationView.redo();
 			undoAction.setEnabled(true);
+			perGestureView.clear();
+			if(lastGroupedSymbols!=null)
+				lastGroupedSymbols.clear();
 			
 			forceRepaint();
 		}
@@ -130,10 +173,11 @@ public class GestureDrawingTab extends AbstractApplicationTab{
 		@Override
 		public void undoUpdate(@Nonnull Pair<MouseClickType, List<RelativePoint>> input) {
 			
-			perGestureView.undo();
-			
 			rectangleRepresentationView.undo();
 			redoAction.setEnabled(true);
+			perGestureView.clear();
+			if(lastGroupedSymbols!=null)
+				lastGroupedSymbols.clear();
 			
 			forceRepaint();
 		}
@@ -142,6 +186,37 @@ public class GestureDrawingTab extends AbstractApplicationTab{
 	
 	//========================================================================================================================
 
+	private final class StoreLastGrouping extends AbstractAction{
+
+		public StoreLastGrouping() {
+			super("Store grouping");
+		}
+		
+		@Override
+		public void actionPerformed(ActionEvent arg0) {			
+			if(lastGroupedSymbols==null || lastGroupedSymbols.isEmpty()){
+				JOptionPane.showMessageDialog(null, "Currently there is no grouping", "Warning", JOptionPane.WARNING_MESSAGE);
+			}
+			else{
+								
+				try {
+					IBooleanExpressionNode node = spatialParser.parse(lastGroupedSymbols);
+					String expressionStringForm = BooleanParser.expressionPreprocessing(node.toString());
+					Expression expression = new Expression(expressionStringForm, lastGroupedSymbols);
+					
+					int option = JOptionPane.showConfirmDialog(null, "Detected expression: " + expressionStringForm + ". Do you still wish to store?","Storing expression",JOptionPane.YES_NO_OPTION);
+					if(option==JOptionPane.YES_OPTION)
+						Application.getInstance().getDataSource().store(expression);
+
+				} catch (Exception e) {
+					Log.addError(e);
+					JOptionPane.showMessageDialog(null, "A critical error has occured. \n " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+				}
+			}
+		}
+		
+	}
+	
 	private final class GroupGesturesAction extends AbstractAction {
 		
 		private GroupGesturesAction(){
@@ -150,7 +225,23 @@ public class GestureDrawingTab extends AbstractApplicationTab{
 		
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			//TODO: 
+			perGestureView.clear();
+
+			List<Gesture> inputData = canvas.getData().stream().map(dataUnit -> new Gesture(dataUnit.right())).collect(Collectors.toList());
+			
+			lastGroupedSymbols = gestureGrouper.group(inputData);
+			
+			for(int i=0,limit=lastGroupedSymbols.size();i<limit;i++){
+				Symbol symbol = lastGroupedSymbols.get(i);
+				
+				String symbolString = symbol.getSymbolAsString();
+				for(Gesture symbolGesture:symbol.getGestures()){
+					perGestureView.addGesture(i+": "+symbolString, symbolGesture);
+					Log.addMessage("Detected symbol("+i+"): " + symbolString, Log.Type.Plain);
+				}
+			}
+			
+			forceRepaint();
 		}
 		
 	}

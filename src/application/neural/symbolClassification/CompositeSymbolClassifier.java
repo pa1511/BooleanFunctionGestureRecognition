@@ -1,6 +1,8 @@
+
 package application.neural.symbolClassification;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -23,6 +25,12 @@ public class CompositeSymbolClassifier implements ISymbolClassifier {
 	private final @Nonnull Comparator<Map.Entry<String, Integer>> intVoteCount = (c1,c2)->{
 		return c1.getValue().compareTo(c2.getValue());
 	};
+	private final @Nonnull Map<String, Double> votes = new HashMap<>();
+
+	
+	public CompositeSymbolClassifier() {
+		this(new ArrayList<>());
+	}
 	
 	public CompositeSymbolClassifier(@Nonnull Collection<ISymbolClassifier> classifiers) {
 		this.classifiers = classifiers;
@@ -48,13 +56,13 @@ public class CompositeSymbolClassifier implements ISymbolClassifier {
 
 
 	public void predict(ADatasetCreator datasetCreator, String real, List<Gesture> gestures, StatisticsCalculator statisticsCalculator) {
+			
+		votes.clear();
 		
-		Map<String, Double> votes = new HashMap<>();
-	
 		for(ISymbolClassifier symbolClassifier:classifiers){
 			String predicted = symbolClassifier.predict(datasetCreator, gestures);
 			statisticsCalculator.updateStatistics(symbolClassifier, real, predicted);
-			updateVotes(votes, symbolClassifier);
+			updateVotes(symbolClassifier);
 		}
 		
 		Map.Entry<String, Double> majorVote = votes.entrySet().stream().max(doubleVoteCount).orElse(null);
@@ -81,30 +89,29 @@ public class CompositeSymbolClassifier implements ISymbolClassifier {
 	@Override
 	public String predict(ADatasetCreator datasetCreator, List<Gesture> gestures) {
 
-		Map<String, Double> votes = new HashMap<>();
-
+		votes.clear();
+		
 		StringBuilder sb = new StringBuilder("Symbol predictions: ");
 		
 		for(ISymbolClassifier symbolClassifier:classifiers){
 			String predicted = symbolClassifier.predict(datasetCreator, gestures);
 			sb.append("||").append(predicted);
 			
-			updateVotes(votes, symbolClassifier);			
+			updateVotes(symbolClassifier);			
 		}
 		
 		Map.Entry<String, Double> majorVote = votes.entrySet().stream().max(doubleVoteCount).orElse(null);
 		
 		if(majorVote!=null){
-			String majorPrediction = majorVote.getKey();
-			sb.append("||Major prediction: " ).append(majorPrediction);
+			sb.append("||Major prediction: " ).append(majorVote);
 			Log.addMessage(sb.toString(), Log.Type.Plain);
 			
 			//TODO:
-			votes.entrySet().stream().forEach(entry->{
-				Log.addMessage(entry.getKey()+"="+entry.getValue(), Log.Type.Plain);
-			});
+//			votes.entrySet().stream().forEach(entry->{
+//				Log.addMessage(entry.getKey()+"="+entry.getValue(), Log.Type.Plain);
+//			});
 						
-			return majorPrediction;
+			return majorVote.getKey();
 		}
 				
 		throw new RuntimeException("Could not predict");
@@ -138,7 +145,7 @@ public class CompositeSymbolClassifier implements ISymbolClassifier {
 	}
 
 	@SuppressWarnings("boxing")
-	private void updateVotes(Map<String, Double> votes, ISymbolClassifier symbolClassifier) {
+	private void updateVotes(ISymbolClassifier symbolClassifier) {
 		Map<String, Double> classifierVotes = symbolClassifier.getProbabilities();
 		for(Map.Entry<String, Double> vote:classifierVotes.entrySet()){
 			String symbol = vote.getKey();
@@ -165,8 +172,7 @@ public class CompositeSymbolClassifier implements ISymbolClassifier {
 	
 	@Override
 	public Map<String, Double> getProbabilities() {
-		//TODO
-		throw new RuntimeException("Composite symbol classifier does not support this method");
+		return votes;
 	}
 
 	@Override

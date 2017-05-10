@@ -1,6 +1,5 @@
 package application.parse;
 
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.function.BiConsumer;
@@ -11,6 +10,7 @@ import java.util.stream.Collectors;
 
 import javax.annotation.Nonnull;
 
+import application.data.handling.SymbolTransformations;
 import application.data.model.Symbol;
 import application.data.model.geometry.RelativeRectangle;
 import application.parse.lexic.ILexicalAnalyzer;
@@ -31,23 +31,28 @@ public class BooleanSpatialParser {
 		RelativeRectangle rec2 = c2.right();
 		return Double.compare(rec1.centerX, rec2.centerX);
 	};
-	
+	private final @Nonnull Function<Symbol, Pair<IBooleanExpressionNode,RelativeRectangle>> symbolToStructureMapper;
+
 	
 	public BooleanSpatialParser(ILexicalAnalyzer lexicalAnalyzer) {
 		this.lexicalAnalizer = lexicalAnalyzer;
+		symbolToStructureMapper = symbol->{
+			
+			LexicalToken lexicalToken = lexicalAnalizer.decodeToken(symbol.getSymbol());
+			IBooleanExpressionNode expressionNode = BooleanNodeFactory.getNodeFor(lexicalToken);
+			
+			return Pair.of(expressionNode, SymbolTransformations.getRectangleRepresentation(symbol));
+		};
 	}
 	
-	public @Nonnull IBooleanExpressionNode parse(@Nonnull List<Pair<Symbol,RelativeRectangle>> symbols) throws Exception{
+	public @Nonnull IBooleanExpressionNode parse(@Nonnull List<Symbol> symbols) throws Exception{
+
+		
 		List<Pair<IBooleanExpressionNode,RelativeRectangle>> symbolsAsToken = symbols.stream()
-				.map(symbol -> {
-					Symbol sy = symbol.left();
-					LexicalToken lt = lexicalAnalizer.decodeToken(sy.getSymbol());
-					IBooleanExpressionNode node = BooleanNodeFactory.getNodeFor(lt);
-					return Pair.of(node, symbol.right());
-				}).collect(Collectors.toList());
-		
-		Collections.sort(symbolsAsToken, leftToRight);
-		
+				.map(symbolToStructureMapper)
+				.sorted(leftToRight)
+				.collect(Collectors.toList());
+
 		return innerParse(symbolsAsToken).left();
 	}
 

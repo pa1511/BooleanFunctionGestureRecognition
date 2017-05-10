@@ -23,6 +23,7 @@ import application.Application;
 import application.data.handling.dataset.DatasetShuffleCreator;
 import application.neural.symbolClassification.ISCModelCreator;
 import application.neural.symbolClassification.ISymbolClassifier;
+import application.neural.symbolClassification.SCKeys;
 import generalfactory.Factory;
 import net.miginfocom.swing.MigLayout;
 import ui.CommonUIActions;
