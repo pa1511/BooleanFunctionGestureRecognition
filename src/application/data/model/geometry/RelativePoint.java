@@ -26,14 +26,6 @@ public class RelativePoint {
 	public Point toPoint(int width, int height) {
 		return new Point((int)(width*x), (int)(height*y));
 	}
-//	
-//	public double getX() {
-//		return x;
-//	}
-//	
-//	public double getY() {
-//		return y;
-//	}
 	
 	@Override
 	public String toString() {
