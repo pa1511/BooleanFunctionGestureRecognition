@@ -3,7 +3,7 @@ package application.data.model.geometry;
 import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
 
-public class RelativeRectangle {
+public class RelativeRectangle1 {
 	
 	public final @Nonnegative double ulX;
 	public final @Nonnegative double ulY;
@@ -15,7 +15,7 @@ public class RelativeRectangle {
 	public final @Nonnegative double centerX;
 	public final @Nonnegative double centerY;
 	
-	public RelativeRectangle(@Nonnegative double x, @Nonnegative double y,
+	public RelativeRectangle1(@Nonnegative double x, @Nonnegative double y,
 			@Nonnegative double width, @Nonnegative double height) {
 		this.ulX = x;
 		this.ulY = y;
@@ -27,12 +27,12 @@ public class RelativeRectangle {
 		this.centerY = (ulY+lrY)/2.0;
 	}
 	
-	public static @Nonnull RelativeRectangle joinRectangles(@Nonnull RelativeRectangle rec1,@Nonnull RelativeRectangle rec2) {
+	public static @Nonnull RelativeRectangle1 joinRectangles(@Nonnull RelativeRectangle1 rec1,@Nonnull RelativeRectangle1 rec2) {
 		
 		double x = Math.min(rec1.ulX, rec2.ulX);
 		double y = Math.min(rec1.ulY, rec2.ulY);
 		
-		return new RelativeRectangle(
+		return new RelativeRectangle1(
 				x,
 				y,
 				Math.max(rec1.lrX, rec2.lrX)-x,
