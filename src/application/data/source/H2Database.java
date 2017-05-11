@@ -114,6 +114,57 @@ public final class H2Database implements IDataSource {
 	public void close(){
 	}
 
+	
+	public void store(@Nonnull List<Expression> expressions) throws Exception {
+
+		try (Connection connection = dbConnection.get()) {
+
+			for (Expression expression : expressions) {
+
+				String insertExpressionSql = "INSERT INTO " + expressionTable + " ( " + exWrittenFormColumn
+						+ " ) VALUES( ? )";
+				int expressionId;
+
+				try (PreparedStatement statement = connection.prepareStatement(insertExpressionSql,
+						Statement.RETURN_GENERATED_KEYS)) {
+
+					statement.setString(1, expression.getSymbolicForm());
+					statement.execute();
+
+					try (ResultSet generatedKeys = statement.getGeneratedKeys()) {
+						generatedKeys.next();
+						expressionId = (int) generatedKeys.getLong(1);
+					}
+
+				}
+
+				String insertGestureSql = "INSERT INTO " + gestureTable + " ( " + geFIdExColumn + "," + geSymbolSyColumn
+						+ "," + geExPositionColumn + "," + gePointsColumn + "," + geExComplexColumn + ","
+						+ geSymbolIDColumn + " ) VALUES( ?,?,?,?,?,? )";
+
+				try (PreparedStatement statement = connection.prepareStatement(insertGestureSql)) {
+					List<Symbol> symbols = expression.getSymbols();
+					for (int j = 0, syLimit = symbols.size(); j < syLimit; j++) {
+						Symbol symbol = symbols.get(j);
+						List<Gesture> gestures = symbol.getGestures();
+						for (int i = 0, limit = gestures.size(); i < limit; i++) {
+							Gesture gesture = gestures.get(i);
+
+							statement.setInt(1, expressionId);
+							statement.setString(2, symbol.getSymbolAsString());
+							statement.setInt(3, i);
+							statement.setObject(4, GestureTransformations.gestureToArray(gesture));
+							statement.setBoolean(5, expression.isComplex());
+							statement.setInt(6, j);
+							statement.addBatch();
+						}
+					}
+					statement.executeBatch();
+				}
+			}
+		}
+	}
+	
 	@Override
 	public void store(@Nonnull Expression expression) throws Exception {
 

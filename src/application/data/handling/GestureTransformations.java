@@ -32,6 +32,27 @@ public class GestureTransformations {
 		return new Gesture(relativePoints,geId);
 	}
 
+	
+//	//TODO: remove
+//	/**
+//	 * Accepts a array of object, but assumes the array has Double objects inside of it. <br>
+//	 */
+//	public static @Nonnull Gesture getOldPointsAsGesture(int geId, @Nonnull Object[] points) {
+//		List<Point> relativePoints = new ArrayList<>();
+//
+//		for (int i = 0; i < points.length; i += 2) {
+//			double oldX = (Double) points[i];
+//			double oldY = (Double) points[i + 1];
+//			int x = (int)(oldX*1660);
+//			int y = (int)(oldY*550);
+//			relativePoints.add(new Point(x, y));
+//		}
+//
+//		return new Gesture(relativePoints,geId);
+//	}
+
+	
+	
 	public static @Nonnull int[] getRawGestureRepresentation(@Nonnull Gesture gesture) {
 
 		List<Point> points = gesture.getPoints();

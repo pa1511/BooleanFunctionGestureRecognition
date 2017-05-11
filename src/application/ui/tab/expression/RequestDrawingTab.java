@@ -21,6 +21,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
+import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
@@ -97,8 +98,15 @@ public class RequestDrawingTab extends AbstractApplicationTab{
 		conceptDescriptionField.getDocument().addDocumentListener(conceptFieldListener);
 		perGestureView = new PerGestureView();
 		
-		JLabel canvasInstruction = new JLabel("Left click and drag for gesture input. Right click to signal symbol end. ");
-		Font tipFont = canvasInstruction.getFont().deriveFont(Font.ITALIC);
+		JLabel canvasInstruction = new JLabel("<html>Left click and drag for gesture input. <br>"
+				+ "Right click once to signal symbol end. <br>"
+				+ "Simbols are read from left to right in order. <br> "
+				+ "! means negation and please write it as a line above a symbol or just a horizontal line if it is the only symbol requested. <br>"
+				+ "CTRL+S save to database <br>"
+				+ "CTRL+Z undo <br>"
+				+ "CTRL+Y redo <br>"
+				+ "CTRL+SHIFT+C clear</html>");
+		Font tipFont = canvasInstruction.getFont().deriveFont(Font.ITALIC).deriveFont(Font.BOLD);
 		canvasInstruction.setFont(tipFont);
 		JPanel canvasHolderPanel = new JPanel(new BorderLayout());
 		canvasHolderPanel.add(canvas,BorderLayout.CENTER);
@@ -130,7 +138,8 @@ public class RequestDrawingTab extends AbstractApplicationTab{
 		
 		canvasObserver = new CanvasObserver();
 		canvas.observationManager.addObserver(canvasObserver);
-
+		
+		SwingUtilities.invokeLater(()->conceptDescriptionField.requestFocus());
 	}
 	
 
@@ -317,8 +326,6 @@ public class RequestDrawingTab extends AbstractApplicationTab{
 					remainingField.setText(remaining+"/"+totalCount);
 				}
 				
-				//TODO: uncomment
-				//JOptionPane.showMessageDialog(null, "Expression successfully stored", "Info", JOptionPane.INFORMATION_MESSAGE);
 				Log.addMessage("Expression stored", Log.Type.Plain);
 			} catch(IllegalArgumentException e1){
 				Log.addMessage(e1.getMessage(),Log.Type.Warning);

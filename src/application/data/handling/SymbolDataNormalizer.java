@@ -16,34 +16,29 @@ public class SymbolDataNormalizer {
 		double averageX = 0;
 		double averageY = 0;
 		
+		double maxX = Double.MIN_VALUE, minX = Double.MAX_VALUE;
+		double maxY = Double.MIN_VALUE, minY = Double.MAX_VALUE;
+		
 		for (int i = 0; i < rawSample.length; i += 2) {
 			averageX += rawSample[i];
 			averageY += rawSample[i + 1];
-		}
-		averageX /= (rawSample.length / 2);
-		averageY /= (rawSample.length / 2);
-
-		for (int i = 0; i < rawSample.length; i += 2) {
-			rawSample[i] -= averageX;
-			rawSample[i + 1] -= averageY;
-		}		
-		
-		double maxX = Double.MIN_VALUE, minX = Double.MAX_VALUE;
-		double maxY = Double.MIN_VALUE, minY = Double.MAX_VALUE;
-
-		for (int i = 0; i < rawSample.length; i += 2) {
+			
 			maxX = Math.max(maxX, rawSample[i]);
 			minX = Math.min(minX, rawSample[i]);
 			maxY = Math.max(maxY, rawSample[i + 1]);
 			minY = Math.min(minY, rawSample[i + 1]);
 		}
-
-		double scale = Math.max(maxX-minX, maxY-minY);
 		
+		averageX /= (rawSample.length / 2);
+		averageY /= (rawSample.length / 2);
+		double scale = Math.max(maxX-minX, maxY-minY);
+
 		for (int i = 0; i < rawSample.length; i += 2) {
+			rawSample[i] -= averageX;
 			rawSample[i] = rawSample[i]/scale;
+			rawSample[i + 1] -= averageY;
 			rawSample[i + 1] = rawSample[i + 1]/scale;
-		}
+		}		
 	}
 
 }

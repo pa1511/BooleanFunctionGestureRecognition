@@ -6,6 +6,7 @@ import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -190,7 +191,7 @@ public class DatasetCreationPanel extends AbstractApplicationTab{
 				PrintStream metaOutputPrintStream = new PrintStream(new FileOutputStream(metaOutputFile))){
 				ClassificationDataSet dataSet = datasetCreator.createSymbolClassificationDataset(requestedSymbolMap,precision);
 				DataSetDepositers.depositToCSV(dataSet, outputPrintStream, false);
-				DataSetDepositers.depositClassificationMeta(dataSet,metaOutputPrintStream, false, true);
+				DataSetDepositers.depositClassificationMeta(dataSet,metaOutputPrintStream, false);
 			} catch (Exception e1) {
 				Log.addError(e1);
 				JOptionPane.showMessageDialog(null, "A critical error has occured.", "Error", JOptionPane.ERROR_MESSAGE);
@@ -204,7 +205,9 @@ public class DatasetCreationPanel extends AbstractApplicationTab{
 	}
 
 	private @Nonnull Map<String, Integer> parseRequest(@Nonnull String requestedSymbolAsString) throws Exception{
+		
 		String[]  perSymbolRequests = requestedSymbolAsString.replaceAll("\\s", "").split(",");
+		Arrays.sort(perSymbolRequests);
 		Map<String, Integer> requestInfo = new HashMap<>();
 		
 		for(String symbolRequest:perSymbolRequests){

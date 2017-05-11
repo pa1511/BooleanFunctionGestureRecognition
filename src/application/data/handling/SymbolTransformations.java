@@ -44,10 +44,12 @@ public class SymbolTransformations {
 		
 		if(rawForm.length == totalSymbolLength){
 
-			int destPos = 0;
 			for(int[] rawGesture:rawGestures){
-				System.arraycopy(rawGesture, 0, rawForm, destPos, rawGesture.length);
-				destPos += rawGesture.length;
+				
+				for(int i=0; i<rawGesture.length;i++){
+					rawForm[i] = rawGesture[i];
+				}
+				
 			}
 			
 		}
