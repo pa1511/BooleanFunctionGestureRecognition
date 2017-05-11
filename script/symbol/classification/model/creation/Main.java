@@ -21,10 +21,13 @@ import application.data.source.IDataSource;
 import application.neural.symbolClassification.ISymbolClassifier;
 import application.neural.symbolClassification.SCModelCreator;
 import application.neural.symbolClassification.StatisticsCalculator;
+import log.Log;
 
 public class Main {
 
 	public static void main(String[] args) throws Exception {
+		
+		Log.setDisabled(true);
 
 		String userDir = System.getProperty("user.dir");
 		

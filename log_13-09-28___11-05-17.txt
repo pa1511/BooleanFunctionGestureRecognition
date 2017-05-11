@@ -1,5 +1,0 @@
-Time: 13-09-28___11-05-17 "Connecting to database" Type:Plain Thread: main
-Time: 13-09-28___11-05-17 "Connection to database established" Type:Plain Thread: main
-Time: 13-09-29___11-05-17 "Connecting to database" Type:Plain Thread: main
-Time: 13-09-29___11-05-17 "Connection to database established" Type:Plain Thread: main
-Time: 13-09-29___11-05-17 "Initializing database tables" Type:Plain Thread: main
