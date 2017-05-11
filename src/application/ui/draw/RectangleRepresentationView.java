@@ -2,6 +2,8 @@ package application.ui.draw;
 
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.Point;
+import java.awt.Rectangle;
 import java.util.ArrayDeque;
 import java.util.List;
 import javax.annotation.Nonnull;
@@ -9,14 +11,12 @@ import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 
 import application.data.handling.RelativePointTransformations;
-import application.data.model.geometry.RelativePoint;
-import application.data.model.geometry.RelativeRectangle;
 import dataModels.Pair;
 
 public class RectangleRepresentationView extends JPanel {
 	
-	private final @Nonnull ArrayDeque<Pair<Color,RelativeRectangle>> rectangleDescriptions;
-	private final @Nonnull ArrayDeque<Pair<Color,RelativeRectangle>> undoneDescriptions;
+	private final @Nonnull ArrayDeque<Pair<Color,Rectangle>> rectangleDescriptions;
+	private final @Nonnull ArrayDeque<Pair<Color,Rectangle>> undoneDescriptions;
 	
 	private final @Nonnull Color defaultColor = Color.BLACK;
 	
@@ -31,12 +31,12 @@ public class RectangleRepresentationView extends JPanel {
 		setBorder(BorderFactory.createMatteBorder(10, 5, 10, 5, Color.LIGHT_GRAY));
 	}
 	
-	public void createRectangle(@Nonnull List<RelativePoint> points){		
+	public void createRectangle(@Nonnull List<Point> points){		
 		createRectangle(points, defaultColor);
 	}
 
-	public void createRectangle(@Nonnull List<RelativePoint> points, @Nonnull Color color){		
-		RelativeRectangle rectangle = RelativePointTransformations.getRectangleRepresentation(points);
+	public void createRectangle(@Nonnull List<Point> points, @Nonnull Color color){		
+		Rectangle rectangle = RelativePointTransformations.getRectangleRepresentation(points);
 		createRectangle(rectangle, color);
 	}
 
@@ -48,19 +48,19 @@ public class RectangleRepresentationView extends JPanel {
 	 * @param width
 	 * @param height
 	 */
-	public void createRectangle(double x, double y, double width, double height){		
+	public void createRectangle(int x, int y, int width, int height){		
 		createRectangle(x, y, width, height, defaultColor);
 	}
 
-	public void createRectangle(double x, double y, double width, double height,@Nonnull Color color){	
-		createRectangle(new RelativeRectangle(x, y, width, height), color);
+	public void createRectangle(int x, int y, int width, int height,@Nonnull Color color){	
+		createRectangle(new Rectangle(x, y, width, height), color);
 	}
 	
-	public void createRectangle(RelativeRectangle syRec) {
+	public void createRectangle(Rectangle syRec) {
 		createRectangle(syRec, defaultColor);
 	}
 
-	public void createRectangle(RelativeRectangle rec,@Nonnull Color color){	
+	public void createRectangle(Rectangle rec,@Nonnull Color color){	
 		undoneDescriptions.clear();
 		rectangleDescriptions.push(Pair.of(color, rec));
 		repaint();
@@ -71,17 +71,13 @@ public class RectangleRepresentationView extends JPanel {
 	protected void paintComponent(Graphics g) {
 		super.paintComponent(g);
 		
-		int componentWidth = getWidth();
-		int componentHeight = getHeight();
-		
 		Color oldColor = g.getColor();
-		for(Pair<Color,RelativeRectangle> rectangleDescription:rectangleDescriptions){
+		for(Pair<Color,Rectangle> rectangleDescription:rectangleDescriptions){
 			g.setColor(rectangleDescription.left());
 
-			RelativeRectangle rectangle = rectangleDescription.right();
-			
-			g.drawRect((int)(rectangle.ulX*componentWidth), (int)(rectangle.ulY*componentHeight),
-					(int)(rectangle.width*componentWidth), (int)(rectangle.height*componentHeight));
+			Rectangle rectangle = rectangleDescription.right();
+			g.drawRect(rectangle.x, rectangle.y,
+					rectangle.width, rectangle.height);
 		}
 		g.setColor(oldColor);
 	}

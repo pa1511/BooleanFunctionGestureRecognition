@@ -68,9 +68,12 @@ public class ExpressionManagementTable extends JTable implements AutoCloseable{
 						if(model.expressions.isLoaded()){
 							model.expressions.reset();
 							model.expressions.getOrThrow();
-							Log.addMessage("Reloaded expressions from db.", Log.Type.Plain);
-							model.fireTableDataChanged();
 						}
+						else{
+							model.resetExpressionCount();
+						}
+						Log.addMessage("Reloaded expressions from db.", Log.Type.Plain);
+						model.fireTableDataChanged();
 					}
 				},
 				new AbstractAction(ACTION_DELETE) {
@@ -143,7 +146,7 @@ public class ExpressionManagementTable extends JTable implements AutoCloseable{
 
 		private final @Nonnull String[] columnNames;
 		private final @Nonnull UnsafeLazy<List<Expression>> expressions;
-		private final @Nonnull IntSupplier expressionCount;
+		private @Nonnull IntSupplier expressionCount;
 		private @CheckForNull ExpressionType filter = null;
 
 		public Model() {
@@ -159,7 +162,11 @@ public class ExpressionManagementTable extends JTable implements AutoCloseable{
 				}
 				return Collections.emptyList();
 			});
-			expressionCount = new IntSupplier() {
+			expressionCount = getExpressionCountLazy();
+		}
+
+		private IntSupplier getExpressionCountLazy() {
+			return new IntSupplier() {
 				
 				private UnsafeLazyInt estimate = new UnsafeLazyInt(()->{
 					try {
@@ -180,6 +187,10 @@ public class ExpressionManagementTable extends JTable implements AutoCloseable{
 					return estimate.getAsInt();
 				}
 			};
+		}
+
+		public void resetExpressionCount() {
+			expressionCount = getExpressionCountLazy();
 		}
 
 		private void handleException(Exception e) {

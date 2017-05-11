@@ -1,19 +1,19 @@
 package application.data.handling;
 
+import java.awt.Point;
+import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.Nonnull;
 
 import application.data.model.Gesture;
-import application.data.model.geometry.RelativePoint;
-import application.data.model.geometry.RelativeRectangle;
 
 public class GestureTransformations {
 
 	private GestureTransformations() {}
 	
-	public static @Nonnull RelativeRectangle getRectangleRepresentation(@Nonnull Gesture gesture){
+	public static @Nonnull Rectangle getRectangleRepresentation(@Nonnull Gesture gesture){
 		return RelativePointTransformations.getRectangleRepresentation(gesture.getPoints());
 	}
 	
@@ -21,25 +21,25 @@ public class GestureTransformations {
 	 * Accepts a array of object, but assumes the array has Double objects inside of it. <br>
 	 */
 	public static @Nonnull Gesture getPointsAsGesture(int geId, @Nonnull Object[] points) {
-		List<RelativePoint> relativePoints = new ArrayList<>();
+		List<Point> relativePoints = new ArrayList<>();
 
 		for (int i = 0; i < points.length; i += 2) {
-			Double x = (Double) points[i];
-			Double y = (Double) points[i + 1];
-			relativePoints.add(new RelativePoint(x.doubleValue(), y.doubleValue()));
+			Integer x = (Integer) points[i];
+			Integer y = (Integer) points[i + 1];
+			relativePoints.add(new Point(x.intValue(), y.intValue()));
 		}
 
 		return new Gesture(relativePoints,geId);
 	}
 
-	public static @Nonnull double[] getRawGestureRepresentation(@Nonnull Gesture gesture) {
+	public static @Nonnull int[] getRawGestureRepresentation(@Nonnull Gesture gesture) {
 
-		List<RelativePoint> points = gesture.getPoints();
+		List<Point> points = gesture.getPoints();
 		int pointsCount = points.size();
-		double[] array = new double[pointsCount * 2];
+		int[] array = new int[pointsCount * 2];
 
 		for (int i = 0; i < pointsCount; i++) {
-			RelativePoint point = points.get(i);
+			Point point = points.get(i);
 			array[2 * i] = point.x;
 			array[2 * i + 1] = point.y;
 		}
@@ -48,16 +48,16 @@ public class GestureTransformations {
 	}
 
 
-	public static @Nonnull Double[] gestureToArray(@Nonnull Gesture gesture) {
+	public static @Nonnull Integer[] gestureToArray(@Nonnull Gesture gesture) {
 
-		List<RelativePoint> points = gesture.getPoints();
+		List<Point> points = gesture.getPoints();
 		int pointsCount = points.size();
-		Double[] array = new Double[pointsCount * 2];
+		Integer[] array = new Integer[pointsCount * 2];
 
 		for (int i = 0; i < pointsCount; i++) {
-			RelativePoint point = points.get(i);
-			array[2 * i] = Double.valueOf(point.x);
-			array[2 * i + 1] = Double.valueOf(point.y);
+			Point point = points.get(i);
+			array[2 * i] = Integer.valueOf(point.x);
+			array[2 * i + 1] = Integer.valueOf(point.y);
 		}
 
 		return array;

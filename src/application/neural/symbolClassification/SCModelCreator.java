@@ -86,7 +86,6 @@ public class SCModelCreator implements ISCModelCreator {
 	            
 	    MultiLayerNetwork model = new MultiLayerNetwork(conf);
 	    model.init();
-	   // model.setListeners(new ScoreIterationListener(nEpochs*iterationCount));    
 	    
 		//Load the training data:
 	    	    

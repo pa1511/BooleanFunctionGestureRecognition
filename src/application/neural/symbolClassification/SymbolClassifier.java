@@ -61,10 +61,6 @@ class SymbolClassifier implements ISymbolClassifier {
 
 	@Override
 	public String predict(ADatasetCreator datasetCreator, List<Gesture> gestures) {
-//		double[] rawSample = datasetCreator.getRawFormForSymbolClassification(gestures, modelInputSize.getAsInt());
-//		INDArray inputArray = Nd4j.create(rawSample);			
-//		int[] prediction = modelNetwork.predict(inputArray);		
-//		return modelOutputInterpreter.apply(prediction[0]);
 		return weightPredict(datasetCreator, gestures);
 	}
 	

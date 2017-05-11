@@ -9,18 +9,18 @@ import javax.annotation.Nonnull;
  * Stores x and y coordinates as values from 0-1 representing a relative position. <br>
  * @author paf
  */
-public class RelativePoint1 {
+public class RelativePoint {
 
 	public final @Nonnegative double x;
 	public final @Nonnegative double y;
 	
-	public RelativePoint1(@Nonnegative double x, @Nonnegative double y) {
+	public RelativePoint(@Nonnegative double x, @Nonnegative double y) {
 		this.x = x;
 		this.y = y;
 	}
 
-	public static @Nonnull RelativePoint1 getAsRelative(@Nonnull Point point, double width, double height) {
-		return new RelativePoint1(point.getX()/width, point.getY()/height);
+	public static @Nonnull RelativePoint getAsRelative(@Nonnull Point point, double width, double height) {
+		return new RelativePoint(point.getX()/width, point.getY()/height);
 	}
 
 	public Point toPoint(int width, int height) {

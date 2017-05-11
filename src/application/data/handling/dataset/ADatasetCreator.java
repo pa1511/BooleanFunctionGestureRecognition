@@ -32,8 +32,7 @@ public abstract class ADatasetCreator {
 	}
 
 	public static @Nonnull String getMetaFileName(String outputFileName) {
-		String metaFileName = outputFileName.replaceAll(".csv", "")+".metadata";
-		return metaFileName;
+		return "."+outputFileName.replaceAll(".csv", "")+".metadata";
 	}
 
 }

@@ -20,7 +20,7 @@ import log.Log;
  * @author paf
  *
  */
-public final class Application extends AApplication {
+public class Application extends AApplication {
 	
 	
 	public static @Nonnull Application getInstance(){
@@ -39,11 +39,21 @@ public final class Application extends AApplication {
 
 	private static final @Nonnull String EXTERNAL_KEY = "external.configuration";
 	
+	private final @Nonnull String propertiesName;
+	
 	public Application() throws Exception {
+		this("config.properties");
+	}
+
+	public Application(String propertiesName) throws Exception {
 		super();
+		this.propertiesName = propertiesName;
+		
+		initialize();
 		Log.addMessage("Application setup completed successfully", Log.Type.Plain);
 	}
 
+	
 	@SuppressWarnings({ "resource", "hiding" })
 	@Override
 	protected void initializeApplicationDataSource() throws Exception {
@@ -59,7 +69,7 @@ public final class Application extends AApplication {
 	@Override
 	protected final void loadApplicationProperties() throws URISyntaxException, IOException, FileNotFoundException {
 		String propertyFilesLocation = System.getProperty("user.dir") + File.separator + "properties";
-		File propertyFile = new File(propertyFilesLocation,"config.properties");
+		File propertyFile = new File(propertyFilesLocation,propertiesName);
 		try(FileInputStream inputStream = new FileInputStream(propertyFile)){
 			properties.load(inputStream);
 		}

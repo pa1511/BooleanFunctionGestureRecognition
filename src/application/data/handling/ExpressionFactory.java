@@ -1,5 +1,6 @@
 package application.data.handling;
 
+import java.awt.Point;
 import java.util.List;
 
 import javax.annotation.Nonnull;
@@ -8,12 +9,11 @@ import application.data.model.Expression;
 import application.data.model.Gesture;
 import application.data.model.Symbol;
 import application.data.model.geometry.MouseClickType;
-import application.data.model.geometry.RelativePoint;
 import dataModels.Pair;
 
 public class ExpressionFactory {
 
-	public static @Nonnull Expression getExpressionFor(@Nonnull String symbolicForm,@Nonnull List<Pair<MouseClickType, List<RelativePoint>>> data) {
+	public static @Nonnull Expression getExpressionFor(@Nonnull String symbolicForm,@Nonnull List<Pair<MouseClickType, List<Point>>> data) {
 		
 		Expression expression = new Expression(symbolicForm);
 

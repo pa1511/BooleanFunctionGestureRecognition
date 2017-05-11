@@ -1,44 +1,43 @@
 package application.data.model;
 
+import java.awt.Point;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.Nonnull;
 
-import application.data.model.geometry.RelativePoint;
-
 public class Gesture extends AIdentifiable{
 
-	private final @Nonnull List<RelativePoint> points;
+	private final @Nonnull List<Point> points;
 
 	public Gesture() {
 		this(new ArrayList<>());
 	}
 
-	public Gesture(List<RelativePoint> points) {
+	public Gesture(List<Point> points) {
 		this(points,-1);
 	}
 
-	public Gesture(List<RelativePoint> points,int id) {
+	public Gesture(List<Point> points,int id) {
 		super(id);
 		this.points = points;
 	}
 
-	public @Nonnull Gesture addPoint(@Nonnull RelativePoint point){
+	public @Nonnull Gesture addPoint(@Nonnull Point point){
 		points.add(point);
 		return this;
 	}
 	
-	public @Nonnull Gesture removePoint(@Nonnull RelativePoint point){
+	public @Nonnull Gesture removePoint(@Nonnull Point point){
 		points.remove(point);
 		return this;
 	}
 
-	public RelativePoint[] getPointsAsArray() {
-		return points.toArray(new RelativePoint[points.size()]);
+	public Point[] getPointsAsArray() {
+		return points.toArray(new Point[points.size()]);
 	}
 
-	public List<RelativePoint> getPoints() {
+	public List<Point> getPoints() {
 		return points;
 	}
 		

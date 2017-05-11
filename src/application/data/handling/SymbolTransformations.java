@@ -1,5 +1,7 @@
 package application.data.handling;
 
+import java.awt.Point;
+import java.awt.Rectangle;
 import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
@@ -9,8 +11,6 @@ import javax.annotation.Nonnull;
 
 import application.data.model.Gesture;
 import application.data.model.Symbol;
-import application.data.model.geometry.RelativePoint;
-import application.data.model.geometry.RelativeRectangle;
 import utilities.random.RNGProvider;
 
 public class SymbolTransformations {
@@ -30,12 +30,12 @@ public class SymbolTransformations {
 
 	public static double[] getRawSymbolRepresentation(@Nonnull List<Gesture> gestures, @Nonnegative int pointCount) {
 		double[] rawForm = new double[pointCount];
-		double[][] rawGestures = new double[gestures.size()][];
+		int[][] rawGestures = new int[gestures.size()][];
 		
 		int gesturePosition = 0;
 		int totalSymbolLength = 0;
 		for(Gesture gesture:gestures){
-			double[] rawGesture = GestureTransformations.getRawGestureRepresentation(gesture);
+			int[] rawGesture = GestureTransformations.getRawGestureRepresentation(gesture);
 			totalSymbolLength+=rawGesture.length;
 			rawGestures[gesturePosition] = rawGesture;
 			gesturePosition++;
@@ -45,7 +45,7 @@ public class SymbolTransformations {
 		if(rawForm.length == totalSymbolLength){
 
 			int destPos = 0;
-			for(double[] rawGesture:rawGestures){
+			for(int[] rawGesture:rawGestures){
 				System.arraycopy(rawGesture, 0, rawForm, destPos, rawGesture.length);
 				destPos += rawGesture.length;
 			}
@@ -58,17 +58,17 @@ public class SymbolTransformations {
 			double chance = (1.0*additionalPoints)/totalSymbolLength;
 			int destPos = 0;
 			
-			for(double[] rawGesture:rawGestures){
+			for(int[] rawGesture:rawGestures){
 				for(int i=0; i<rawGesture.length; i++){
 					if(additionalPoints>0 && chance>=random.nextDouble()){
 						if(i+1<rawGesture.length){
 							rawForm[destPos] = rawGesture[i];
 							destPos++;
-							double other =  rawGesture[i+1];
+							int other =  rawGesture[i+1];
 							rawForm[destPos] = (rawGesture[i] + other)/2.0;
 						}
 						else if(i-1>=0){
-							double other =  rawGesture[i-1];
+							int other =  rawGesture[i-1];
 							rawForm[destPos] = (rawGesture[i] + other)/2.0;
 							destPos++;
 							rawForm[destPos] = rawGesture[i];
@@ -87,8 +87,8 @@ public class SymbolTransformations {
 				}
 			}
 			if(additionalPoints>0){
-				double[] lastGesture = rawGestures[rawGestures.length-1];
-				double lastPoint = lastGesture[lastGesture.length-1];
+				int[] lastGesture = rawGestures[rawGestures.length-1];
+				int lastPoint = lastGesture[lastGesture.length-1];
 				while(additionalPoints!=0){
 					rawForm[destPos] = lastPoint;
 					destPos++;
@@ -99,7 +99,7 @@ public class SymbolTransformations {
 		else{
 			int destPos = 0;
 			
-			for(double[] rawGesture:rawGestures){
+			for(int[] rawGesture:rawGestures){
 				
 				int pointsToSelect = Math.round(rawGesture.length*rawForm.length/(float)totalSymbolLength);
 				
@@ -112,8 +112,8 @@ public class SymbolTransformations {
 				}
 			}
 			if(destPos<rawForm.length){
-				double[] lastGesture = rawGestures[rawGestures.length-1];
-				double lastPoint = lastGesture[lastGesture.length-1];
+				int[] lastGesture = rawGestures[rawGestures.length-1];
+				int lastPoint = lastGesture[lastGesture.length-1];
 				while(destPos<rawForm.length){
 					rawForm[destPos] = lastPoint;
 					destPos++;
@@ -129,8 +129,8 @@ public class SymbolTransformations {
 	/**
 	 * Returns a rectangle representation of the given symbol. <br>
 	 */
-	public static @Nonnull RelativeRectangle getRectangleRepresentation(@Nonnull Symbol symbol) {
-		List<RelativePoint> relativePoints = symbol.getGestures()
+	public static @Nonnull Rectangle getRectangleRepresentation(@Nonnull Symbol symbol) {
+		List<Point> relativePoints = symbol.getGestures()
 				.stream()
 				.map(Gesture::getPoints)
 				.flatMap(points->points.stream())

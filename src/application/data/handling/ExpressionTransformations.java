@@ -1,5 +1,6 @@
 package application.data.handling;
 
+import java.awt.Point;
 import java.util.ArrayDeque;
 import java.util.List;
 
@@ -9,14 +10,13 @@ import application.data.model.Expression;
 import application.data.model.Gesture;
 import application.data.model.Symbol;
 import application.data.model.geometry.MouseClickType;
-import application.data.model.geometry.RelativePoint;
 import dataModels.Pair;
 
 public class ExpressionTransformations {
 
-	public static @Nonnull ArrayDeque<Pair<MouseClickType, List<RelativePoint>>> getCanvasForm(@Nonnull Expression expression) {
+	public static @Nonnull ArrayDeque<Pair<MouseClickType, List<Point>>> getCanvasForm(@Nonnull Expression expression) {
 		
-		ArrayDeque<Pair<MouseClickType, List<RelativePoint>>> canvasForm = new ArrayDeque<>();
+		ArrayDeque<Pair<MouseClickType, List<Point>>> canvasForm = new ArrayDeque<>();
 		
 		for(Symbol symbol:expression.getSymbols()){
 			for(Gesture gesture:symbol.getGestures()){

@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
+import java.awt.Rectangle;
 import java.util.List;
 import java.util.Properties;
 
@@ -28,7 +29,6 @@ import application.data.handling.SymbolTransformations;
 import application.data.model.Expression;
 import application.data.model.ExpressionType;
 import application.data.model.Symbol;
-import application.data.model.geometry.RelativeRectangle;
 import application.parse.BooleanParser;
 import application.parse.BooleanSpatialParser;
 import application.parse.ParserKeys;
@@ -161,7 +161,7 @@ public class ExpressionConstructionPanel extends AbstractApplicationTab{
 			
 			List<Symbol> symbols = expression.getSymbols();
 			for(Symbol symbol:symbols){
-				RelativeRectangle syRec = SymbolTransformations.getRectangleRepresentation(symbol);
+				Rectangle syRec = SymbolTransformations.getRectangleRepresentation(symbol);
 				rectangleView.createRectangle(syRec);
 			}
 			

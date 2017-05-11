@@ -5,11 +5,7 @@ import javax.annotation.Nonnull;
 public class SymbolDataNormalizer {
 
 	private SymbolDataNormalizer() {}
-	
-	private static final int lower = -1;
-	private static final int upper = 1;
-	private static final int interval = upper - lower;
-	
+		
 	public static void normalizeSymbolSamples(@Nonnull double[][] samples) {
 		for(double[] sample:samples)
 			normalizeSample(sample);
@@ -45,8 +41,8 @@ public class SymbolDataNormalizer {
 		double scale = Math.max(maxX-minX, maxY-minY);
 		
 		for (int i = 0; i < rawSample.length; i += 2) {
-			rawSample[i] = rawSample[i]*interval/scale+lower;//((rawSample[i] - minX) / (maxX - minX)) * interval + lower;
-			rawSample[i + 1] = rawSample[i + 1]*interval/scale+lower;//((rawSample[i + 1] - minY) / (maxY - minY)) * interval + lower;
+			rawSample[i] = rawSample[i]/scale;
+			rawSample[i + 1] = rawSample[i + 1]/scale;
 		}
 	}
 

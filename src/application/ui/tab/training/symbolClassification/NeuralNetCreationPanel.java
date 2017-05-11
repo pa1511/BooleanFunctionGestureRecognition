@@ -25,6 +25,7 @@ import application.neural.symbolClassification.ISCModelCreator;
 import application.neural.symbolClassification.ISymbolClassifier;
 import application.neural.symbolClassification.SCKeys;
 import generalfactory.Factory;
+import log.Log;
 import net.miginfocom.swing.MigLayout;
 import ui.CommonUIActions;
 import ui.Progress;
@@ -165,11 +166,17 @@ public class NeuralNetCreationPanel extends AbstractApplicationTab{
 
 				@Override
 				protected Boolean doInBackground() throws Exception {
-					ISymbolClassifier model = modelCreator.createAndTrainModel(new File(fileNameTrain), nEpochs, iterationCount,
-							numInputs, numOutputs, hiddenNodes, scoreLimit, learningRate, batchSize, progress -> setProgress(progress));
-					model.storeTo(modelName, outputFolder);
-					JOptionPane.showMessageDialog(null, "Model successfully created.", "Info", JOptionPane.INFORMATION_MESSAGE);
-					return Boolean.TRUE;
+					try{
+						ISymbolClassifier model = modelCreator.createAndTrainModel(new File(fileNameTrain), nEpochs, iterationCount,
+								numInputs, numOutputs, hiddenNodes, scoreLimit, learningRate, batchSize, progress -> setProgress(progress));
+						model.storeTo(modelName, outputFolder);
+						JOptionPane.showMessageDialog(null, "Model successfully created.", "Info", JOptionPane.INFORMATION_MESSAGE);
+						return Boolean.TRUE;
+					}
+					catch (Exception e) {
+						Log.addError(e);
+						return Boolean.FALSE;
+					}
 				}
 			};
 			

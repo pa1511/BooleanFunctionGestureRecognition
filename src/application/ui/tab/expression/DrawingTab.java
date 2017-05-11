@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.FlowLayout;
 import java.awt.Font;
+import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.util.List;
@@ -29,7 +30,6 @@ import application.data.handling.ExpressionFactory;
 import application.data.model.Expression;
 import application.data.model.Gesture;
 import application.data.model.geometry.MouseClickType;
-import application.data.model.geometry.RelativePoint;
 import application.parse.BooleanParser;
 import application.ui.draw.Canvas;
 import application.ui.draw.PerGestureView;
@@ -121,9 +121,9 @@ public class DrawingTab extends AbstractApplicationTab{
 
 	private void registerKeyboardActions() {
 		conceptDescriptionField.registerKeyboardAction(undoAction, 
-				KeyStroke.getKeyStroke(KeyEvent.VK_U, KeyEvent.CTRL_DOWN_MASK), JComponent.WHEN_FOCUSED);
+				KeyStroke.getKeyStroke(KeyEvent.VK_Z, KeyEvent.CTRL_DOWN_MASK), JComponent.WHEN_FOCUSED);
 		conceptDescriptionField.registerKeyboardAction(redoAction, 
-				KeyStroke.getKeyStroke(KeyEvent.VK_R, KeyEvent.CTRL_DOWN_MASK), JComponent.WHEN_FOCUSED);
+				KeyStroke.getKeyStroke(KeyEvent.VK_Y, KeyEvent.CTRL_DOWN_MASK), JComponent.WHEN_FOCUSED);
 		conceptDescriptionField.registerKeyboardAction(storeExpressionAction, 
 				KeyStroke.getKeyStroke(KeyEvent.VK_S, KeyEvent.CTRL_DOWN_MASK), JComponent.WHEN_FOCUSED);
 		conceptDescriptionField.registerKeyboardAction(clearCanvasAction, 
@@ -186,13 +186,13 @@ public class DrawingTab extends AbstractApplicationTab{
 		}
 
 		@Override
-		public void newInputUpdate(@Nonnull Pair<MouseClickType, List<RelativePoint>> relativePoints) {
+		public void newInputUpdate(@Nonnull Pair<MouseClickType, List<Point>> relativePoints) {
 			if((relativePoints.left()==MouseClickType.RIGHT)){
 				rectangleRepresentationView.createRectangle(relativePoints.right(),Color.RED);
 				currentSy++;
 			}
 			else{
-				List<RelativePoint> points = relativePoints.right();
+				List<Point> points = relativePoints.right();
 				rectangleRepresentationView.createRectangle(points);
 				
 				char[] symbols = conceptDescriptionField.getText().toCharArray();
@@ -206,7 +206,7 @@ public class DrawingTab extends AbstractApplicationTab{
 		}
 
 		@Override
-		public void redoUpdate(@Nonnull Pair<MouseClickType, List<RelativePoint>> input) {
+		public void redoUpdate(@Nonnull Pair<MouseClickType, List<Point>> input) {
 			MouseClickType type = input.left();
 			
 			if(type==MouseClickType.RIGHT){
@@ -223,7 +223,7 @@ public class DrawingTab extends AbstractApplicationTab{
 		}
 		
 		@Override
-		public void undoUpdate(@Nonnull Pair<MouseClickType, List<RelativePoint>> input) {
+		public void undoUpdate(@Nonnull Pair<MouseClickType, List<Point>> input) {
 			
 			MouseClickType type = input.left();
 			

@@ -5,6 +5,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Point;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.Nonnegative;
@@ -43,8 +44,34 @@ public class GesturePanel extends JPanel{
 		
 		private final @Nonnull List<RelativePoint> pointsList;
 
-		public DrawingPane(@Nonnull List<RelativePoint> pointsList) {
-			this.pointsList = pointsList;
+		public DrawingPane(@Nonnull List<Point> pointsList) {
+			this.pointsList = new ArrayList<>();
+			
+			int minX = Integer.MAX_VALUE;
+			int maxX = Integer.MIN_VALUE;
+			int minY = Integer.MAX_VALUE;
+			int maxY = Integer.MIN_VALUE;
+			
+			for(Point point:pointsList){
+				minX = Math.min(minX, point.x);
+				minY = Math.min(minY, point.y);
+				maxX = Math.max(maxX, point.x);
+				maxY = Math.max(maxY, point.y);
+			}
+			
+			double intervalX = maxX-minX;
+			double intervalY = maxY-minY;
+			
+			double scale = Math.max(intervalX, intervalY);
+			
+			for(Point point:pointsList){
+				
+				double x = (point.x-minX)/scale;
+				double y = (point.y-minY)/scale;
+				
+				this.pointsList.add(new RelativePoint(x, y));
+			}
+			
 			setBackground(Color.WHITE);
 		}
 		
@@ -52,16 +79,18 @@ public class GesturePanel extends JPanel{
 		protected void paintComponent(Graphics g) {
 			super.paintComponent(g);
 			
-			int width = getWidth();
-			int height = getHeight();
-			
 			Color oldColor = g.getColor();
 			g.setColor(Color.BLUE);
-						
+			
+			int width = (int)(getWidth()*0.9);
+			int height = (int)(getHeight()*0.9);
+			
+			
 			for (int i = 0, size = pointsList.size() - 1; i < size; i++) {
-				Point first = pointsList.get(i).toPoint(width,height);
-				Point second = pointsList.get(i + 1).toPoint(width,height);
-				g.drawLine(first.x, first.y, second.x, second.y);
+				RelativePoint first = pointsList.get(i);
+				RelativePoint second = pointsList.get(i + 1);
+				g.drawLine((int)(first.x*width), (int)(first.y*height), 
+							(int)(second.x*width), (int)(second.y*height));
 			}
 				
 			g.setColor(oldColor);

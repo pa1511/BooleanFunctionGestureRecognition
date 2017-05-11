@@ -2,6 +2,7 @@ package application.ui.tab.training.gestureGrouping;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
+import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.util.List;
 import java.util.Properties;
@@ -22,7 +23,6 @@ import application.data.model.Expression;
 import application.data.model.Gesture;
 import application.data.model.Symbol;
 import application.data.model.geometry.MouseClickType;
-import application.data.model.geometry.RelativePoint;
 import application.gestureGrouping.GGKeys;
 import application.gestureGrouping.IGestureGrouper;
 import application.parse.BooleanParser;
@@ -145,9 +145,9 @@ public class GestureDrawingTab extends AbstractApplicationTab{
 		}
 
 		@Override
-		public void newInputUpdate(@Nonnull Pair<MouseClickType, List<RelativePoint>> relativePoints) {
+		public void newInputUpdate(@Nonnull Pair<MouseClickType, List<Point>> relativePoints) {
 			
-			List<RelativePoint> points = relativePoints.right();
+			List<Point> points = relativePoints.right();
 			rectangleRepresentationView.createRectangle(points);
 			perGestureView.clear();
 			if(lastGroupedSymbols!=null)
@@ -159,7 +159,7 @@ public class GestureDrawingTab extends AbstractApplicationTab{
 		}
 
 		@Override
-		public void redoUpdate(@Nonnull Pair<MouseClickType, List<RelativePoint>> input) {
+		public void redoUpdate(@Nonnull Pair<MouseClickType, List<Point>> input) {
 			
 			rectangleRepresentationView.redo();
 			undoAction.setEnabled(true);
@@ -171,7 +171,7 @@ public class GestureDrawingTab extends AbstractApplicationTab{
 		}
 		
 		@Override
-		public void undoUpdate(@Nonnull Pair<MouseClickType, List<RelativePoint>> input) {
+		public void undoUpdate(@Nonnull Pair<MouseClickType, List<Point>> input) {
 			
 			rectangleRepresentationView.undo();
 			redoAction.setEnabled(true);

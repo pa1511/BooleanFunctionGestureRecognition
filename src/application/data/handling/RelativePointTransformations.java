@@ -1,24 +1,23 @@
 package application.data.handling;
 
+import java.awt.Point;
+import java.awt.Rectangle;
 import java.util.List;
 
 import javax.annotation.Nonnull;
-
-import application.data.model.geometry.RelativePoint;
-import application.data.model.geometry.RelativeRectangle;
 
 public class RelativePointTransformations {
 	
 	private RelativePointTransformations() {}
 
-	public static @Nonnull RelativeRectangle getRectangleRepresentation(@Nonnull List<RelativePoint> points){
+	public static @Nonnull Rectangle getRectangleRepresentation(@Nonnull List<Point> points){
 		
-		double maxX = Double.MIN_VALUE;
-		double minX = Double.MAX_VALUE;
-		double maxY = Double.MIN_VALUE;
-		double minY = Double.MAX_VALUE;
+		int maxX = Integer.MIN_VALUE;
+		int minX = Integer.MAX_VALUE;
+		int maxY = Integer.MIN_VALUE;
+		int minY = Integer.MAX_VALUE;
 		
-		for(RelativePoint relativePoint:points){
+		for(Point relativePoint:points){
 			
 			maxX = Math.max(maxX, relativePoint.x);
 			minX = Math.min(minX, relativePoint.x);
@@ -28,7 +27,7 @@ public class RelativePointTransformations {
 		}
 
 		
-		return new RelativeRectangle(minX, minY, maxX-minX, maxY-minY);
+		return new Rectangle(minX, minY, maxX-minX, maxY-minY);
 	}
 	
 }

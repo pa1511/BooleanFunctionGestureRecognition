@@ -6,7 +6,7 @@ import javax.swing.SwingUtilities;
 
 import application.AApplication;
 import application.AApplicationFrame;
-import application.Application;
+import application.DataGenerationApplication;
 import application.ui.ApplicationFrame;
 import log.Log;
 
@@ -24,8 +24,8 @@ public class DataGenerationMain {
 	@SuppressWarnings("resource")
 	public static void main(@Nonnull String[] args) {
 		
-		//TODO: Application.class.getName
-		AApplication.setApplicationImplementationClassName(Application.class.getName());
+		AApplication.setApplicationImplementationClassName(DataGenerationApplication.class.getName());
+		
 		
 		SwingUtilities.invokeLater(()->{
 			AApplicationFrame frame;
