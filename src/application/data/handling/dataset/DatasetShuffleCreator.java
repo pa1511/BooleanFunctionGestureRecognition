@@ -41,7 +41,7 @@ public class DatasetShuffleCreator extends ADatasetCreator {
 			symbolOutput[symbolEntryId] = 1.0;
 			classToSampleOutput.put(symbol, symbolOutput);
 			
-			List<Symbol> symbolSamples = dataSource.getSymbols(symbol,symbolEntry.getValue());
+			List<Symbol> symbolSamples = dataSource.getSymbols(symbol,symbolEntry.getValue().intValue());
 			symbols.addAll(symbolSamples);
 						
 			symbolEntryId++;
@@ -68,7 +68,7 @@ public class DatasetShuffleCreator extends ADatasetCreator {
 	@Override
 	public @Nonnull double[] getRawFormForSymbolClassification(@Nonnull List<Gesture> gestures, @Nonnegative int precision){
 		double[] rawSample = SymbolTransformations.getRawSymbolRepresentation(gestures, precision);
-		SymbolDataNormalizer.normalizeSample(rawSample);
+		SymbolDataNormalizer.normalizeSymbolSample(rawSample);
 		return rawSample;
 	}
 

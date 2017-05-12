@@ -356,7 +356,7 @@ public final class H2Database implements IDataSource {
 	}
 	
 	@Override
-	public @Nonnull List<Symbol> getSymbols(@Nonnull String symbolAsString, @Nonnull Integer limit) throws Exception {
+	public @Nonnull List<Symbol> getSymbols(@Nonnull String symbolAsString, int limit) throws Exception {
 		
 		List<Symbol> symbols = new ArrayList<>();
 		char symbolAsChar = symbolAsString.charAt(0);
@@ -383,7 +383,7 @@ public final class H2Database implements IDataSource {
 							if(current!=null){
 								symbols.add(current);
 								//TODO: hack limit fix
-								if(symbols.size()==limit.intValue())
+								if(symbols.size()==limit)
 									break;
 							}
 							

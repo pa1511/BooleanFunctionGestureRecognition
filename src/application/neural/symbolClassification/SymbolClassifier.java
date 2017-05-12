@@ -24,7 +24,7 @@ class SymbolClassifier implements ISymbolClassifier {
 	private final @Nonnull MultiLayerNetwork modelNetwork;
 	private final @Nonnull SCModelOutputInterpreter modelOutputInterpreter;
 	private final @Nonnull UnsafeLazyInt modelInputSize;
-	private final @Nonnull String name;
+	private @Nonnull String name;
 	private final @Nonnull Map<String, Double> probabilitiesMap;
 	private final double[] probabilities;
 	private final int outputCount;
@@ -92,6 +92,11 @@ class SymbolClassifier implements ISymbolClassifier {
 	@Override
 	public int getOutputCount() {
 		return outputCount;
+	}
+	
+	@Override
+	public void setName(String name) {
+		this.name = name;
 	}
 	
 	@Override

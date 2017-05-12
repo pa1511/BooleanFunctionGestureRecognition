@@ -21,6 +21,8 @@ public interface ISymbolClassifier {
 	
 	
 	public @Nonnegative int getOutputCount();
+	
+	public @Nonnull void setName(String name);
 
 	public @Nonnull String getName();
 

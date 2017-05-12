@@ -180,9 +180,20 @@ public class CompositeSymbolClassifier implements ISymbolClassifier {
 		//TODO
 		throw new RuntimeException("Composite symbol classifier does not support this method");
 	}
+	
+	private String name = null;
+	
+	@Override
+	public void setName(String name) {
+		this.name = name;
+	}
 
 	@Override
 	public String getName() {
+		
+		if(name!=null)
+			return null;
+		
 		StringBuilder stringBuilder = new StringBuilder();
 		for(ISymbolClassifier symbolClassifier:classifiers)
 			stringBuilder.append(symbolClassifier.getName()).append("||");

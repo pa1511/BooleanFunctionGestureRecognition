@@ -203,7 +203,7 @@ public class ModelTesting extends AbstractApplicationTab{
 				
 				for(Map.Entry<String, Integer> symbolEntry:request.entrySet()){
 					
-						for(Symbol symbol:dataSource.getSymbols(symbolEntry.getKey(),symbolEntry.getValue())){
+						for(Symbol symbol:dataSource.getSymbols(symbolEntry.getKey(),symbolEntry.getValue().intValue())){
 							compositeModel.predict(datasetCreator, symbol.getSymbolAsString(),symbol.getGestures(),statisticsCalculator);
 						}				
 					

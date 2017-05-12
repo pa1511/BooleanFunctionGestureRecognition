@@ -40,7 +40,7 @@ public class SequenceDatasetCreator extends ADatasetCreator{
 			symbolOutput[symbolEntryId] = 1.0;
 			classToSampleOutput.put(symbol, symbolOutput);
 			
-			List<Symbol> symbolSamples = dataSource.getSymbols(symbol,symbolEntry.getValue());
+			List<Symbol> symbolSamples = dataSource.getSymbols(symbol,symbolEntry.getValue().intValue());
 			for(Symbol sample:symbolSamples){
 				
 				double[] rawSample = SymbolTransformations.getRawSymbolRepresentation(sample, pointCount);				
@@ -60,7 +60,7 @@ public class SequenceDatasetCreator extends ADatasetCreator{
 	@Override
 	public @Nonnull double[] getRawFormForSymbolClassification(@Nonnull List<Gesture> gestures, @Nonnegative int precision){
 		double[] rawSample = SymbolTransformations.getRawSymbolRepresentation(gestures, precision);
-		SymbolDataNormalizer.normalizeSample(rawSample);
+		SymbolDataNormalizer.normalizeSymbolSample(rawSample);
 		return rawSample;
 	}
 	

@@ -24,12 +24,19 @@ public class SymbolTransformations {
 	 * The representation will have pointCount points. <br>
 	 */
 	public static @Nonnull double[] getRawSymbolRepresentation(@Nonnull Symbol symbol, @Nonnegative int pointCount){
-		List<Gesture> gestures = symbol.getGestures();
-		return getRawSymbolRepresentation(gestures,pointCount);
+		return getRawSymbolRepresentation(symbol.getGestures(),pointCount);
 	}
 
+	public static void getRawSymbolRepresentation(@Nonnull Symbol symbol, @Nonnull double[] rawForm) {
+		getRawSymbolRepresentation(symbol.getGestures(), rawForm);
+	}
 	public static double[] getRawSymbolRepresentation(@Nonnull List<Gesture> gestures, @Nonnegative int pointCount) {
 		double[] rawForm = new double[pointCount];
+		getRawSymbolRepresentation(gestures, rawForm);
+		return rawForm;
+	}
+	
+	public static void getRawSymbolRepresentation(@Nonnull List<Gesture> gestures, @Nonnull double[] rawForm) {
 		int[][] rawGestures = new int[gestures.size()][];
 		
 		int gesturePosition = 0;
@@ -123,8 +130,6 @@ public class SymbolTransformations {
 			}
 		}
 		
-				
-		return rawForm;
 	}
 
 

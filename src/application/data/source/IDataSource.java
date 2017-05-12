@@ -22,7 +22,7 @@ public interface IDataSource extends IApplicationDataSource{
 	
 	//Symbol handling
 	public @Nonnull List<SymbolSamplesInformation> getSymbolSamplesInformation() throws Exception;
-	public @Nonnull List<Symbol> getSymbols(@Nonnull String key,@Nonnull Integer value) throws Exception;
+	public @Nonnull List<Symbol> getSymbols(@Nonnull String key,int value) throws Exception;
 	public @Nonnegative int getDistinctSymbolCount(boolean includingComplex) throws Exception;
 	
 }

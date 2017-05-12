@@ -10,6 +10,7 @@ import java.util.Properties;
 
 import application.data.model.Expression;
 import application.data.source.H2Database;
+import log.Log;
 
 public class DataTransferMain {
 
@@ -18,8 +19,10 @@ public class DataTransferMain {
 	//If you need to use this again don't forget the old point storage adjustment
 	public static void main(String[] args) throws Exception {
 		
-		try(H2Database newDb = createBasedOn("properties/h2-new.properties");
-				H2Database oldDb = createBasedOn("properties/h2-old.properties")){
+		Log.setDisabled(true);
+		
+		try(H2Database newDb = createBasedOn("properties/transfer/h2-new.properties");
+				H2Database oldDb = createBasedOn("properties/transfer/h2-old.properties")){
 			
 			
 			List<Expression> expressions = oldDb.getExpressions();
