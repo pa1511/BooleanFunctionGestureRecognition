@@ -1,4 +1,4 @@
-package application.neural.symbolClassification.classifier;
+package application.symbolClassification.classifier;
 
 import java.io.File;
 import java.util.HashMap;
@@ -16,9 +16,9 @@ import org.nd4j.linalg.factory.Nd4j;
 
 import application.data.handling.dataset.ADatasetCreator;
 import application.data.model.Gesture;
-import application.neural.symbolClassification.ISymbolClassifier;
-import application.neural.symbolClassification.SCModelOutputInterpreter;
-import application.neural.symbolClassification.SymbolClassificationSystem;
+import application.symbolClassification.ISymbolClassifier;
+import application.symbolClassification.SCModelOutputInterpreter;
+import application.symbolClassification.SymbolClassificationSystem;
 import utilities.lazy.UnsafeLazyInt;
 
 

@@ -18,10 +18,10 @@ import application.data.handling.dataset.ADatasetCreator;
 import application.data.model.Symbol;
 import application.data.source.H2Database;
 import application.data.source.IDataSource;
-import application.neural.symbolClassification.ISymbolClassifier;
-import application.neural.symbolClassification.SymbolClassificationSystem;
-import application.neural.symbolClassification.classifier.SymbolNetworkBasedClassifierModelCreator;
-import application.neural.symbolClassification.statistics.StatisticsCalculator;
+import application.symbolClassification.ISymbolClassifier;
+import application.symbolClassification.SymbolClassificationSystem;
+import application.symbolClassification.classifier.SymbolNetworkBasedClassifierModelCreator;
+import application.symbolClassification.statistics.StatisticsCalculator;
 import log.Log;
 
 public class Main {

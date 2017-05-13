@@ -1,4 +1,4 @@
-package application.neural.symbolClassification;
+package application.symbolClassification;
 
 import java.io.File;
 import java.io.IOException;

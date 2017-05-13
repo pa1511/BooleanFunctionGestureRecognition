@@ -1,4 +1,4 @@
-package application.neural.symbolClassification.classifier;
+package application.symbolClassification.classifier;
 
 import java.io.File;
 import java.io.PrintStream;
@@ -14,7 +14,7 @@ import javax.annotation.Nonnull;
 
 import application.data.handling.dataset.ADatasetCreator;
 import application.data.model.Gesture;
-import application.neural.symbolClassification.ISymbolClassifier;
+import application.symbolClassification.ISymbolClassifier;
 import utilities.PStrings;
 
 public class SymbolDistanceClassifier implements ISymbolClassifier{

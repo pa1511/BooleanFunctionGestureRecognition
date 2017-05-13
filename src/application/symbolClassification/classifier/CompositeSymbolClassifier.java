@@ -1,5 +1,5 @@
 
-package application.neural.symbolClassification.classifier;
+package application.symbolClassification.classifier;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -14,8 +14,8 @@ import javax.annotation.Nonnull;
 
 import application.data.handling.dataset.ADatasetCreator;
 import application.data.model.Gesture;
-import application.neural.symbolClassification.ISymbolClassifier;
-import application.neural.symbolClassification.statistics.StatisticsCalculator;
+import application.symbolClassification.ISymbolClassifier;
+import application.symbolClassification.statistics.StatisticsCalculator;
 import log.Log;
 
 public class CompositeSymbolClassifier implements ISymbolClassifier {

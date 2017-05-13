@@ -1,11 +1,11 @@
-package application.neural.symbolClassification.statistics;
+package application.symbolClassification.statistics;
 
 import java.io.File;
 import java.io.PrintStream;
 import java.util.HashMap;
 import java.util.Map;
 
-import application.neural.symbolClassification.ISymbolClassifier;
+import application.symbolClassification.ISymbolClassifier;
 import log.Log;
 
 public class StatisticsCalculator {
