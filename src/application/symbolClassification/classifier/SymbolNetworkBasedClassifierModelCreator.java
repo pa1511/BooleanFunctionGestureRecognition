@@ -47,6 +47,8 @@ public class SymbolNetworkBasedClassifierModelCreator implements ISCModelCreator
 	private @Nonnull LossFunction lossFunction;
 	private @Nonnull OptimizationAlgorithm optimizationAlgorithm;
 	private @Nonnull Updater updater;
+	private boolean useRegularization;
+	private double regularizationFactor;
 
 	public SymbolNetworkBasedClassifierModelCreator() {
 		weightInit  = WeightInit.XAVIER;
@@ -56,6 +58,8 @@ public class SymbolNetworkBasedClassifierModelCreator implements ISCModelCreator
 		lossFunction = LossFunction.RECONSTRUCTION_CROSSENTROPY;
 		optimizationAlgorithm = OptimizationAlgorithm.STOCHASTIC_GRADIENT_DESCENT;
 	    updater = Updater.ADAM;
+		useRegularization = true;
+		regularizationFactor = 1e-4;
 	}
 	
 	@Override
@@ -74,7 +78,7 @@ public class SymbolNetworkBasedClassifierModelCreator implements ISCModelCreator
 	            .optimizationAlgo(optimizationAlgorithm)
 	            .learningRate(learningRate)
 	            .updater(updater)
-	            .regularization(true).l2(1e-4)
+	            .regularization(useRegularization).l2(regularizationFactor)
 	            .list();
 	    
 	    for(int i=0; i<hiddenNodes.length; i++){
@@ -102,7 +106,7 @@ public class SymbolNetworkBasedClassifierModelCreator implements ISCModelCreator
 		//
 		EarlyStoppingConfiguration<MultiLayerNetwork> esConf = new EarlyStoppingConfiguration.Builder<MultiLayerNetwork>()
 				.epochTerminationConditions(new MaxEpochsTerminationCondition(nEpochs), new BestScoreEpochTerminationCondition(scoreLimit),
-						new ScoreImprovementEpochTerminationCondition((int) (nEpochs*0.01)))
+						new ScoreImprovementEpochTerminationCondition((int) (nEpochs*0.1)))
 				.iterationTerminationConditions(new InvalidScoreIterationTerminationCondition())
 				.scoreCalculator(new DataSetLossCalculator(trainIter, true))
 				.evaluateEveryNEpochs((int)(0.01*nEpochs))
@@ -183,6 +187,14 @@ public class SymbolNetworkBasedClassifierModelCreator implements ISCModelCreator
 
 	public void setUpdater(Updater updater) {
 		this.updater = updater;
+	}
+	
+	public void setRegularizationFactor(double regularizationFactor) {
+		this.regularizationFactor = regularizationFactor;
+	}
+	
+	public void setUseRegularization(boolean useRegularization) {
+		this.useRegularization = useRegularization;
 	}
 	
 	

@@ -26,8 +26,11 @@ public class RepresentationClassificationTesting {
 		Log.setDisabled(true);
 		
 		String userDir = System.getProperty("user.dir");
+		String underTest = "representative-sorted-138";
 		File representationFile = new File(userDir,
-				"training/symbol/data/output/representative-sorted-138-.txt");
+				"training/symbol/data/output/"+underTest+".txt");
+		String outputFileName = underTest+"-results.txt";
+
 		SymbolDistanceClassifier symbolDistanceClassifier = new SymbolDistanceClassifier(representationFile);
 		ADatasetCreator datasetCreator = new SortDatasetCreator();
 
@@ -60,7 +63,7 @@ public class RepresentationClassificationTesting {
 		}
 		
 		File statOutputFolder = new File(userDir,"symbol/statistics");
-		StatisticsCalculator.storeStatitstics(statOutputFolder, representationFile.getName()+"-new-statistics.txt", statisticsCalculator);
+		StatisticsCalculator.storeStatitstics(statOutputFolder, outputFileName, statisticsCalculator);
 
 	}
 }

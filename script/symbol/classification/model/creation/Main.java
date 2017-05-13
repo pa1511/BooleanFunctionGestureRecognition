@@ -10,6 +10,7 @@ import java.util.Properties;
 
 import org.deeplearning4j.nn.conf.Updater;
 import org.nd4j.linalg.activations.Activation;
+import org.nd4j.linalg.lossfunctions.LossFunctions.LossFunction;
 
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Multiset;
@@ -34,18 +35,18 @@ public class Main {
 		
 		File statOutputFolder = new File(userDir,"symbol/statistics");
 		File outputFolder = new File(userDir, "training/symbol/model/output");
-		String fileNameTrain = "training/symbol/data/output/1000_all_gesture_count-31-9.csv";
+		String fileNameTrain = "training/symbol/data/output/all-51-9.csv";
 		File inputFile = new File(userDir, fileNameTrain);
 		int nEpochs = 8000;
 		int iterationCount = 1;
 		double[] scoreLimits = new double[]{1e-3};
 		int numInputs = ADatasetCreator.getNumberOfInputsFrom(inputFile);
 		int numOutputs = ADatasetCreator.getNumberOfOutputsFrom(inputFile);
-		int[][] hidenNodesConfigs = new int[][] { { 32, 30}/*, { 26, 24 }, { 24, 22 }, { 22, 20 } */};
+		int[][] hidenNodesConfigs = new int[][] { { 40, 30, 30,20}/*, { 26, 24 }, { 24, 22 }, { 22, 20 } */};
 		double[] learningRateConfigs = new double[] { 0.015 /*,5e-3, 1e-2*/ };
-		int[] batchSizeConfigs = new int[] { 125};
+		int[] batchSizeConfigs = new int[] {80};
 
-		Activation[] activationMethodConfig = new Activation[] { /*Activation.SIGMOID, Activation.TANH,*/  Activation.RATIONALTANH/*, Activation.HARDTANH */};
+		Activation[] activationMethodConfig = new Activation[] { Activation.RELU/*Activation.SIGMOID, Activation.TANH,  Activation.RATIONALTANH, Activation.HARDTANH*/ };
 		Updater[] updaterConfig = new Updater[] { Updater.ADAM };
 		
 		List<Symbol> symbols = new ArrayList<>();
@@ -88,7 +89,8 @@ public class Main {
 
 								modelCreator.setActivationMethod(activationMethod);
 								modelCreator.setUpdater(updater);
-	
+								modelCreator.setLossFunction(LossFunction.L2);
+								
 								ISymbolClassifier model = modelCreator.createAndTrainModel(new File(fileNameTrain), nEpochs,
 										iterationCount, numInputs, numOutputs, hiddenNodes, scoreLimit, learningRate,
 										batchSize, i -> {

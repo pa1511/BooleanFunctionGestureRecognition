@@ -17,8 +17,7 @@ import javax.annotation.Nonnull;
 
 import application.Application;
 import application.data.dataset.ADatasetCreator;
-import application.data.dataset.PointSequenceDatasetCreator;
-import application.data.dataset.ShuffleDatasetCreator;
+import application.data.dataset.SortDatasetCreator;
 import application.data.model.Gesture;
 import application.data.model.Symbol;
 import application.gestureGrouping.IGestureGrouper;
@@ -45,9 +44,8 @@ class SCModelBasedGestureGrouper implements IGestureGrouper{
 	
 	//TODO: remove
 	private final @Nonnull SymbolDistanceClassifier symbolDistanceClassifier = new SymbolDistanceClassifier(
-			new File(System.getProperty("user.dir"),"training/symbol/data/output/representative.txt"));
-	private final @Nonnull ADatasetCreator distanceDatasetCreator = new ShuffleDatasetCreator(new PointSequenceDatasetCreator());//new SortDatasetCreator();
-
+			new File(System.getProperty("user.dir"),"training/symbol/data/output/representative-sorted-138.txt"));
+	private final @Nonnull ADatasetCreator distanceDatasetCreator = new SortDatasetCreator();
 
 	public SCModelBasedGestureGrouper() throws Exception {
 		final Properties properties = Application.getInstance().getProperties();

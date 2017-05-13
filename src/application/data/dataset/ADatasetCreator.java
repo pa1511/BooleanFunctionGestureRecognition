@@ -89,9 +89,19 @@ public abstract class ADatasetCreator {
 	
 	public static @Nonnull Map<String, Integer> parseRequest(@Nonnull String requestedSymbolAsString) throws Exception{
 		
+		
 		String[]  perSymbolRequests = requestedSymbolAsString.replaceAll("\\s", "").split(",");
 		Arrays.sort(perSymbolRequests);
 		Map<String, Integer> requestInfo = new HashMap<>();
+
+		if(requestedSymbolAsString.equals("ALL")){
+			Application.getInstance().getDataSource().getSymbolSamplesInformation().forEach(ssi->{
+				requestInfo.put(ssi.symbol, ssi.simpleSampleCount);
+			});;
+			return requestInfo;
+		}
+
+		
 		
 		for(String symbolRequest:perSymbolRequests){
 			String[] infoPack = symbolRequest.split(":");
