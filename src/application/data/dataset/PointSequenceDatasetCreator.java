@@ -8,7 +8,7 @@ import application.data.model.Symbol;
 import application.data.model.handling.SymbolDataNormalizer;
 import application.data.model.handling.SymbolTransformations;
 
-class PointSequenceDatasetCreator extends ADatasetCreator{
+public class PointSequenceDatasetCreator extends ADatasetCreator{
 
 	@Override
 	protected void createSamplesFrom(List<Symbol> symbols, LinkedHashMap<String, double[]> classToSampleOutput,

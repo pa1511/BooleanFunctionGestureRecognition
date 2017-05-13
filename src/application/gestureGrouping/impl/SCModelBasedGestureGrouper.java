@@ -17,6 +17,8 @@ import javax.annotation.Nonnull;
 
 import application.Application;
 import application.data.dataset.ADatasetCreator;
+import application.data.dataset.PointSequenceDatasetCreator;
+import application.data.dataset.ShuffleDatasetCreator;
 import application.data.model.Gesture;
 import application.data.model.Symbol;
 import application.gestureGrouping.IGestureGrouper;
@@ -24,6 +26,7 @@ import application.symbolClassification.ISCModelCreator;
 import application.symbolClassification.ISymbolClassifier;
 import application.symbolClassification.SymbolClassificationSystem;
 import application.symbolClassification.classifier.CompositeSymbolClassifier;
+import application.symbolClassification.classifier.SymbolDistanceClassifier;
 import log.Log;
 import utilities.lazy.ILazy;
 import utilities.lazy.UnsafeLazy;
@@ -34,11 +37,17 @@ class SCModelBasedGestureGrouper implements IGestureGrouper{
 	private static final @Nonnull String MODELS_IMPL_KEY = "gesture.grouping.model.based.impl";
 	
 	//TODO: extract
-	private static final @Nonnull int maxGesturesPerSymbol = 3;
+	private static final @Nonnull int maxGesturesPerSymbol = 2;
 	
 	private final @Nonnull ILazy<ISymbolClassifier> symbolClassifierLazy;
 	private final @Nonnull ISCModelCreator modelCreator;
 	private final @Nonnull ADatasetCreator datasetCreator;
+	
+	//TODO: remove
+	private final @Nonnull SymbolDistanceClassifier symbolDistanceClassifier = new SymbolDistanceClassifier(
+			new File(System.getProperty("user.dir"),"training/symbol/data/output/representative.txt"));
+	private final @Nonnull ADatasetCreator distanceDatasetCreator = new ShuffleDatasetCreator(new PointSequenceDatasetCreator());//new SortDatasetCreator();
+
 
 	public SCModelBasedGestureGrouper() throws Exception {
 		final Properties properties = Application.getInstance().getProperties();
@@ -89,6 +98,10 @@ class SCModelBasedGestureGrouper implements IGestureGrouper{
 	public List<Symbol> group(List<Gesture> gestures) {		
 		int gestureCount = gestures.size();
 		int combinationCount = (int) Math.pow(2, (gestureCount-1));
+		
+		//TODO: magic numbers
+		if(combinationCount>16)
+			Log.setDisabled(true);
 		Log.addMessage("Number of gesture groupings to test: " + combinationCount , Log.Type.Plain);
 
 		double maxProbable = Double.MIN_VALUE;
@@ -121,26 +134,41 @@ class SCModelBasedGestureGrouper implements IGestureGrouper{
 			Log.addMessage("Grouping " + i, Log.Type.Plain);
 			symbols.add(currentSymbol);
 			
-			double probability = 0.0;
+			double distanceProbability = 0.0;
+			double neuralProbability = 0.0;
+			
 			List<Symbol> symbolsList = new ArrayList<>();
 			for(List<Gesture> gestureGroup:symbols){
-				String prediction = symbolClassifierLazy.getOrThrow().predict(datasetCreator, gestureGroup);
-				double predictionProbability = symbolClassifierLazy.getOrThrow().getProbabilities().get(prediction).doubleValue();
-				probability+=predictionProbability;
+				//TODO: remove
+				String prediction = /*symbolClassifierLazy.getOrThrow()*/symbolDistanceClassifier.predict(distanceDatasetCreator, gestureGroup);
+				double distancePredictionProbability = /*symbolClassifierLazy.getOrThrow()*/symbolDistanceClassifier.getProbabilities().get(prediction).doubleValue();
+				
+				prediction = symbolClassifierLazy.getOrThrow().predict(datasetCreator, gestureGroup);
+				double neuralPredictionProbability = symbolClassifierLazy.getOrThrow().getProbabilities().get(prediction).doubleValue();
+				
+				distanceProbability+=distancePredictionProbability;
+				neuralProbability +=neuralPredictionProbability;
 				symbolsList.add(new Symbol(prediction.charAt(0), gestureGroup));
 			}
-			probability /= symbols.size();
+			distanceProbability/=symbols.size();
+			neuralProbability/=symbols.size();
 			
-			Log.addMessage("Grouping " + i + " probability: " + probability, Log.Type.Plain);
+			//distanceProbability*0.3+neuralProbability*0.7 seems relatively ok :D
+			double probability =  distanceProbability*0.3+neuralProbability*0.7;
+			
+			Log.addMessage("Grouping " + i + " probability: " + probability + "(D:"+distanceProbability+",N:"+neuralProbability+")", Log.Type.Plain);
 			
 			int comparison = Double.compare(maxProbable, probability);
-			if(comparison<0 || bestGroupedSymbols==null || (comparison==0 && symbolsList.size()<bestGroupedSymbols.size())){
+			if(comparison<0 || bestGroupedSymbols==null){
 				maxProbable = probability;
 				bestGroupedSymbols = symbolsList;
 			}
-			
+						
 		}
 		
+		Log.setDisabled(false);
+
+		Log.addMessage("Max probability: " + maxProbable, Log.Type.Plain);
 		return bestGroupedSymbols;
 	}
 

@@ -60,7 +60,7 @@ public class RepresentationClassificationTesting {
 		}
 		
 		File statOutputFolder = new File(userDir,"symbol/statistics");
-		StatisticsCalculator.storeStatitstics(statOutputFolder, representationFile.getName()+"-statistics.txt", statisticsCalculator);
+		StatisticsCalculator.storeStatitstics(statOutputFolder, representationFile.getName()+"-new-statistics.txt", statisticsCalculator);
 
 	}
 }

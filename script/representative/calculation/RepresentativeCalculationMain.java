@@ -29,10 +29,11 @@ public class RepresentativeCalculationMain {
 
 	public static void main(String[] args) throws Exception {
 		
+		//TODO: this should be changed into a proper model creator and dataset creator
 		Log.setDisabled(true);
 		
 		Properties properties = new Properties();
-		try(InputStream inStream = new FileInputStream(new File(System.getProperty("user.dir"),"properties/script.properties"))){
+		try(InputStream inStream = new FileInputStream(new File(System.getProperty("user.dir"),"properties/model-creation-script/script-distance.properties"))){
 			properties.load(inStream);
 		}
 		
@@ -60,7 +61,7 @@ public class RepresentativeCalculationMain {
 					}
 				}				
 			}
-			averagePointsPerSymbol /= multiset.size();
+			averagePointsPerSymbol /= symbols.size();
 			//average was printed to be 68.5485
 			//System.out.println("Average points per symbol: " + averagePointsPerSymbol);
 			

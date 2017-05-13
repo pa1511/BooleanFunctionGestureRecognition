@@ -9,7 +9,7 @@ import javax.annotation.Nonnull;
 
 import application.data.model.Symbol;
 
-class ShuffleDatasetCreator extends ADatasetCreatorDecorator {
+public class ShuffleDatasetCreator extends ADatasetCreatorDecorator {
 
 
 	public ShuffleDatasetCreator(@Nonnull ADatasetCreator datasetCreator) {

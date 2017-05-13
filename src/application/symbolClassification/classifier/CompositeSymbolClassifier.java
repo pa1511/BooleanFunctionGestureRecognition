@@ -69,23 +69,6 @@ public class CompositeSymbolClassifier implements ISymbolClassifier {
 		
 		Map.Entry<String, Double> majorVote = votes.entrySet().stream().max(doubleVoteCount).orElse(null);
 		statisticsCalculator.updateStatistics(this, real, majorVote.getKey());
-
-//TODO		
-//		Map<String, Integer> votes = new HashMap<>();
-//	
-//		for(ISymbolClassifier symbolClassifier:classifiers){
-//			String predicted = symbolClassifier.predict(datasetCreator, gestures);
-//			statisticsCalculator.updateStatistics(symbolClassifier, real, predicted);
-//			
-//			Integer count = votes.get(predicted);
-//			if(count==null){
-//				count = Integer.valueOf(0);
-//			}
-//			votes.put(predicted, Integer.valueOf(count.intValue()+1));
-//		}
-//		
-//		Map.Entry<String, Integer> majorVote = votes.entrySet().stream().max(intVoteCount).orElse(null);
-//		statisticsCalculator.updateStatistics(this, real, majorVote.getKey());
 	}
 
 	@Override
@@ -101,49 +84,24 @@ public class CompositeSymbolClassifier implements ISymbolClassifier {
 			
 			updateVotes(symbolClassifier);			
 		}
+		final int classifierCount = classifiers.size();
 		
-		Map.Entry<String, Double> majorVote = votes.entrySet().stream().max(doubleVoteCount).orElse(null);
+		@SuppressWarnings("boxing")
+		Map.Entry<String, Double> majorVote = votes.entrySet().stream().map(entry->{
+			entry.setValue(entry.getValue()/classifierCount);
+			return entry;
+		}).max(doubleVoteCount).orElse(null);
 		
 		if(majorVote!=null){
 			sb.append("||Major prediction: " ).append(majorVote);
 			Log.addMessage(sb.toString(), Log.Type.Plain);
 			
-			//TODO:
-//			votes.entrySet().stream().forEach(entry->{
-//				Log.addMessage(entry.getKey()+"="+entry.getValue(), Log.Type.Plain);
-//			});
-						
 			return majorVote.getKey();
 		}
 				
 		throw new RuntimeException("Could not predict");
 
 		
-		
-//		Map<String, Integer> votes = new HashMap<>();
-//
-//		StringBuilder sb = new StringBuilder("Symbol predictions: ");
-//		
-//		for(ISymbolClassifier symbolClassifier:classifiers){
-//			String predicted = symbolClassifier.predict(datasetCreator, gestures);
-//			sb.append("||").append(predicted);
-//			Integer count = votes.get(predicted);
-//			if(count==null){
-//				count = Integer.valueOf(0);
-//			}
-//			votes.put(predicted, Integer.valueOf(count.intValue()+1));
-//		}
-//		
-//		Map.Entry<String, Integer> majorVote = votes.entrySet().stream().max(voteCount).orElse(null);
-//		
-//		if(majorVote!=null){
-//			String majorPrediction = majorVote.getKey();
-//			sb.append("||Major prediction: " ).append(majorPrediction);
-//			Log.addMessage(sb.toString(), Log.Type.Plain);
-//			return majorPrediction;
-//		}
-//				
-//		throw new RuntimeException("Could not predict");
 	}
 
 	@SuppressWarnings("boxing")
