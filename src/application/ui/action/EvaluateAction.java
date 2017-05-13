@@ -8,7 +8,7 @@ import javax.annotation.Nonnull;
 import javax.swing.AbstractAction;
 import javax.swing.JOptionPane;
 
-import application.expressionParse.BooleanParser;
+import application.expressionParse.IBooleanTextParser;
 import application.expressionParse.exception.BooleanExpressionParseException;
 import application.expressionParse.syntactic.node.IBooleanExpressionNode;
 import log.Log;
@@ -18,9 +18,9 @@ public final class EvaluateAction extends AbstractAction {
 
 	private final @Nonnull Supplier<String> expressionSupplier;
 	private final @Nonnull Consumer<IBooleanExpressionNode> nodeConsumer;
-	private final @Nonnull BooleanParser booleanParser;
+	private final @Nonnull IBooleanTextParser booleanParser;
 
-	public EvaluateAction(@Nonnull Supplier<String> expressionSupplier, @Nonnull Consumer<IBooleanExpressionNode> newNodeConsumer, BooleanParser booleanParser) {
+	public EvaluateAction(@Nonnull Supplier<String> expressionSupplier, @Nonnull Consumer<IBooleanExpressionNode> newNodeConsumer, IBooleanTextParser booleanParser) {
 		super("Evaluate");
 		this.expressionSupplier = expressionSupplier;
 		this.nodeConsumer = newNodeConsumer;

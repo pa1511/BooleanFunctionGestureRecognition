@@ -11,19 +11,20 @@ import application.expressionParse.syntactic.ISyntacticAnalyzer;
 import application.expressionParse.syntactic.node.IBooleanExpressionNode;
 import log.Log;
 
-public class BooleanParser {
+class BooleanTextParser implements IBooleanTextParser {
 	
 	private final @Nonnull ILexicalAnalyzer lexicalAnalyzer;
 	private final @Nonnull ISyntacticAnalyzer syntacticAnalyzer;
 	
-	public BooleanParser(ILexicalAnalyzer lexicalAnalyzer, ISyntacticAnalyzer syntacticAnalyzer) throws Exception {
+	public BooleanTextParser(ILexicalAnalyzer lexicalAnalyzer, ISyntacticAnalyzer syntacticAnalyzer) throws Exception {
 		this.lexicalAnalyzer = lexicalAnalyzer;
 		this.syntacticAnalyzer = syntacticAnalyzer;
 	}
 	
+	@Override
 	public @Nonnull IBooleanExpressionNode parse(@Nonnull String expression) throws BooleanExpressionParseException {
 
-		expression = expressionPreprocessing(expression);
+		expression = IBooleanTextParser.expressionPreprocessing(expression);
 		Log.addMessage("Expression after preprocessing: " + expression, Log.Type.Plain);
 		
 		LexicalToken[] tokens = lexicalAnalyzer.analyze(expression);
@@ -33,14 +34,6 @@ public class BooleanParser {
 		Log.addMessage("Syntactic analysis result: " + syntacticTopNode, Log.Type.Plain);
 				
 		return syntacticTopNode;
-	}
-
-	/**
-	 * Does initial expression preparation for further analysis. <br>
-	 */
-	public static String expressionPreprocessing(String expression) {
-		return expression.replaceAll("\\s", "").toUpperCase()
-				.replaceAll("[0|1|A-Z|\\)](?=[A-Z|0|1|\\(|!])", "$0\\*");
 	}
 	
 }

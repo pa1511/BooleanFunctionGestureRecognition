@@ -30,7 +30,7 @@ import application.data.geometry.MouseClickType;
 import application.data.model.Expression;
 import application.data.model.Gesture;
 import application.data.model.handling.ExpressionFactory;
-import application.expressionParse.BooleanParser;
+import application.expressionParse.IBooleanTextParser;
 import application.ui.draw.Canvas;
 import application.ui.draw.PerGestureView;
 import application.ui.draw.ACanvasObserver;
@@ -272,7 +272,7 @@ public class DrawingTab extends AbstractApplicationTab{
 				if(text==null || text.isEmpty())
 					throw new IllegalArgumentException("No expression provided");
 
-				String expressionSymbolicForm = BooleanParser.expressionPreprocessing(text);
+				String expressionSymbolicForm = IBooleanTextParser.expressionPreprocessing(text);
 				Expression expression = ExpressionFactory.getExpressionFor(expressionSymbolicForm,canvas.getData());
 				Application.getInstance().getDataSource().store(expression);
 				//TODO: uncomment

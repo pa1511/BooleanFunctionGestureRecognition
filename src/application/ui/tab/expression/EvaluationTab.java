@@ -14,11 +14,9 @@ import javax.swing.JTextField;
 
 import application.AbstractApplicationTab;
 import application.Application;
-import application.expressionParse.BooleanParser;
+import application.expressionParse.IBooleanTextParser;
 import application.expressionParse.ParserSystem;
 import application.expressionParse.VariableValueProvider;
-import application.expressionParse.lexic.ILexicalAnalyzer;
-import application.expressionParse.syntactic.ISyntacticAnalyzer;
 import application.expressionParse.syntactic.node.IBooleanExpressionNode;
 import application.ui.action.EvaluateAction;
 import application.ui.table.ExpressionEvaluationTableModel;
@@ -30,7 +28,7 @@ public class EvaluationTab extends AbstractApplicationTab{
 	
 	private @Nonnull JTable truthTable;
 	
-	private final @Nonnull BooleanParser booleanParser;
+	private final @Nonnull IBooleanTextParser booleanParser;
 	private @CheckForNull IBooleanExpressionNode expression;
 	private @CheckForNull VariableValueProvider variableValueProvider;
 	
@@ -38,10 +36,7 @@ public class EvaluationTab extends AbstractApplicationTab{
 		super("Evaluation");
 		
 		Properties properties = Application.getInstance().getProperties();
-		ILexicalAnalyzer lexicalAnalyzer = ParserSystem.getLexicalAnalizer(properties);
-		ISyntacticAnalyzer syntacticAnalyzer = ParserSystem.getSyntacticAnalyzer(properties);
-
-		booleanParser = new BooleanParser(lexicalAnalyzer,syntacticAnalyzer);
+		booleanParser = ParserSystem.getBooleanTextParser(properties);
 		
 		//setting tab layout
 		setLayout(new BorderLayout());

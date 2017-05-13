@@ -29,12 +29,10 @@ import application.data.model.ExpressionType;
 import application.data.model.Symbol;
 import application.data.model.handling.ExpressionTransformations;
 import application.data.model.handling.SymbolTransformations;
-import application.expressionParse.BooleanParser;
-import application.expressionParse.BooleanSpatialParser;
+import application.expressionParse.IBooleanSpatialParser;
+import application.expressionParse.IBooleanTextParser;
 import application.expressionParse.ParserSystem;
 import application.expressionParse.VariableValueProvider;
-import application.expressionParse.lexic.ILexicalAnalyzer;
-import application.expressionParse.syntactic.ISyntacticAnalyzer;
 import application.expressionParse.syntactic.node.IBooleanExpressionNode;
 import application.ui.draw.Canvas;
 import application.ui.draw.RectangleRepresentationView;
@@ -45,8 +43,8 @@ import log.Log;
 
 public class ExpressionConstructionPanel extends AbstractApplicationTab{
 
-	private final @Nonnull BooleanParser booleanParser;
-	private final @Nonnull BooleanSpatialParser booleanSpatialParser;
+	private final @Nonnull IBooleanTextParser booleanParser;
+	private final @Nonnull IBooleanSpatialParser booleanSpatialParser;
 	
 	//UI elements
 	private final @Nonnull ExpressionManagementTable expressionManagementTable;
@@ -70,10 +68,8 @@ public class ExpressionConstructionPanel extends AbstractApplicationTab{
 		
 		//
 		Properties properties = Application.getInstance().getProperties();
-		ILexicalAnalyzer lexicalAnalyzer = ParserSystem.getLexicalAnalizer(properties);
-		ISyntacticAnalyzer syntacticAnalyzer = ParserSystem.getSyntacticAnalyzer(properties);
-		booleanParser = new BooleanParser(lexicalAnalyzer,syntacticAnalyzer);
-		booleanSpatialParser = new BooleanSpatialParser(lexicalAnalyzer);
+		booleanParser = ParserSystem.getBooleanTextParser(properties);
+		booleanSpatialParser = ParserSystem.getBooleanSpatialParser(properties);
 		
 		//Initialize components
 		expressionManagementTable = new ExpressionManagementTable(ExpressionType.COMPLEX);

@@ -23,7 +23,7 @@ import application.expressionParse.syntactic.node.leaf.NotNode;
 import application.expressionParse.syntactic.node.leaf.OrNode;
 import dataModels.Pair;
 
-public class BooleanSpatialParser {
+class BooleanSpatialParser implements IBooleanSpatialParser {
 
 	private final @Nonnull ILexicalAnalyzer lexicalAnalizer;
 	private final @Nonnull Comparator<Pair<IBooleanExpressionNode,Rectangle>> leftToRight = (c1,c2)->{
@@ -46,6 +46,7 @@ public class BooleanSpatialParser {
 		};
 	}
 	
+	@Override
 	public @Nonnull IBooleanExpressionNode parse(@Nonnull List<Symbol> symbols) throws Exception{
 
 		

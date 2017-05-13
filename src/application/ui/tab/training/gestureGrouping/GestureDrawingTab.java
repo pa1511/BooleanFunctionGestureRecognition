@@ -26,10 +26,9 @@ import application.data.geometry.MouseClickType;
 import application.data.model.Expression;
 import application.data.model.Gesture;
 import application.data.model.Symbol;
-import application.expressionParse.BooleanParser;
-import application.expressionParse.BooleanSpatialParser;
+import application.expressionParse.IBooleanTextParser;
+import application.expressionParse.IBooleanSpatialParser;
 import application.expressionParse.ParserSystem;
-import application.expressionParse.lexic.ILexicalAnalyzer;
 import application.expressionParse.syntactic.node.IBooleanExpressionNode;
 import application.gestureGrouping.GestureGroupingSystem;
 import application.gestureGrouping.IGestureGrouper;
@@ -63,16 +62,15 @@ public class GestureDrawingTab extends AbstractApplicationTab{
 	private @CheckForNull List<Symbol> lastGroupedSymbols;
 	
 	//Spatial parser
-	private final @Nonnull BooleanSpatialParser spatialParser;
+	private final @Nonnull IBooleanSpatialParser spatialParser;
 
 	
 	public GestureDrawingTab() throws Exception {
 		super("Drawing");
 		
 		Properties properties = Application.getInstance().getProperties();
-		ILexicalAnalyzer lexicalAnalyzer = ParserSystem.getLexicalAnalizer(properties);
-
-		spatialParser = new BooleanSpatialParser(lexicalAnalyzer);
+		
+		spatialParser = ParserSystem.getBooleanSpatialParser(properties);
 		gestureGrouper = GestureGroupingSystem.getGestureGrouper(properties);
 		
 		//set tab  layout
@@ -224,7 +222,7 @@ public class GestureDrawingTab extends AbstractApplicationTab{
 								
 				try {
 					IBooleanExpressionNode node = spatialParser.parse(lastGroupedSymbols);
-					String expressionStringForm = BooleanParser.expressionPreprocessing(node.toString());
+					String expressionStringForm = IBooleanTextParser.expressionPreprocessing(node.toString());
 					Expression expression = new Expression(expressionStringForm, lastGroupedSymbols);
 					
 					int option = JOptionPane.showConfirmDialog(null, "Detected expression: " + expressionStringForm + ". Do you still wish to store?","Storing expression",JOptionPane.YES_NO_OPTION);

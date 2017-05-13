@@ -1,4 +1,4 @@
-package application.parse;
+package application.expressionParse;
 
 import static org.junit.Assert.*;
 
@@ -11,7 +11,8 @@ import javax.annotation.Nonnull;
 import org.junit.Rule;
 import org.junit.Test;
 
-import application.expressionParse.BooleanParser;
+import application.expressionParse.BooleanTextParser;
+import application.expressionParse.IBooleanTextParser;
 import application.expressionParse.VariableValueProvider;
 import application.expressionParse.lexic.LexicalAnalyzer;
 import application.expressionParse.syntactic.SyntacticAnalyzer;
@@ -31,26 +32,26 @@ public class BooleanParserTest {
 	@Test
 	public void testExpressionPreprocessing() {
 		
-		String expression = BooleanParser.expressionPreprocessing("ab+c      ");
+		String expression = IBooleanTextParser.expressionPreprocessing("ab+c      ");
 		assertEquals("A*B+C", expression);
 		
-		expression = BooleanParser.expressionPreprocessing("(a)");
+		expression = IBooleanTextParser.expressionPreprocessing("(a)");
 		assertEquals("(A)", expression);
 		
-		expression = BooleanParser.expressionPreprocessing("a(!B    + c)d");
+		expression = IBooleanTextParser.expressionPreprocessing("a(!B    + c)d");
 		assertEquals("A*(!B+C)*D", expression);
 		
-		expression = BooleanParser.expressionPreprocessing("1a");
+		expression = IBooleanTextParser.expressionPreprocessing("1a");
 		assertEquals("1*A", expression);
 		
-		expression = BooleanParser.expressionPreprocessing("0a");
+		expression = IBooleanTextParser.expressionPreprocessing("0a");
 		assertEquals("0*A", expression);
 	}
 
 	@Test
 	public void testParse() throws Exception {
 		
-		BooleanParser booleanParser = new BooleanParser(new LexicalAnalyzer(), new SyntacticAnalyzer());
+		IBooleanTextParser booleanParser = new BooleanTextParser(new LexicalAnalyzer(), new SyntacticAnalyzer());
 		
 		//or test
 		IBooleanExpressionNode expressionHead = booleanParser.parse("a+b");
