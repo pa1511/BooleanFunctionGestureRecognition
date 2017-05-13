@@ -66,11 +66,7 @@ public class ExpressionManagementTable extends JTable implements AutoCloseable{
 					@Override
 					public void actionPerformed(@CheckForNull ActionEvent arg0) {
 						if(model.expressions.isLoaded()){
-							model.expressions.reset();
-							model.expressions.getOrThrow();
-						}
-						else{
-							model.resetExpressionCount();
+							model.reset();
 						}
 						Log.addMessage("Reloaded expressions from db.", Log.Type.Plain);
 						model.fireTableDataChanged();
@@ -165,32 +161,22 @@ public class ExpressionManagementTable extends JTable implements AutoCloseable{
 			expressionCount = getExpressionCountLazy();
 		}
 
-		private IntSupplier getExpressionCountLazy() {
-			return new IntSupplier() {
-				
-				private UnsafeLazyInt estimate = new UnsafeLazyInt(()->{
-					try {
-						return Application.getInstance().getDataSource().getExpressionCount(filter);
-					} catch (Exception e) {
-						handleException(e);
-					}
-
-					return 0;
-				});
-
-				@Override
-				public int getAsInt() {
-					if (expressions.isLoaded()) {
-						return expressions.getOrThrow().size();
-					}
-
-					return estimate.getAsInt();
-				}
-			};
+		public void reset() {
+			expressions.reset();
+			expressionCount = getExpressionCountLazy();
+			expressions.getOrThrow();
 		}
 
-		public void resetExpressionCount() {
-			expressionCount = getExpressionCountLazy();
+		private IntSupplier getExpressionCountLazy() {
+			return new UnsafeLazyInt(()->{
+				try {
+					return expressions.isLoaded() ? expressions.getOrThrow().size() : Application.getInstance().getDataSource().getExpressionCount(filter);
+				} catch (Exception e) {
+					handleException(e);
+				}
+
+				return 0;
+			});
 		}
 
 		private void handleException(Exception e) {

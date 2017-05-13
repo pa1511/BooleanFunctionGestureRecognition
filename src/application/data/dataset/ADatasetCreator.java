@@ -1,7 +1,6 @@
 package application.data.dataset;
 
 import java.io.File;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -82,19 +81,7 @@ public abstract class ADatasetCreator {
 	//Dataset creator factory 
 	
 	public static @Nonnull ADatasetCreator getDatasetCreator(@Nonnull String creatorClassName, @Nonnull String path, @Nonnull String... decorationClassNames) throws Exception{
-		
-		ADatasetCreator creator = Factory.getInstance(creatorClassName, path);
-		
-		Class<?>[] decoratorArgumentClass = (Class<?>[]) Array.newInstance(Class.class, 1);
-		decoratorArgumentClass[0] = ADatasetCreator.class;
-		ADatasetCreator[] decoratorArgument = new ADatasetCreator[1];
-		
-		for(String decoration:decorationClassNames){
-			decoratorArgument[0] = creator;
-			creator = Factory.getInstance(decoration, path, decoratorArgumentClass, decoratorArgument);
-		}
-		
-		return creator;
+		return Factory.getDecoratedInstance(ADatasetCreator.class,creatorClassName, path, decorationClassNames);
 	}
 	
 	//====================================================================================================================

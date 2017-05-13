@@ -33,6 +33,7 @@ public class Application extends AApplication {
 	
 	private static final @Nonnull String DATA_SOURCE_IMPL_KEY = "data.source.impl";
 	private static final @Nonnull String DATA_SOURCE_IMPL_PATH_KEY = "data.source.impl.path";
+	private static final @Nonnull String DATA_SOURCE_DECORATION  = "data.source.impl.decoration";
 		
 	public static final @Nonnull String UI_TAB_PATH_KEY = "tab.path";
 	public static final @Nonnull String UI_TAB_NAMES_KEY = "tab.names";
@@ -57,12 +58,18 @@ public class Application extends AApplication {
 	@SuppressWarnings({ "resource", "hiding" })
 	@Override
 	protected void initializeApplicationDataSource() throws Exception {
+		String className = properties.getProperty(DATA_SOURCE_IMPL_KEY);
+		String dataSourcePath = properties.getProperty(DATA_SOURCE_IMPL_PATH_KEY);
+		
 		IDataSource dataSource = Factory.getInstance(
-				properties.getProperty(DATA_SOURCE_IMPL_KEY),
-				properties.getProperty(DATA_SOURCE_IMPL_PATH_KEY),
+				className,
+				dataSourcePath,
 				new Class<?>[]{ properties.getClass()},
 				new Object[]{ properties});
-				
+		
+		String[] decorations = properties.getProperty(DATA_SOURCE_DECORATION).split(";");
+		dataSource = Factory.decorate(IDataSource.class, dataSourcePath, dataSource, decorations);
+		
 		this.dataSource.setInstance(dataSource);
 	}
 

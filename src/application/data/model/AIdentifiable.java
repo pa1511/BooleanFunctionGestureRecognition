@@ -1,10 +1,8 @@
 package application.data.model;
 
-import javax.annotation.CheckForNull;
-
 public abstract class AIdentifiable {
 
-	protected final @CheckForNull int id;
+	protected int id;
 	
 	public AIdentifiable(int id) {
 		this.id = id;
@@ -13,5 +11,11 @@ public abstract class AIdentifiable {
 	public int getId() {
 		return id;
 	}
+	
+
+	public void setId(int id) {
+		this.id = id;
+	}
+
 	
 }

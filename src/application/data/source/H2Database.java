@@ -134,6 +134,7 @@ public final class H2Database implements IDataSource {
 					try (ResultSet generatedKeys = statement.getGeneratedKeys()) {
 						generatedKeys.next();
 						expressionId = (int) generatedKeys.getLong(1);
+						expression.setId(expressionId);
 					}
 
 				}
