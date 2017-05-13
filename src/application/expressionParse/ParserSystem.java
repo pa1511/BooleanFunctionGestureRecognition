@@ -38,11 +38,11 @@ public class ParserSystem {
 		return implementation;
 	}
 
-	public static IBooleanSpatialParser getBooleanSpatialParser(Properties properties) throws Exception {
+	public static @Nonnull IBooleanSpatialParser getBooleanSpatialParser(@Nonnull Properties properties) throws Exception {
 		return new BooleanSpatialParser(getLexicalAnalizer(properties));
 	}
 
-	public static IBooleanTextParser getBooleanTextParser(Properties properties) throws Exception {
+	public static @Nonnull IBooleanTextParser getBooleanTextParser(@Nonnull Properties properties) throws Exception {
 		return new BooleanTextParser(getLexicalAnalizer(properties), getSyntacticAnalyzer(properties));
 	}
 	
