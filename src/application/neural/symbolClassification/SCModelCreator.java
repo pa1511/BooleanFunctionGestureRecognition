@@ -133,12 +133,12 @@ public class SCModelCreator implements ISCModelCreator {
 		SCModelOutputInterpreter modelOutputInterpreter = new SCModelOutputInterpreter(trainDataFileName.getParent()+File.separator+
 				SCUtilities.modelMetaDataFileNameFromTrainFile(trainDataFileName.getName()));
 		
-		return new SymbolClassifier(model, modelOutputInterpreter,trainDataFileName.getName());
+		return new SymbolNetworkBasedClassifier(model, modelOutputInterpreter,trainDataFileName.getName());
 	}
 
 	@Override
 	public ISymbolClassifier loadSymbolClassifierFrom(File selectedFile) throws Exception {
-		return new SymbolClassifier(selectedFile);
+		return new SymbolNetworkBasedClassifier(selectedFile);
 	}
 
 	private DenseLayer getLayer(@Nonnegative int numInputs,@Nonnegative int numHiddenNodes) {

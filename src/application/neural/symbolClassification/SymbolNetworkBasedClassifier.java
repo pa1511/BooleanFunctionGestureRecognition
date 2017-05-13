@@ -19,7 +19,7 @@ import application.data.model.Gesture;
 import utilities.lazy.UnsafeLazyInt;
 
 
-class SymbolClassifier implements ISymbolClassifier {
+class SymbolNetworkBasedClassifier implements ISymbolClassifier {
 
 	private final @Nonnull MultiLayerNetwork modelNetwork;
 	private final @Nonnull SCModelOutputInterpreter modelOutputInterpreter;
@@ -29,14 +29,14 @@ class SymbolClassifier implements ISymbolClassifier {
 	private final double[] probabilities;
 	private final int outputCount;
 
-	public SymbolClassifier(@Nonnull File networkModelFile) throws Exception {
+	public SymbolNetworkBasedClassifier(@Nonnull File networkModelFile) throws Exception {
 		this(ModelSerializer.restoreMultiLayerNetwork(networkModelFile), 
 				new SCModelOutputInterpreter(networkModelFile.getParent()+File.separator+SCUtilities.modelMetaDataFileName(networkModelFile.getName())),
 				networkModelFile.getName());
 		
 	}
 	
-	public SymbolClassifier(@Nonnull MultiLayerNetwork modelNetwork,
+	public SymbolNetworkBasedClassifier(@Nonnull MultiLayerNetwork modelNetwork,
 			@Nonnull SCModelOutputInterpreter modelOutputInterpreter,String name) {
 		this.modelNetwork = modelNetwork;
 		this.modelOutputInterpreter = modelOutputInterpreter;
@@ -121,7 +121,7 @@ class SymbolClassifier implements ISymbolClassifier {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		SymbolClassifier other = (SymbolClassifier) obj;
+		SymbolNetworkBasedClassifier other = (SymbolNetworkBasedClassifier) obj;
 		if (modelNetwork == null) {
 			if (other.modelNetwork != null)
 				return false;
