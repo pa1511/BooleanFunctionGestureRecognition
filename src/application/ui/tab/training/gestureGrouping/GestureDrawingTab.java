@@ -28,7 +28,7 @@ import application.data.model.Gesture;
 import application.data.model.Symbol;
 import application.expressionParse.BooleanParser;
 import application.expressionParse.BooleanSpatialParser;
-import application.expressionParse.ParserKeys;
+import application.expressionParse.ParserSystem;
 import application.expressionParse.lexic.ILexicalAnalyzer;
 import application.expressionParse.syntactic.node.IBooleanExpressionNode;
 import application.gestureGrouping.GestureGroupingSystem;
@@ -39,7 +39,6 @@ import application.ui.draw.PerGestureView;
 import application.ui.draw.ACanvasObserver;
 import application.ui.draw.RectangleRepresentationView;
 import dataModels.Pair;
-import generalfactory.Factory;
 import log.Log;
 
 public class GestureDrawingTab extends AbstractApplicationTab{
@@ -71,7 +70,7 @@ public class GestureDrawingTab extends AbstractApplicationTab{
 		super("Drawing");
 		
 		Properties properties = Application.getInstance().getProperties();
-		ILexicalAnalyzer lexicalAnalyzer = Factory.getInstance(properties.getProperty(ParserKeys.LEXICAL_ANALYZER_KEY));
+		ILexicalAnalyzer lexicalAnalyzer = ParserSystem.getLexicalAnalizer(properties);
 
 		spatialParser = new BooleanSpatialParser(lexicalAnalyzer);
 		gestureGrouper = GestureGroupingSystem.getGestureGrouper(properties);

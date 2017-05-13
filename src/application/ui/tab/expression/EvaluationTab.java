@@ -15,14 +15,13 @@ import javax.swing.JTextField;
 import application.AbstractApplicationTab;
 import application.Application;
 import application.expressionParse.BooleanParser;
-import application.expressionParse.ParserKeys;
+import application.expressionParse.ParserSystem;
 import application.expressionParse.VariableValueProvider;
 import application.expressionParse.lexic.ILexicalAnalyzer;
 import application.expressionParse.syntactic.ISyntacticAnalyzer;
 import application.expressionParse.syntactic.node.IBooleanExpressionNode;
 import application.ui.action.EvaluateAction;
 import application.ui.table.ExpressionEvaluationTableModel;
-import generalfactory.Factory;
 
 public class EvaluationTab extends AbstractApplicationTab{
 
@@ -39,8 +38,8 @@ public class EvaluationTab extends AbstractApplicationTab{
 		super("Evaluation");
 		
 		Properties properties = Application.getInstance().getProperties();
-		ILexicalAnalyzer lexicalAnalyzer = Factory.getInstance(properties.getProperty(ParserKeys.LEXICAL_ANALYZER_KEY));
-		ISyntacticAnalyzer syntacticAnalyzer = Factory.getInstance(properties.getProperty(ParserKeys.SYNTACTIC_ANALYZER_KEY));
+		ILexicalAnalyzer lexicalAnalyzer = ParserSystem.getLexicalAnalizer(properties);
+		ISyntacticAnalyzer syntacticAnalyzer = ParserSystem.getSyntacticAnalyzer(properties);
 
 		booleanParser = new BooleanParser(lexicalAnalyzer,syntacticAnalyzer);
 		

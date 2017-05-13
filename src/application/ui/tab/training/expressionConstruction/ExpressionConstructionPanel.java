@@ -31,7 +31,7 @@ import application.data.model.handling.ExpressionTransformations;
 import application.data.model.handling.SymbolTransformations;
 import application.expressionParse.BooleanParser;
 import application.expressionParse.BooleanSpatialParser;
-import application.expressionParse.ParserKeys;
+import application.expressionParse.ParserSystem;
 import application.expressionParse.VariableValueProvider;
 import application.expressionParse.lexic.ILexicalAnalyzer;
 import application.expressionParse.syntactic.ISyntacticAnalyzer;
@@ -41,7 +41,6 @@ import application.ui.draw.RectangleRepresentationView;
 import application.ui.table.AExpressionManagementObserver;
 import application.ui.table.ExpressionEvaluationTableModel;
 import application.ui.table.ExpressionManagementTable;
-import generalfactory.Factory;
 import log.Log;
 
 public class ExpressionConstructionPanel extends AbstractApplicationTab{
@@ -71,9 +70,8 @@ public class ExpressionConstructionPanel extends AbstractApplicationTab{
 		
 		//
 		Properties properties = Application.getInstance().getProperties();
-		ILexicalAnalyzer lexicalAnalyzer = Factory.getInstance(properties.getProperty(ParserKeys.LEXICAL_ANALYZER_KEY));
-		ISyntacticAnalyzer syntacticAnalyzer = Factory.getInstance(properties.getProperty(ParserKeys.SYNTACTIC_ANALYZER_KEY));
-
+		ILexicalAnalyzer lexicalAnalyzer = ParserSystem.getLexicalAnalizer(properties);
+		ISyntacticAnalyzer syntacticAnalyzer = ParserSystem.getSyntacticAnalyzer(properties);
 		booleanParser = new BooleanParser(lexicalAnalyzer,syntacticAnalyzer);
 		booleanSpatialParser = new BooleanSpatialParser(lexicalAnalyzer);
 		
