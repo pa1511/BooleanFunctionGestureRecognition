@@ -6,9 +6,9 @@ import java.util.List;
 
 import javax.annotation.Nonnull;
 
-public class RelativePointTransformations {
+public class PointTransformations {
 	
-	private RelativePointTransformations() {}
+	private PointTransformations() {}
 
 	public static @Nonnull Rectangle getRectangleRepresentation(@Nonnull List<Point> points){
 		

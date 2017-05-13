@@ -10,7 +10,7 @@ import javax.annotation.Nonnull;
 import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 
-import application.data.handling.RelativePointTransformations;
+import application.data.handling.PointTransformations;
 import dataModels.Pair;
 
 public class RectangleRepresentationView extends JPanel {
@@ -36,7 +36,7 @@ public class RectangleRepresentationView extends JPanel {
 	}
 
 	public void createRectangle(@Nonnull List<Point> points, @Nonnull Color color){		
-		Rectangle rectangle = RelativePointTransformations.getRectangleRepresentation(points);
+		Rectangle rectangle = PointTransformations.getRectangleRepresentation(points);
 		createRectangle(rectangle, color);
 	}
 

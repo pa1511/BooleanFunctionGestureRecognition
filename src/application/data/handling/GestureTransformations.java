@@ -14,7 +14,7 @@ public class GestureTransformations {
 	private GestureTransformations() {}
 	
 	public static @Nonnull Rectangle getRectangleRepresentation(@Nonnull Gesture gesture){
-		return RelativePointTransformations.getRectangleRepresentation(gesture.getPoints());
+		return PointTransformations.getRectangleRepresentation(gesture.getPoints());
 	}
 	
 	/**

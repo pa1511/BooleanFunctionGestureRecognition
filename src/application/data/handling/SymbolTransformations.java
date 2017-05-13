@@ -142,6 +142,6 @@ public class SymbolTransformations {
 				.map(Gesture::getPoints)
 				.flatMap(points->points.stream())
 				.collect(Collectors.toList());
-		return RelativePointTransformations.getRectangleRepresentation(relativePoints);
+		return PointTransformations.getRectangleRepresentation(relativePoints);
 	}
 }
