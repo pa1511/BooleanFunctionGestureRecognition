@@ -25,6 +25,8 @@ import application.data.model.handling.GestureTransformations;
 import dataModels.Pair;
 import database.H2DatabaseSupport;
 import log.Log;
+import utilities.lazy.Lazy;
+import utilities.lazy.LazyAutoCloseable;
 
 public final class H2Database implements IDataSource {
 
@@ -53,7 +55,7 @@ public final class H2Database implements IDataSource {
 	private static final @Nonnull String geExComplexColumn = "EX_COMPLEX";
 
 	// Database connection
-	private final @Nonnull Supplier<Connection> dbConnection;
+	private final @Nonnull LazyAutoCloseable<Connection> dbConnection;
 		
 	public H2Database(Properties properties) {
 		
@@ -63,7 +65,7 @@ public final class H2Database implements IDataSource {
 		
 		final String dbConnectionString = "jdbc:h2:" + dbLocation;
 
-		dbConnection = () -> {
+		Supplier<Connection> connectionSupplier = () -> {
 
 			boolean didDbExistPriorToThis = H2DatabaseSupport.doesDbExist(dbLocation, user, password);
 
@@ -86,6 +88,8 @@ public final class H2Database implements IDataSource {
 			}
 
 		};
+		
+		dbConnection = new LazyAutoCloseable<>(new Lazy<>(connectionSupplier));
 
 	}
 
@@ -117,8 +121,11 @@ public final class H2Database implements IDataSource {
 	
 	public void store(@Nonnull List<Expression> expressions) throws Exception {
 
-		try (Connection connection = dbConnection.get()) {
+		try (LazyAutoCloseable<Connection> lazyConnection = dbConnection) {
 
+			@SuppressWarnings("resource")
+			Connection connection = lazyConnection.getOrThrow();
+			
 			for (Expression expression : expressions) {
 
 				String insertExpressionSql = "INSERT INTO " + expressionTable + " ( " + exWrittenFormColumn
@@ -169,7 +176,10 @@ public final class H2Database implements IDataSource {
 	@Override
 	public void store(@Nonnull Expression expression) throws Exception {
 
-		try (Connection connection = dbConnection.get()) {
+		try (LazyAutoCloseable<Connection> lazyConnection = dbConnection) {
+
+			@SuppressWarnings("resource")
+			Connection connection = lazyConnection.getOrThrow();
 
 			String insertExpressionSql = "INSERT INTO " + expressionTable + " ( " + exWrittenFormColumn
 					+ " ) VALUES( ? )";
@@ -214,9 +224,13 @@ public final class H2Database implements IDataSource {
 		}
 	}
 
+	@SuppressWarnings("resource")
 	@Override
-	public int getExpressionCount(@CheckForNull ExpressionType type) throws SQLException {
-		try(Connection connection = dbConnection.get()){
+	public int getExpressionCount(@CheckForNull ExpressionType type) throws Exception {
+		try (LazyAutoCloseable<Connection> lazyConnection = dbConnection) {
+
+			Connection connection = lazyConnection.getOrThrow();
+			
 			try (Statement statement = connection.createStatement()) {
 				
 				String query = "SELECT COUNT(" + exIdColumn + ") FROM " + expressionTable;
@@ -235,14 +249,18 @@ public final class H2Database implements IDataSource {
 					}
 				}
 			}
+			
 			return 0;
 		}
 	}
 
+	@SuppressWarnings("resource")
 	@Override
 	public List<Expression> getExpressions() throws Exception {
 
-		try (Connection connection = dbConnection.get()) {
+		try (LazyAutoCloseable<Connection> lazyConnection = dbConnection) {
+
+			Connection connection = lazyConnection.getOrThrow();
 
 			List<Expression> expressions = new ArrayList<>();
 			// TODO: use some SQL JOINS!!!
@@ -288,14 +306,18 @@ public final class H2Database implements IDataSource {
 					}
 				}
 			}
+			
 			return expressions;
 		}
 	}
 	
 
 	@Override
-	public void delete(@Nonnull Expression expression) throws SQLException {
-		try(Connection connection = dbConnection.get()){
+	public void delete(@Nonnull Expression expression) throws Exception {
+		try (LazyAutoCloseable<Connection> lazyConnection = dbConnection) {
+
+			@SuppressWarnings("resource")
+			Connection connection = lazyConnection.getOrThrow();
 			try(PreparedStatement statement = connection.prepareStatement("DELETE FROM " + gestureTable + " WHERE " + geIdColumn + " = ?")){
 				for(Symbol symbol:expression.getSymbols()){
 					for(Gesture gesture:symbol.getGestures()){
@@ -316,7 +338,11 @@ public final class H2Database implements IDataSource {
 		
 		List<SymbolSamplesInformation> symbolSamplesInformations = new ArrayList<>();
 		
-		try(Connection connection = dbConnection.get()){
+		try (LazyAutoCloseable<Connection> lazyConnection = dbConnection) {
+
+			@SuppressWarnings("resource")
+			Connection connection = lazyConnection.getOrThrow();
+			
 			try(Statement statement = connection.createStatement()){
 				try(ResultSet resultSet = statement.executeQuery(
 						"SELECT "+ 
@@ -338,9 +364,13 @@ public final class H2Database implements IDataSource {
 		return symbolSamplesInformations;
 	}
 
+	@SuppressWarnings("resource")
 	@Override
 	public int getDistinctSymbolCount(boolean includingComplex) throws Exception {
-		try(Connection connection = dbConnection.get()){
+		try (LazyAutoCloseable<Connection> lazyConnection = dbConnection) {
+
+			Connection connection = lazyConnection.getOrThrow();
+			
 			try (Statement statement = connection.createStatement()) {
 				
 				String query = "SELECT COUNT( DISTINCT( " + geSymbolSyColumn + ")) FROM " + gestureTable;
@@ -351,6 +381,7 @@ public final class H2Database implements IDataSource {
 						return resultSet.getInt(1);
 				}
 			}
+			
 			return 0;
 		}
 
@@ -362,7 +393,11 @@ public final class H2Database implements IDataSource {
 		List<Symbol> symbols = new ArrayList<>();
 		char symbolAsChar = symbolAsString.charAt(0);
 		
-		try(Connection connection = dbConnection.get()){
+		try (LazyAutoCloseable<Connection> lazyConnection = dbConnection) {
+
+			@SuppressWarnings("resource")
+			Connection connection = lazyConnection.getOrThrow();
+			
 			try(PreparedStatement statement = connection.prepareStatement(
 				"SELECT * FROM " + gestureTable +" " + 
 				"WHERE " + geSymbolSyColumn + " = ? " +
