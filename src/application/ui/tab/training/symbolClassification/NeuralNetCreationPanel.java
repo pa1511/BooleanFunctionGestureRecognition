@@ -20,7 +20,7 @@ import javax.swing.SwingWorker;
 
 import application.AbstractApplicationTab;
 import application.Application;
-import application.data.handling.dataset.DatasetShuffleCreator;
+import application.data.handling.dataset.ADatasetCreator;
 import application.neural.symbolClassification.ISCModelCreator;
 import application.neural.symbolClassification.ISymbolClassifier;
 import application.neural.symbolClassification.SCKeys;
@@ -150,8 +150,8 @@ public class NeuralNetCreationPanel extends AbstractApplicationTab{
 			}
 			
 		    String fileNameTrain = inputFile.getAbsolutePath();
-		    int numInputs = DatasetShuffleCreator.getNumberOfInputsFrom(inputFile);
-		    int numOutputs = DatasetShuffleCreator.getNumberOfOutputsFrom(inputFile);
+		    int numInputs = ADatasetCreator.getNumberOfInputsFrom(inputFile);
+		    int numOutputs = ADatasetCreator.getNumberOfOutputsFrom(inputFile);
 		    
 		    
 		    int[] hiddenNodes = Arrays.stream(hiddenNodesField.getText().toLowerCase().split("x")).mapToInt(Integer::parseInt).toArray();

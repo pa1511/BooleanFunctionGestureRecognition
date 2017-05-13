@@ -8,7 +8,7 @@ import javax.annotation.Nonnull;
 
 public class Symbol extends AIdentifiable{
 
-	private final char symbol;
+	private char symbol;
 	private final @Nonnull List<Gesture> gestures;
 
 	public Symbol(char symbol) {
@@ -37,6 +37,10 @@ public class Symbol extends AIdentifiable{
 	public @Nonnull Symbol removeGesture(@Nonnull Gesture gesture){
 		gestures.remove(gesture);
 		return this;
+	}
+	
+	public void setSymbol(char symbol) {
+		this.symbol = symbol;
 	}
 
 	public char getSymbol() {

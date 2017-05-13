@@ -4,7 +4,10 @@ import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
+import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.stream.Collectors;
 
@@ -25,6 +28,7 @@ import application.data.model.Symbol;
 import application.data.model.geometry.MouseClickType;
 import application.gestureGrouping.GGKeys;
 import application.gestureGrouping.IGestureGrouper;
+import application.neural.symbolClassification.SymbolDistanceClassifier;
 import application.parse.BooleanParser;
 import application.parse.BooleanSpatialParser;
 import application.parse.ParserKeys;
@@ -112,6 +116,31 @@ public class GestureDrawingTab extends AbstractApplicationTab{
 		
 		canvasObserver = new CanvasObserver();
 		canvas.observationManager.addObserver(canvasObserver);
+		
+		//===========================================================================================================
+		//TODO:Remove
+		File representationFile = new File(System.getProperty("user.dir"),"training/symbol/data/output/representative138.txt");
+		SymbolDistanceClassifier symbolDistanceClassifier = new SymbolDistanceClassifier(representationFile);
+		
+		for(Map.Entry<String, double[]> representation:symbolDistanceClassifier.getRepresentations().entrySet()){
+
+			String symbol = representation.getKey();
+			double[] points = representation.getValue();
+			
+			List<Point> gesturePoints = new ArrayList<>();
+			
+			for(int i=0;i<points.length;i+=2){
+				points[i] = points[i] + 1;
+				points[i+1] = points[i+1] + 1;
+				gesturePoints.add(new Point((int)(points[i]*100), (int)(points[i+1]*100)));
+			}
+			
+			
+			Gesture gesture = new Gesture(gesturePoints);
+			
+			perGestureView.addGesture(symbol, gesture);
+		}		
+		//===========================================================================================================
 	}
 
 	private void forceRepaint() {

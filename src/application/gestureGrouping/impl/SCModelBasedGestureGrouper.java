@@ -5,6 +5,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
@@ -36,7 +37,7 @@ public class SCModelBasedGestureGrouper implements IGestureGrouper{
 	//TODO: extract
 	private static final @Nonnull int maxGesturesPerSymbol = 3;
 	
-	private final @Nonnull ILazy<CompositeSymbolClassifier> compositeSymbolClassifierLazy;
+	private final @Nonnull ILazy<ISymbolClassifier> symbolClassifierLazy;
 	private final @Nonnull ISCModelCreator modelCreator;
 	private final @Nonnull ADatasetCreator datasetCreator;
 
@@ -51,9 +52,10 @@ public class SCModelBasedGestureGrouper implements IGestureGrouper{
 		//loading dataset creator
 		String datasetCreatorPath = applicationProperties.getProperty(SCKeys.DATA_CREATION_IMPL_PATH);
 		String datasetCeratorName = applicationProperties.getProperty(SCKeys.DATA_CREATION_IMPL_NAME);
-		datasetCreator = Factory.getInstance(datasetCeratorName, datasetCreatorPath);
+		String[] datasetCreatorDecorations = applicationProperties.getProperty(SCKeys.DATA_CREATION_DECORATIION).split(";");
+		datasetCreator = ADatasetCreator.getDatasetCreator(datasetCeratorName, datasetCreatorPath, datasetCreatorDecorations);
 
-		compositeSymbolClassifierLazy = new UnsafeLazy<CompositeSymbolClassifier>(()->{
+		symbolClassifierLazy = new UnsafeLazy<ISymbolClassifier>(()->{
 			
 			try{
 				CompositeSymbolClassifier compositeSymbolClassifier = new CompositeSymbolClassifier();
@@ -63,11 +65,11 @@ public class SCModelBasedGestureGrouper implements IGestureGrouper{
 				
 				Predicate<File> shouldLoadModel;
 				if(modelImpl.equals("ALL")){
-					shouldLoadModel = f->!f.getName().endsWith(".metadata");
+					shouldLoadModel = f->!f.getName().matches(".*\\.(metadata|txt)");
 				}
 				else{
 					Set<String> modelsToLoad = new HashSet<>(Arrays.asList(modelImpl.split(";")));
-					shouldLoadModel = f->!f.getName().endsWith(".metadata") && modelsToLoad.contains(f.getName());
+					shouldLoadModel = f->!f.getName().matches(".*\\.(metadata|txt)") && modelsToLoad.contains(f.getName());
 				}
 
 				
@@ -88,8 +90,7 @@ public class SCModelBasedGestureGrouper implements IGestureGrouper{
 				throw new RuntimeException(e);
 			}
 		});
-	}
-	
+	}	
 	@Override
 	public List<Symbol> group(List<Gesture> gestures) {		
 		int gestureCount = gestures.size();
@@ -97,8 +98,8 @@ public class SCModelBasedGestureGrouper implements IGestureGrouper{
 		Log.addMessage("Number of gesture groupings to test: " + combinationCount , Log.Type.Plain);
 
 		double maxProbable = Double.MIN_VALUE;
-		List<Symbol> bestGroupedSymbols = null;
-		
+		List<Symbol> bestGroupedSymbols = Collections.emptyList();
+
 		for(int i=0;i<combinationCount;i++){
 			
 			List<List<Gesture>> symbols = new ArrayList<>();
@@ -129,8 +130,8 @@ public class SCModelBasedGestureGrouper implements IGestureGrouper{
 			double probability = 0.0;
 			List<Symbol> symbolsList = new ArrayList<>();
 			for(List<Gesture> gestureGroup:symbols){
-				String prediction = compositeSymbolClassifierLazy.getOrThrow().predict(datasetCreator, gestureGroup);
-				double predictionProbability = compositeSymbolClassifierLazy.getOrThrow().getProbabilities().get(prediction).doubleValue();
+				String prediction = symbolClassifierLazy.getOrThrow().predict(datasetCreator, gestureGroup);
+				double predictionProbability = symbolClassifierLazy.getOrThrow().getProbabilities().get(prediction).doubleValue();
 				probability+=predictionProbability;
 				symbolsList.add(new Symbol(prediction.charAt(0), gestureGroup));
 			}

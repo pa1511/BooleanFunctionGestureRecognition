@@ -6,8 +6,6 @@ import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
@@ -31,7 +29,6 @@ import application.neural.symbolClassification.SCKeys;
 import application.ui.table.SymbolInformationTableModel;
 import dataset.ClassificationDataSet;
 import dataset.handeling.DataSetDepositers;
-import generalfactory.Factory;
 import log.Log;
 import net.miginfocom.swing.MigLayout;
 import ui.CommonUIActions;
@@ -55,10 +52,11 @@ public class DatasetCreationPanel extends AbstractApplicationTab{
 		super("Dataset creation");
 		
 		Properties properties = Application.getInstance().getProperties();
-		
-		String dataCreatorPath = properties.getProperty(SCKeys.DATA_CREATION_IMPL_PATH);
-		String dataCreatorName = properties.getProperty(SCKeys.DATA_CREATION_IMPL_NAME);
-		datasetCreator = Factory.getInstance(dataCreatorName, dataCreatorPath);
+		String creatorPath = properties.getProperty(SCKeys.DATA_CREATION_IMPL_PATH);
+		String creatorName = properties.getProperty(SCKeys.DATA_CREATION_IMPL_NAME);
+		String[] creatorDecorations = properties.getProperty(SCKeys.DATA_CREATION_DECORATIION).split(";");
+				
+		datasetCreator = ADatasetCreator.getDatasetCreator(creatorName, creatorPath, creatorDecorations);
 		
 		symbolsField = new JTextField("A:1000,B:1000,+:1000,*:1000,!:1000,1:1000,0:1000,(:1000,):1000");
 		JLabel instructionLabel = new JLabel("<html>Input the symbols you whish the system to use like this: \"A:10,B:20\".</br> The meaning is use the symbol and this amount of learning examples.</html>");
@@ -176,7 +174,7 @@ public class DatasetCreationPanel extends AbstractApplicationTab{
 			
 			Map<String, Integer> requestedSymbolMap;
 			try{
-				requestedSymbolMap = parseRequest(requestedSymbolAsString);
+				requestedSymbolMap = ADatasetCreator.parseRequest(requestedSymbolAsString);
 			}
 			catch(Exception ex){
 				Log.addError(ex);
@@ -204,19 +202,4 @@ public class DatasetCreationPanel extends AbstractApplicationTab{
 
 	}
 
-	private @Nonnull Map<String, Integer> parseRequest(@Nonnull String requestedSymbolAsString) throws Exception{
-		
-		String[]  perSymbolRequests = requestedSymbolAsString.replaceAll("\\s", "").split(",");
-		Arrays.sort(perSymbolRequests);
-		Map<String, Integer> requestInfo = new HashMap<>();
-		
-		for(String symbolRequest:perSymbolRequests){
-			String[] infoPack = symbolRequest.split(":");
-			String symbol = infoPack[0];
-			int symbolCount = Integer.parseInt(infoPack[1]);
-			requestInfo.put(symbol, Integer.valueOf(symbolCount));
-		}
-		
-		return requestInfo;
-	}
 }

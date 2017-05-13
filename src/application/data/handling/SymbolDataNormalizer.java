@@ -5,13 +5,13 @@ import javax.annotation.Nonnull;
 public class SymbolDataNormalizer {
 
 	private SymbolDataNormalizer() {}
-		
-	public static void normalizeSymbolSamples(@Nonnull double[][] samples) {
+			
+	public static void normalizeSymbolSamples(@Nonnull double[][] samples, double modifier) {
 		for(double[] sample:samples)
-			normalizeSymbolSample(sample);
+			normalizeSymbolSample(sample,modifier);
 	}
 
-	public static void normalizeSymbolSample(@Nonnull double[] rawSample) {
+	public static void normalizeSymbolSample(@Nonnull double[] rawSample, double modifier) {
 
 		double averageX = 0;
 		double averageY = 0;
@@ -37,7 +37,7 @@ public class SymbolDataNormalizer {
 		
 		averageX /= (rawSample.length / 2);
 		averageY /= (rawSample.length / 2);
-		double scale = Math.max(maxX-minX, maxY-minY);
+		double scale = Math.max(maxX-minX, maxY-minY)*modifier;
 
 		for (int i = 0; i < rawSample.length-1; i += 2) {
 			rawSample[i] -= averageX;

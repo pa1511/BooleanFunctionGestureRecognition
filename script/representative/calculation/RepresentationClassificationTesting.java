@@ -9,7 +9,7 @@ import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Multiset;
 
 import application.data.handling.dataset.ADatasetCreator;
-import application.data.handling.dataset.DatasetShuffleCreator;
+import application.data.handling.dataset.SortDatasetCreator;
 import application.data.model.Symbol;
 import application.data.source.H2Database;
 import application.data.source.IDataSource;
@@ -26,12 +26,15 @@ public class RepresentationClassificationTesting {
 		Log.setDisabled(true);
 		
 		String userDir = System.getProperty("user.dir");
-		SymbolDistanceClassifier symbolDistanceClassifier = new SymbolDistanceClassifier(new File(userDir,"training/symbol/data/output/representative.txt"));
-		ADatasetCreator datasetCreator = new DatasetShuffleCreator();
+		File representationFile = new File(userDir,
+				"training/symbol/data/output/representative-sorted-138-.txt");
+		SymbolDistanceClassifier symbolDistanceClassifier = new SymbolDistanceClassifier(representationFile);
+		ADatasetCreator datasetCreator = new SortDatasetCreator();
+
 		StatisticsCalculator statisticsCalculator = new StatisticsCalculator();
 		
 		Properties properties = new Properties();
-		try(InputStream inputStream = new FileInputStream(new File(userDir,"properties/model-creation-script/h2-script.properties"))){
+		try(InputStream inputStream = new FileInputStream(new File(userDir,"properties/model-creation-script/script.properties"))){
 			properties.load(inputStream);
 		}
 		try(final IDataSource dataSource = new H2Database(properties)){
@@ -57,7 +60,7 @@ public class RepresentationClassificationTesting {
 		}
 		
 		File statOutputFolder = new File(userDir,"symbol/statistics");
-		StatisticsCalculator.storeStatitstics(statOutputFolder, "distance-statistics.txt", statisticsCalculator);
+		StatisticsCalculator.storeStatitstics(statOutputFolder, representationFile.getName()+"-statistics.txt", statisticsCalculator);
 
 	}
 }

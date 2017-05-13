@@ -5,20 +5,21 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Properties;
 
 import org.deeplearning4j.nn.conf.Updater;
 import org.nd4j.linalg.activations.Activation;
 
+import com.google.common.collect.HashMultiset;
+import com.google.common.collect.Multiset;
+
 import application.data.handling.dataset.ADatasetCreator;
-import application.data.handling.dataset.DatasetShuffleCreator;
 import application.data.model.Symbol;
 import application.data.source.H2Database;
 import application.data.source.IDataSource;
 import application.neural.symbolClassification.ISymbolClassifier;
+import application.neural.symbolClassification.SCKeys;
 import application.neural.symbolClassification.SCModelCreator;
 import application.neural.symbolClassification.StatisticsCalculator;
 import log.Log;
@@ -33,48 +34,53 @@ public class Main {
 		
 		File statOutputFolder = new File(userDir,"symbol/statistics");
 		File outputFolder = new File(userDir, "training/symbol/model/output");
-		String fileNameTrain = "training/symbol/data/output/1000_all-30-9.csv";
+		String fileNameTrain = "training/symbol/data/output/1000_all_gesture_count-31-9.csv";
 		File inputFile = new File(userDir, fileNameTrain);
-		int nEpochs = 10000;
+		int nEpochs = 8000;
 		int iterationCount = 1;
 		double[] scoreLimits = new double[]{1e-3};
-		int numInputs = DatasetShuffleCreator.getNumberOfInputsFrom(inputFile);
-		int numOutputs = DatasetShuffleCreator.getNumberOfOutputsFrom(inputFile);
-		int[][] hidenNodesConfigs = new int[][] { { 30, 30}/*, { 26, 24 }, { 24, 22 }, { 22, 20 } */};
-		double[] learningRateConfigs = new double[] { 0.012 /*,5e-3, 1e-2*/ };
-		int[] batchSizeConfigs = new int[] { 50};
+		int numInputs = ADatasetCreator.getNumberOfInputsFrom(inputFile);
+		int numOutputs = ADatasetCreator.getNumberOfOutputsFrom(inputFile);
+		int[][] hidenNodesConfigs = new int[][] { { 32, 30}/*, { 26, 24 }, { 24, 22 }, { 22, 20 } */};
+		double[] learningRateConfigs = new double[] { 0.015 /*,5e-3, 1e-2*/ };
+		int[] batchSizeConfigs = new int[] { 125};
 
-		Activation[] activationMethodConfig = new Activation[] { Activation.SIGMOID, Activation.TANH,  Activation.RATIONALTANH, Activation.HARDTANH };
+		Activation[] activationMethodConfig = new Activation[] { /*Activation.SIGMOID, Activation.TANH,*/  Activation.RATIONALTANH/*, Activation.HARDTANH */};
 		Updater[] updaterConfig = new Updater[] { Updater.ADAM };
 		
 		List<Symbol> symbols = new ArrayList<>();
 
 		Properties properties = new Properties();
-		try(InputStream inputStream = new FileInputStream(new File(userDir,"properties/model-creation-script/h2-script.properties"))){
+		try(InputStream inputStream = new FileInputStream(new File(userDir,"properties/model-creation-script/script.properties"))){
 			properties.load(inputStream);
 		}
 		try(final IDataSource dataSource = new H2Database(properties)){
 
-			Map<String,Integer> request = new HashMap<>();
-			request.put("A", Integer.valueOf(200));
-			request.put("B", Integer.valueOf(200));
-			request.put("!", Integer.valueOf(200));
-			request.put("+", Integer.valueOf(200));
-			request.put("*", Integer.valueOf(200));
-			request.put("0", Integer.valueOf(200));
-			request.put("1", Integer.valueOf(200));
-			request.put("(", Integer.valueOf(200));
-			request.put(")", Integer.valueOf(200));
+			Multiset<String> multiset = HashMultiset.create();
+			multiset.add("A", 200);
+			multiset.add("B", 200);
+			multiset.add("!", 200);
+			multiset.add("+", 200);
+			multiset.add("*", 200);
+			multiset.add("0", 200);
+			multiset.add("1", 200);
+			multiset.add("(", 200);
+			multiset.add(")", 200);
 		
-			for(Map.Entry<String, Integer> symbolEntry:request.entrySet()){
-				for(Symbol symbol:dataSource.getSymbols(symbolEntry.getKey(),symbolEntry.getValue().intValue())){
+			for(String symbolEntry:multiset.elementSet()){
+				for(Symbol symbol:dataSource.getSymbols(symbolEntry,multiset.count(symbolEntry))){
 					symbols.add(symbol);
 				}				
 			}
 
 		}
 
-		ADatasetCreator datasetCreator = new DatasetShuffleCreator();
+		String creatorPath = properties.getProperty(SCKeys.DATA_CREATION_IMPL_PATH);
+		String creatorName = properties.getProperty(SCKeys.DATA_CREATION_IMPL_NAME);
+		String[] creatorDecorations = properties.getProperty(SCKeys.DATA_CREATION_DECORATIION).split(";");
+				
+		ADatasetCreator datasetCreator = ADatasetCreator.getDatasetCreator(creatorName, creatorPath, creatorDecorations);
+		
 		SCModelCreator modelCreator = new SCModelCreator();
 
 		for (int[] hiddenNodes : hidenNodesConfigs) {
@@ -93,7 +99,7 @@ public class Main {
 										});
 	
 								String modelName = activationMethod + "-" + updater + "-sm-rce-"
-										+ Arrays.toString(hiddenNodes)+"-"+batchSize+"-"+learningRate+"-"+scoreLimit;
+										+ Arrays.toString(hiddenNodes)+"-"+nEpochs+"-"+batchSize+"-"+learningRate+"-"+scoreLimit;
 	
 								model.setName(modelName);
 								model.storeTo(modelName, outputFolder);
@@ -105,7 +111,7 @@ public class Main {
 									statisticsCalculator.updateStatistics(model, symbol.getSymbolAsString(), predicted);
 								}
 	
-								StatisticsCalculator.storeStatitstics(statOutputFolder, modelName + "statistics.txt",
+								StatisticsCalculator.storeStatitstics(statOutputFolder, modelName + "-statistics.txt",
 										statisticsCalculator);
 							}
 						}

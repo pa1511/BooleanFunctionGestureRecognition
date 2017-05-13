@@ -43,6 +43,7 @@ public class StatisticsCalculator {
 			return true;
 		} catch (Exception e) {
 			Log.addError(e);
+			e.printStackTrace();
 			return false;			
 		}
 

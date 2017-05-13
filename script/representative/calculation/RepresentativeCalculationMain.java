@@ -13,8 +13,8 @@ import java.util.Properties;
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Multiset;
 
-import application.data.handling.SymbolDataNormalizer;
-import application.data.handling.SymbolTransformations;
+import application.data.handling.dataset.ADatasetCreator;
+import application.data.handling.dataset.SortDatasetCreator;
 import application.data.model.Gesture;
 import application.data.model.Symbol;
 import application.data.source.H2Database;
@@ -32,7 +32,7 @@ public class RepresentativeCalculationMain {
 		Log.setDisabled(true);
 		
 		Properties properties = new Properties();
-		try(InputStream inStream = new FileInputStream(new File(System.getProperty("user.dir"),"properties/h2.properties"))){
+		try(InputStream inStream = new FileInputStream(new File(System.getProperty("user.dir"),"properties/script.properties"))){
 			properties.load(inStream);
 		}
 		
@@ -64,7 +64,7 @@ public class RepresentativeCalculationMain {
 			//average was printed to be 68.5485
 			//System.out.println("Average points per symbol: " + averagePointsPerSymbol);
 			
-			int precision = (int)(averagePointsPerSymbol);
+			int precision = (int)(averagePointsPerSymbol*2);
 			if(precision%2!=0)
 				precision++;
 			
@@ -74,11 +74,10 @@ public class RepresentativeCalculationMain {
 			}
 			
 			double[] rawSymbol = new double[precision];
+			ADatasetCreator datasetCreator = new SortDatasetCreator();
 			
 			for(Symbol symbol:symbols){
-				SymbolTransformations.getRawSymbolRepresentation(symbol, rawSymbol);
-				SymbolDataNormalizer.normalizeSymbolSample(rawSymbol);
-
+				datasetCreator.getRawFormForSymbolClassification(symbol.getGestures(), rawSymbol);
 				double[] representativeData =representative.get(symbol.getSymbolAsString());
 				VectorUtils.add(representativeData, rawSymbol, representativeData, false);
 			}
@@ -88,7 +87,7 @@ public class RepresentativeCalculationMain {
 				VectorUtils.unaryVectorOperation(representation, representation, value->value/multiset.count(symbolRepresentative.getKey()), false);
 			}
 
-			try(PrintStream printStream = new PrintStream(new File(System.getProperty("user.dir"),"training/symbol/data/output/representative.txt"))){
+			try(PrintStream printStream = new PrintStream(new File(System.getProperty("user.dir"),"training/symbol/data/output/representative-sorted-"+precision+"-.txt"))){
 				for(Map.Entry<String, double[]> symbolRepresentative:representative.entrySet()){
 					printStream.println(symbolRepresentative.getKey());
 					printStream.println(PStrings.toCSV(symbolRepresentative.getValue()));

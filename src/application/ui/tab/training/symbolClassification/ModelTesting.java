@@ -5,7 +5,6 @@ import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.io.File;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -63,8 +62,11 @@ public class ModelTesting extends AbstractApplicationTab{
 		super("Neural net testing");
 
 		Properties properties = Application.getInstance().getProperties();
-		datasetCreator = Factory.getInstance(properties.getProperty(SCKeys.DATA_CREATION_IMPL_NAME), 
-				properties.getProperty(SCKeys.DATA_CREATION_IMPL_PATH));
+		String creatorPath = properties.getProperty(SCKeys.DATA_CREATION_IMPL_PATH);
+		String creatorName = properties.getProperty(SCKeys.DATA_CREATION_IMPL_NAME);
+		String[] creatorDecorations = properties.getProperty(SCKeys.DATA_CREATION_DECORATIION).split(";");
+				
+		datasetCreator = ADatasetCreator.getDatasetCreator(creatorName, creatorPath, creatorDecorations);
 		
 		modelCreator = Factory.getInstance(properties.getProperty(SCKeys.TRAINING_MODEL_IMPL_NAME),
 				properties.getProperty(SCKeys.TRAINING_MODEL_IMPL_PATH));
@@ -197,7 +199,7 @@ public class ModelTesting extends AbstractApplicationTab{
 			StatisticsCalculator statisticsCalculator = new StatisticsCalculator();
 			
 			try {
-				Map<String,Integer> request = parseRequest(requestString);
+				Map<String,Integer> request = ADatasetCreator.parseRequest(requestString);
 				@SuppressWarnings("resource")
 				IDataSource dataSource = Application.getInstance().getDataSource();
 				
@@ -222,22 +224,6 @@ public class ModelTesting extends AbstractApplicationTab{
 				JOptionPane.showMessageDialog(null, "An error happend durring statistics writing", "error", JOptionPane.ERROR_MESSAGE);
 			}
 		}
-
-		
-		private @Nonnull Map<String, Integer> parseRequest(@Nonnull String requestedSymbolAsString) {
-			String[]  perSymbolRequests = requestedSymbolAsString.replaceAll("\\s", "").split(",");
-			Map<String, Integer> requestInfo = new HashMap<>();
-			
-			for(String symbolRequest:perSymbolRequests){
-				String[] infoPack = symbolRequest.split(":");
-				String symbol = infoPack[0];
-				int symbolCount = Integer.parseInt(infoPack[1]);
-				requestInfo.put(symbol, Integer.valueOf(symbolCount));
-			}
-			
-			return requestInfo;
-		}
-
 	}
 
 
