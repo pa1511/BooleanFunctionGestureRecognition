@@ -30,7 +30,7 @@ import application.data.geometry.MouseClickType;
 import application.data.model.Expression;
 import application.data.model.Gesture;
 import application.data.model.handling.ExpressionFactory;
-import application.parse.BooleanParser;
+import application.expressionParse.BooleanParser;
 import application.ui.draw.Canvas;
 import application.ui.draw.PerGestureView;
 import application.ui.draw.ACanvasObserver;

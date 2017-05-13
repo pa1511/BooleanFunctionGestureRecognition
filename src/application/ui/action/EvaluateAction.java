@@ -8,9 +8,9 @@ import javax.annotation.Nonnull;
 import javax.swing.AbstractAction;
 import javax.swing.JOptionPane;
 
-import application.parse.BooleanParser;
-import application.parse.exception.BooleanExpressionParseException;
-import application.parse.syntactic.node.IBooleanExpressionNode;
+import application.expressionParse.BooleanParser;
+import application.expressionParse.exception.BooleanExpressionParseException;
+import application.expressionParse.syntactic.node.IBooleanExpressionNode;
 import log.Log;
 
 public final class EvaluateAction extends AbstractAction {

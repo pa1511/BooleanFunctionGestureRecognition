@@ -14,12 +14,12 @@ import javax.swing.JTextField;
 
 import application.AbstractApplicationTab;
 import application.Application;
-import application.parse.BooleanParser;
-import application.parse.ParserKeys;
-import application.parse.VariableValueProvider;
-import application.parse.lexic.ILexicalAnalyzer;
-import application.parse.syntactic.ISyntacticAnalyzer;
-import application.parse.syntactic.node.IBooleanExpressionNode;
+import application.expressionParse.BooleanParser;
+import application.expressionParse.ParserKeys;
+import application.expressionParse.VariableValueProvider;
+import application.expressionParse.lexic.ILexicalAnalyzer;
+import application.expressionParse.syntactic.ISyntacticAnalyzer;
+import application.expressionParse.syntactic.node.IBooleanExpressionNode;
 import application.ui.action.EvaluateAction;
 import application.ui.table.ExpressionEvaluationTableModel;
 import generalfactory.Factory;

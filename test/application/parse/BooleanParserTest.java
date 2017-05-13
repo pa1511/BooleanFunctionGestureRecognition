@@ -11,9 +11,11 @@ import javax.annotation.Nonnull;
 import org.junit.Rule;
 import org.junit.Test;
 
-import application.parse.lexic.LexicalAnalyzer;
-import application.parse.syntactic.SyntacticAnalyzer;
-import application.parse.syntactic.node.IBooleanExpressionNode;
+import application.expressionParse.BooleanParser;
+import application.expressionParse.VariableValueProvider;
+import application.expressionParse.lexic.LexicalAnalyzer;
+import application.expressionParse.syntactic.SyntacticAnalyzer;
+import application.expressionParse.syntactic.node.IBooleanExpressionNode;
 import src.utilities.PProperties;
 import testingHelp.TestLogWatchman;
 
