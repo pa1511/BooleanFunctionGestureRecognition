@@ -20,16 +20,15 @@ import application.data.handling.dataset.ADatasetCreator;
 import application.data.model.Gesture;
 import application.data.model.Symbol;
 import application.gestureGrouping.IGestureGrouper;
-import application.neural.symbolClassification.CompositeSymbolClassifier;
 import application.neural.symbolClassification.ISCModelCreator;
 import application.neural.symbolClassification.ISymbolClassifier;
-import application.neural.symbolClassification.SCKeys;
-import generalfactory.Factory;
+import application.neural.symbolClassification.SymbolClassificationSystem;
+import application.neural.symbolClassification.classifier.CompositeSymbolClassifier;
 import log.Log;
 import utilities.lazy.ILazy;
 import utilities.lazy.UnsafeLazy;
 
-public class SCModelBasedGestureGrouper implements IGestureGrouper{
+class SCModelBasedGestureGrouper implements IGestureGrouper{
 
 	private static final @Nonnull String MODELS_PATH_KEY = "gesture.grouping.model.based.path";
 	private static final @Nonnull String MODELS_IMPL_KEY = "gesture.grouping.model.based.impl";
@@ -42,18 +41,13 @@ public class SCModelBasedGestureGrouper implements IGestureGrouper{
 	private final @Nonnull ADatasetCreator datasetCreator;
 
 	public SCModelBasedGestureGrouper() throws Exception {
-		final Properties applicationProperties = Application.getInstance().getProperties();
+		final Properties properties = Application.getInstance().getProperties();
 
 		//loading model creator
-		String modelCreatorPath = applicationProperties.getProperty(SCKeys.TRAINING_MODEL_IMPL_PATH);
-		String modelCreatorName = applicationProperties.getProperty(SCKeys.TRAINING_MODEL_IMPL_NAME);
-		modelCreator = Factory.getInstance(modelCreatorName, modelCreatorPath);
+		modelCreator = SymbolClassificationSystem.getModelCreator(properties);
 
 		//loading dataset creator
-		String datasetCreatorPath = applicationProperties.getProperty(SCKeys.DATA_CREATION_IMPL_PATH);
-		String datasetCeratorName = applicationProperties.getProperty(SCKeys.DATA_CREATION_IMPL_NAME);
-		String[] datasetCreatorDecorations = applicationProperties.getProperty(SCKeys.DATA_CREATION_DECORATIION).split(";");
-		datasetCreator = ADatasetCreator.getDatasetCreator(datasetCeratorName, datasetCreatorPath, datasetCreatorDecorations);
+		datasetCreator = SymbolClassificationSystem.getDatasetCreator(properties);
 
 		symbolClassifierLazy = new UnsafeLazy<ISymbolClassifier>(()->{
 			
@@ -61,7 +55,7 @@ public class SCModelBasedGestureGrouper implements IGestureGrouper{
 				CompositeSymbolClassifier compositeSymbolClassifier = new CompositeSymbolClassifier();
 							
 				//loading models
-				String modelImpl = applicationProperties.getProperty(MODELS_IMPL_KEY);
+				String modelImpl = properties.getProperty(MODELS_IMPL_KEY);
 				
 				Predicate<File> shouldLoadModel;
 				if(modelImpl.equals("ALL")){
@@ -73,7 +67,7 @@ public class SCModelBasedGestureGrouper implements IGestureGrouper{
 				}
 
 				
-				String modelsPath = applicationProperties.getProperty(MODELS_PATH_KEY);
+				String modelsPath = properties.getProperty(MODELS_PATH_KEY);
 				File modelsFolder = new File(modelsPath);
 				
 				List<File> modelFiles = Files.list(modelsFolder.toPath()).map(Path::toFile)

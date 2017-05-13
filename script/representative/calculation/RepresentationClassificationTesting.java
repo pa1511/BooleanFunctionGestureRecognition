@@ -13,8 +13,8 @@ import application.data.handling.dataset.SortDatasetCreator;
 import application.data.model.Symbol;
 import application.data.source.H2Database;
 import application.data.source.IDataSource;
-import application.neural.symbolClassification.StatisticsCalculator;
-import application.neural.symbolClassification.SymbolDistanceClassifier;
+import application.neural.symbolClassification.classifier.SymbolDistanceClassifier;
+import application.neural.symbolClassification.statistics.StatisticsCalculator;
 import log.Log;
 
 public class RepresentationClassificationTesting {

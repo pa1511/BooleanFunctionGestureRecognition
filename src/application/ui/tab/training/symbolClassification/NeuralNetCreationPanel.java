@@ -23,8 +23,7 @@ import application.Application;
 import application.data.handling.dataset.ADatasetCreator;
 import application.neural.symbolClassification.ISCModelCreator;
 import application.neural.symbolClassification.ISymbolClassifier;
-import application.neural.symbolClassification.SCKeys;
-import generalfactory.Factory;
+import application.neural.symbolClassification.SymbolClassificationSystem;
 import log.Log;
 import net.miginfocom.swing.MigLayout;
 import ui.CommonUIActions;
@@ -54,17 +53,15 @@ public class NeuralNetCreationPanel extends AbstractApplicationTab{
 				
 		Properties properties = Application.getInstance().getProperties();
 		
-		String modelPath = properties.getProperty(SCKeys.TRAINING_MODEL_IMPL_PATH);
-		String modelName = properties.getProperty(SCKeys.TRAINING_MODEL_IMPL_NAME);
-		modelCreator = Factory.getInstance(modelName, modelPath);
+		modelCreator = SymbolClassificationSystem.getModelCreator(properties);
 		
-		String inputFileLocation = properties.getProperty(SCKeys.TRAINING_DATA_OUTPUT_KEY);
+		String inputFileLocation = SymbolClassificationSystem.getTrainingDataFolder(properties);
 		JButton inputFileSelectionButton = new JButton(new SelectInputFileAction("Select",inputFileLocation));
 		inputFile = (inputFileLocation==null || inputFileLocation.isEmpty()) ? null : new File(inputFileLocation+File.separator+"output-50-5.csv");
 		inputFileField = new JTextField((inputFile!=null) ? inputFile.getAbsolutePath() : "");
 		inputFileField.setEditable(false);
 		
-		String outputFolderLocation = properties.getProperty(SCKeys.TRAINING_MODEl_OUTPUT_KEY);
+		String outputFolderLocation = SymbolClassificationSystem.getModelFolder(properties);
 		JButton outputFileSelectionButton = new JButton(new SelectOutputDirectoryAction("Select"));
 		modelOutputFolder = (outputFolderLocation==null || outputFolderLocation.isEmpty()) ? null : new File(outputFolderLocation);
 		outputFolderField = new JTextField((modelOutputFolder!=null) ? modelOutputFolder.getAbsolutePath() : "");

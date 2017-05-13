@@ -1,4 +1,4 @@
-package application.neural.symbolClassification;
+package application.neural.symbolClassification.classifier;
 
 import java.io.File;
 import java.util.HashMap;
@@ -16,6 +16,9 @@ import org.nd4j.linalg.factory.Nd4j;
 
 import application.data.handling.dataset.ADatasetCreator;
 import application.data.model.Gesture;
+import application.neural.symbolClassification.ISymbolClassifier;
+import application.neural.symbolClassification.SCModelOutputInterpreter;
+import application.neural.symbolClassification.SymbolClassificationSystem;
 import utilities.lazy.UnsafeLazyInt;
 
 
@@ -31,7 +34,7 @@ class SymbolNetworkBasedClassifier implements ISymbolClassifier {
 
 	public SymbolNetworkBasedClassifier(@Nonnull File networkModelFile) throws Exception {
 		this(ModelSerializer.restoreMultiLayerNetwork(networkModelFile), 
-				new SCModelOutputInterpreter(networkModelFile.getParent()+File.separator+SCUtilities.modelMetaDataFileName(networkModelFile.getName())),
+				new SCModelOutputInterpreter(networkModelFile.getParent()+File.separator+SymbolClassificationSystem.modelMetaDataFileName(networkModelFile.getName())),
 				networkModelFile.getName());
 		
 	}
@@ -56,7 +59,7 @@ class SymbolNetworkBasedClassifier implements ISymbolClassifier {
 	@Override
 	public void storeTo(String modelName, File folder) throws Exception{
 		ModelSerializer.writeModel(this.modelNetwork, new File(folder, modelName), false);
-		modelOutputInterpreter.store(new File(folder,SCUtilities.modelMetaDataFileName(modelName)));
+		modelOutputInterpreter.store(new File(folder,SymbolClassificationSystem.modelMetaDataFileName(modelName)));
 	}
 
 	@Override

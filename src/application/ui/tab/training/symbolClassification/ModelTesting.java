@@ -27,12 +27,11 @@ import application.data.handling.dataset.ADatasetCreator;
 import application.data.model.Gesture;
 import application.data.model.Symbol;
 import application.data.source.IDataSource;
-import application.neural.symbolClassification.CompositeSymbolClassifier;
 import application.neural.symbolClassification.ISCModelCreator;
-import application.neural.symbolClassification.SCKeys;
-import application.neural.symbolClassification.StatisticsCalculator;
+import application.neural.symbolClassification.SymbolClassificationSystem;
+import application.neural.symbolClassification.classifier.CompositeSymbolClassifier;
+import application.neural.symbolClassification.statistics.StatisticsCalculator;
 import application.ui.draw.Canvas;
-import generalfactory.Factory;
 import log.Log;
 import net.miginfocom.swing.MigLayout;
 import ui.CommonUIActions;
@@ -62,17 +61,11 @@ public class ModelTesting extends AbstractApplicationTab{
 		super("Neural net testing");
 
 		Properties properties = Application.getInstance().getProperties();
-		String creatorPath = properties.getProperty(SCKeys.DATA_CREATION_IMPL_PATH);
-		String creatorName = properties.getProperty(SCKeys.DATA_CREATION_IMPL_NAME);
-		String[] creatorDecorations = properties.getProperty(SCKeys.DATA_CREATION_DECORATIION).split(";");
-				
-		datasetCreator = ADatasetCreator.getDatasetCreator(creatorName, creatorPath, creatorDecorations);
-		
-		modelCreator = Factory.getInstance(properties.getProperty(SCKeys.TRAINING_MODEL_IMPL_NAME),
-				properties.getProperty(SCKeys.TRAINING_MODEL_IMPL_PATH));
-		
+		datasetCreator = SymbolClassificationSystem.getDatasetCreator(properties);		
+		modelCreator = SymbolClassificationSystem.getModelCreator(properties);
 		compositeModel = new CompositeSymbolClassifier();
-		String modelFolder = properties.getProperty(SCKeys.TRAINING_MODEl_OUTPUT_KEY);
+		
+		String modelFolder = SymbolClassificationSystem.getModelFolder(properties);
 
 		setLayout(new MigLayout("","[][][][grow]","[]10[][grow][]"));
 		

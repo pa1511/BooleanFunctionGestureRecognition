@@ -1,4 +1,4 @@
-package application.neural.symbolClassification;
+package application.neural.symbolClassification.classifier;
 
 import java.io.File;
 import java.util.function.IntConsumer;
@@ -33,9 +33,13 @@ import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
 import org.nd4j.linalg.factory.Nd4j;
 import org.nd4j.linalg.lossfunctions.LossFunctions.LossFunction;
 
+import application.neural.symbolClassification.ISCModelCreator;
+import application.neural.symbolClassification.ISymbolClassifier;
+import application.neural.symbolClassification.SCModelOutputInterpreter;
+import application.neural.symbolClassification.SymbolClassificationSystem;
 import log.Log;
 
-public class SCModelCreator implements ISCModelCreator {
+public class SymbolNetworkBasedClassifierModelCreator implements ISCModelCreator {
 
 	private @Nonnull WeightInit weightInit;
 	private @Nonnull Activation activationMethod;
@@ -44,7 +48,7 @@ public class SCModelCreator implements ISCModelCreator {
 	private @Nonnull OptimizationAlgorithm optimizationAlgorithm;
 	private @Nonnull Updater updater;
 
-	public SCModelCreator() {
+	public SymbolNetworkBasedClassifierModelCreator() {
 		weightInit  = WeightInit.XAVIER;
 		//TANH and SIGMOID have proven very good
 		activationMethod = Activation.SIGMOID;
@@ -131,7 +135,7 @@ public class SCModelCreator implements ISCModelCreator {
 	    
 		
 		SCModelOutputInterpreter modelOutputInterpreter = new SCModelOutputInterpreter(trainDataFileName.getParent()+File.separator+
-				SCUtilities.modelMetaDataFileNameFromTrainFile(trainDataFileName.getName()));
+				SymbolClassificationSystem.modelMetaDataFileNameFromTrainFile(trainDataFileName.getName()));
 		
 		return new SymbolNetworkBasedClassifier(model, modelOutputInterpreter,trainDataFileName.getName());
 	}

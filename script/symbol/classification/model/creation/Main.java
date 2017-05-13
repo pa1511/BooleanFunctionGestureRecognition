@@ -19,9 +19,9 @@ import application.data.model.Symbol;
 import application.data.source.H2Database;
 import application.data.source.IDataSource;
 import application.neural.symbolClassification.ISymbolClassifier;
-import application.neural.symbolClassification.SCKeys;
-import application.neural.symbolClassification.SCModelCreator;
-import application.neural.symbolClassification.StatisticsCalculator;
+import application.neural.symbolClassification.SymbolClassificationSystem;
+import application.neural.symbolClassification.classifier.SymbolNetworkBasedClassifierModelCreator;
+import application.neural.symbolClassification.statistics.StatisticsCalculator;
 import log.Log;
 
 public class Main {
@@ -75,13 +75,9 @@ public class Main {
 
 		}
 
-		String creatorPath = properties.getProperty(SCKeys.DATA_CREATION_IMPL_PATH);
-		String creatorName = properties.getProperty(SCKeys.DATA_CREATION_IMPL_NAME);
-		String[] creatorDecorations = properties.getProperty(SCKeys.DATA_CREATION_DECORATIION).split(";");
-				
-		ADatasetCreator datasetCreator = ADatasetCreator.getDatasetCreator(creatorName, creatorPath, creatorDecorations);
+		ADatasetCreator datasetCreator = SymbolClassificationSystem.getDatasetCreator(properties);
 		
-		SCModelCreator modelCreator = new SCModelCreator();
+		SymbolNetworkBasedClassifierModelCreator modelCreator = new SymbolNetworkBasedClassifierModelCreator();
 
 		for (int[] hiddenNodes : hidenNodesConfigs) {
 			for (Updater updater : updaterConfig) {

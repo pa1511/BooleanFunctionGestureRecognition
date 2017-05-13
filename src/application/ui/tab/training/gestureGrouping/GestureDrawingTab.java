@@ -26,9 +26,9 @@ import application.data.model.Expression;
 import application.data.model.Gesture;
 import application.data.model.Symbol;
 import application.data.model.geometry.MouseClickType;
-import application.gestureGrouping.GGKeys;
+import application.gestureGrouping.GestureGroupingSystem;
 import application.gestureGrouping.IGestureGrouper;
-import application.neural.symbolClassification.SymbolDistanceClassifier;
+import application.neural.symbolClassification.classifier.SymbolDistanceClassifier;
 import application.parse.BooleanParser;
 import application.parse.BooleanSpatialParser;
 import application.parse.ParserKeys;
@@ -70,16 +70,11 @@ public class GestureDrawingTab extends AbstractApplicationTab{
 	public GestureDrawingTab() throws Exception {
 		super("Drawing");
 		
-		Properties applicationProperties = Application.getInstance().getProperties();
-		ILexicalAnalyzer lexicalAnalyzer = Factory.getInstance(applicationProperties.getProperty(ParserKeys.LEXICAL_ANALYZER_KEY));
+		Properties properties = Application.getInstance().getProperties();
+		ILexicalAnalyzer lexicalAnalyzer = Factory.getInstance(properties.getProperty(ParserKeys.LEXICAL_ANALYZER_KEY));
 
 		spatialParser = new BooleanSpatialParser(lexicalAnalyzer);
-
-		
-		String gestureGrouperClassName = applicationProperties.getProperty(GGKeys.GESTURE_GROUPING_IMPL_NAME);
-		String gestureGrouperPath = applicationProperties.getProperty(GGKeys.GESTURE_GROUPING_IMPL_PATH);
-		
-		gestureGrouper = Factory.getInstance(gestureGrouperClassName, gestureGrouperPath);
+		gestureGrouper = GestureGroupingSystem.getGestureGrouper(properties);
 		
 		//set tab  layout
 		setLayout(new BorderLayout());

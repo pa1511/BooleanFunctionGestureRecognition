@@ -25,7 +25,7 @@ import javax.swing.SpinnerNumberModel;
 import application.AbstractApplicationTab;
 import application.Application;
 import application.data.handling.dataset.ADatasetCreator;
-import application.neural.symbolClassification.SCKeys;
+import application.neural.symbolClassification.SymbolClassificationSystem;
 import application.ui.table.SymbolInformationTableModel;
 import dataset.ClassificationDataSet;
 import dataset.handeling.DataSetDepositers;
@@ -52,19 +52,15 @@ public class DatasetCreationPanel extends AbstractApplicationTab{
 		super("Dataset creation");
 		
 		Properties properties = Application.getInstance().getProperties();
-		String creatorPath = properties.getProperty(SCKeys.DATA_CREATION_IMPL_PATH);
-		String creatorName = properties.getProperty(SCKeys.DATA_CREATION_IMPL_NAME);
-		String[] creatorDecorations = properties.getProperty(SCKeys.DATA_CREATION_DECORATIION).split(";");
+		datasetCreator = SymbolClassificationSystem.getDatasetCreator(properties);
 				
-		datasetCreator = ADatasetCreator.getDatasetCreator(creatorName, creatorPath, creatorDecorations);
-		
 		symbolsField = new JTextField("A:1000,B:1000,+:1000,*:1000,!:1000,1:1000,0:1000,(:1000,):1000");
 		JLabel instructionLabel = new JLabel("<html>Input the symbols you whish the system to use like this: \"A:10,B:20\".</br> The meaning is use the symbol and this amount of learning examples.</html>");
 		Font instructionFont = instructionLabel.getFont().deriveFont(Font.ITALIC);
 		instructionLabel.setFont(instructionFont);
 		JButton selectOutputFolderButton = new JButton(new SelectDirectoryAction());
 		JLabel outputLabel = new JLabel("output folder: " );		
-		String outputFolderLocation = properties.getProperty(SCKeys.TRAINING_DATA_OUTPUT_KEY);
+		String outputFolderLocation = SymbolClassificationSystem.getTrainingDataFolder(properties);
 		outputFolder = new File(outputFolderLocation);
 		outputFolderField = new JTextField(outputFolder.getAbsolutePath());
 		
