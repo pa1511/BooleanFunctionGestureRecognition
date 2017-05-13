@@ -24,7 +24,7 @@ import javax.swing.SpinnerNumberModel;
 
 import application.AbstractApplicationTab;
 import application.Application;
-import application.data.handling.dataset.ADatasetCreator;
+import application.data.dataset.ADatasetCreator;
 import application.symbolClassification.SymbolClassificationSystem;
 import application.ui.table.SymbolInformationTableModel;
 import dataset.ClassificationDataSet;

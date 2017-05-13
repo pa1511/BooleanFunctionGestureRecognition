@@ -1,4 +1,4 @@
-package application.data.handling;
+package application.data.model.handling;
 
 import java.awt.Point;
 import java.awt.Rectangle;
@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
 
+import application.data.geometry.PointTransformations;
 import application.data.model.Gesture;
 import application.data.model.Symbol;
 import utilities.random.RNGProvider;

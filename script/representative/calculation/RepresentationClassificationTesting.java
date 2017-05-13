@@ -8,8 +8,8 @@ import java.util.Properties;
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Multiset;
 
-import application.data.handling.dataset.ADatasetCreator;
-import application.data.handling.dataset.SortDatasetCreator;
+import application.data.dataset.ADatasetCreator;
+import application.data.dataset.SortDatasetCreator;
 import application.data.model.Symbol;
 import application.data.source.H2Database;
 import application.data.source.IDataSource;

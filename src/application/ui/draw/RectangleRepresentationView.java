@@ -10,7 +10,7 @@ import javax.annotation.Nonnull;
 import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 
-import application.data.handling.PointTransformations;
+import application.data.geometry.PointTransformations;
 import dataModels.Pair;
 
 public class RectangleRepresentationView extends JPanel {

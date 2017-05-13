@@ -27,10 +27,10 @@ import javax.swing.event.DocumentListener;
 
 import application.AbstractApplicationTab;
 import application.Application;
-import application.data.handling.ExpressionFactory;
+import application.data.geometry.MouseClickType;
 import application.data.model.Expression;
 import application.data.model.Gesture;
-import application.data.model.geometry.MouseClickType;
+import application.data.model.handling.ExpressionFactory;
 import application.parse.BooleanParser;
 import application.ui.draw.Canvas;
 import application.ui.draw.PerGestureView;

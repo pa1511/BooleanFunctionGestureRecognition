@@ -1,4 +1,4 @@
-package application.data.handling.dataset;
+package application.data.dataset;
 
 import java.io.File;
 import java.lang.reflect.Array;

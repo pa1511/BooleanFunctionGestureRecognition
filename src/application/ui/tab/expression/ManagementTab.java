@@ -10,8 +10,8 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
 import application.AbstractApplicationTab;
-import application.data.handling.ExpressionTransformations;
 import application.data.model.Expression;
+import application.data.model.handling.ExpressionTransformations;
 import application.ui.draw.Canvas;
 import application.ui.table.AExpressionManagementObserver;
 import application.ui.table.ExpressionManagementTable;

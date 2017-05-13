@@ -20,7 +20,7 @@ import javax.swing.SwingWorker;
 
 import application.AbstractApplicationTab;
 import application.Application;
-import application.data.handling.dataset.ADatasetCreator;
+import application.data.dataset.ADatasetCreator;
 import application.symbolClassification.ISCModelCreator;
 import application.symbolClassification.ISymbolClassifier;
 import application.symbolClassification.SymbolClassificationSystem;

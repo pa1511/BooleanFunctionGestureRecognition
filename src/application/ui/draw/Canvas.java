@@ -17,7 +17,7 @@ import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
-import application.data.model.geometry.MouseClickType;
+import application.data.geometry.MouseClickType;
 import dataModels.Pair;
 import observer.StrictObservationManager;
 

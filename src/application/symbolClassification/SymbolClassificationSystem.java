@@ -4,7 +4,7 @@ import java.util.Properties;
 
 import javax.annotation.Nonnull;
 
-import application.data.handling.dataset.ADatasetCreator;
+import application.data.dataset.ADatasetCreator;
 import generalfactory.Factory;
 
 public class SymbolClassificationSystem {

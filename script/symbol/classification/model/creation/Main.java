@@ -14,7 +14,7 @@ import org.nd4j.linalg.activations.Activation;
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Multiset;
 
-import application.data.handling.dataset.ADatasetCreator;
+import application.data.dataset.ADatasetCreator;
 import application.data.model.Symbol;
 import application.data.source.H2Database;
 import application.data.source.IDataSource;

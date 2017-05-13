@@ -22,10 +22,10 @@ import javax.swing.SwingUtilities;
 
 import application.AbstractApplicationTab;
 import application.Application;
+import application.data.geometry.MouseClickType;
 import application.data.model.Expression;
 import application.data.model.Gesture;
 import application.data.model.Symbol;
-import application.data.model.geometry.MouseClickType;
 import application.gestureGrouping.GestureGroupingSystem;
 import application.gestureGrouping.IGestureGrouper;
 import application.parse.BooleanParser;

@@ -5,7 +5,7 @@ import java.util.List;
 
 import javax.annotation.Nonnull;
 
-import application.data.model.geometry.MouseClickType;
+import application.data.geometry.MouseClickType;
 import dataModels.Pair;
 import observer.AbstractObserver;
 

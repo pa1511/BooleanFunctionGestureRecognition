@@ -13,8 +13,8 @@ import javax.annotation.Nonnull;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import application.data.geometry.RelativePoint;
 import application.data.model.Gesture;
-import application.data.model.geometry.RelativePoint;
 
 public class GesturePanel extends JPanel{
 

@@ -1,4 +1,4 @@
-package application.data.model.geometry;
+package application.data.geometry;
 
 import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;

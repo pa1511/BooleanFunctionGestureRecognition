@@ -1,4 +1,4 @@
-package application.data.handling;
+package application.data.model.handling;
 
 import javax.annotation.Nonnull;
 

@@ -24,11 +24,11 @@ import javax.swing.SwingUtilities;
 
 import application.AbstractApplicationTab;
 import application.Application;
-import application.data.handling.ExpressionTransformations;
-import application.data.handling.SymbolTransformations;
 import application.data.model.Expression;
 import application.data.model.ExpressionType;
 import application.data.model.Symbol;
+import application.data.model.handling.ExpressionTransformations;
+import application.data.model.handling.SymbolTransformations;
 import application.parse.BooleanParser;
 import application.parse.BooleanSpatialParser;
 import application.parse.ParserKeys;

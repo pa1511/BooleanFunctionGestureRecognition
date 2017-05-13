@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 
 import application.Application;
-import application.data.handling.dataset.ADatasetCreator;
+import application.data.dataset.ADatasetCreator;
 import application.data.model.Gesture;
 import application.data.model.Symbol;
 import application.gestureGrouping.IGestureGrouper;

@@ -11,8 +11,8 @@ import java.util.stream.Collectors;
 
 import javax.annotation.Nonnull;
 
-import application.data.handling.SymbolTransformations;
 import application.data.model.Symbol;
+import application.data.model.handling.SymbolTransformations;
 import application.parse.lexic.ILexicalAnalyzer;
 import application.parse.lexic.token.LexicalToken;
 import application.parse.syntactic.node.BooleanNodeFactory;

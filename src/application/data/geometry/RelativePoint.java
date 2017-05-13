@@ -1,4 +1,4 @@
-package application.data.model.geometry;
+package application.data.geometry;
 
 import java.awt.Point;
 

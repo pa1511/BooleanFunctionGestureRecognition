@@ -1,4 +1,4 @@
-package application.data.handling.dataset;
+package application.data.dataset;
 
 import java.util.LinkedHashMap;
 import java.util.List;

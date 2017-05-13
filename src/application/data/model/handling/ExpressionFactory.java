@@ -1,14 +1,14 @@
-package application.data.handling;
+package application.data.model.handling;
 
 import java.awt.Point;
 import java.util.List;
 
 import javax.annotation.Nonnull;
 
+import application.data.geometry.MouseClickType;
 import application.data.model.Expression;
 import application.data.model.Gesture;
 import application.data.model.Symbol;
-import application.data.model.geometry.MouseClickType;
 import dataModels.Pair;
 
 public class ExpressionFactory {

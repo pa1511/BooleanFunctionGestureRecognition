@@ -14,7 +14,7 @@ import org.deeplearning4j.util.ModelSerializer;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.factory.Nd4j;
 
-import application.data.handling.dataset.ADatasetCreator;
+import application.data.dataset.ADatasetCreator;
 import application.data.model.Gesture;
 import application.symbolClassification.ISymbolClassifier;
 import application.symbolClassification.SCModelOutputInterpreter;

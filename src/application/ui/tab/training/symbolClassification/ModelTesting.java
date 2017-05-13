@@ -22,10 +22,10 @@ import javax.swing.KeyStroke;
 
 import application.AbstractApplicationTab;
 import application.Application;
-import application.data.handling.GestureFactory;
-import application.data.handling.dataset.ADatasetCreator;
+import application.data.dataset.ADatasetCreator;
 import application.data.model.Gesture;
 import application.data.model.Symbol;
+import application.data.model.handling.GestureFactory;
 import application.data.source.IDataSource;
 import application.symbolClassification.ISCModelCreator;
 import application.symbolClassification.SymbolClassificationSystem;

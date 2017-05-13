@@ -16,12 +16,12 @@ import java.util.function.Supplier;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 
-import application.data.handling.GestureTransformations;
 import application.data.model.Expression;
 import application.data.model.ExpressionType;
 import application.data.model.Gesture;
 import application.data.model.Symbol;
 import application.data.model.SymbolSamplesInformation;
+import application.data.model.handling.GestureTransformations;
 import dataModels.Pair;
 import database.H2DatabaseSupport;
 import log.Log;

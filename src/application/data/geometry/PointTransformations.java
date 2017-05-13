@@ -1,4 +1,4 @@
-package application.data.handling;
+package application.data.geometry;
 
 import java.awt.Point;
 import java.awt.Rectangle;
