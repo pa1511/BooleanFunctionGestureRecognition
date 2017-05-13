@@ -5,9 +5,10 @@ import java.util.Properties;
 import javax.annotation.Nonnull;
 
 import application.data.dataset.ADatasetCreator;
+import application.system.ASystem;
 import generalfactory.Factory;
 
-public class SymbolClassificationSystem {
+public class SymbolClassificationSystem extends ASystem {
 
 	private SymbolClassificationSystem() {}
 	

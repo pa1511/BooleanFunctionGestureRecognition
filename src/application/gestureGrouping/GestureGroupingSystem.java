@@ -4,9 +4,9 @@ import java.util.Properties;
 
 import javax.annotation.Nonnull;
 
-import generalfactory.Factory;
+import application.system.ASystem;
 
-public class GestureGroupingSystem {
+public class GestureGroupingSystem extends ASystem{
 
 	private GestureGroupingSystem() {
 	}
@@ -15,11 +15,8 @@ public class GestureGroupingSystem {
 	private static final @Nonnull String GESTURE_GROUPING_IMPL_NAME = "gesture.grouping.impl.name";
 
 	public static IGestureGrouper getGestureGrouper(Properties properties) throws Exception {
-
-		String gestureGrouperClassName = properties.getProperty(GestureGroupingSystem.GESTURE_GROUPING_IMPL_NAME);
-		String gestureGrouperPath = properties.getProperty(GestureGroupingSystem.GESTURE_GROUPING_IMPL_PATH);
-
-		return Factory.getInstance(gestureGrouperClassName, gestureGrouperPath);
+		return ASystem.getImplementation(properties, GestureGroupingSystem.GESTURE_GROUPING_IMPL_PATH,
+				GestureGroupingSystem.GESTURE_GROUPING_IMPL_NAME);
 	}
 	
 }
