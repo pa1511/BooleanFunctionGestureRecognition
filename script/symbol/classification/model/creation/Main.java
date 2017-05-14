@@ -39,14 +39,14 @@ public class Main {
 		File inputFile = new File(userDir, fileNameTrain);
 		int nEpochs = 10000;
 		int iterationCount = 2;
-		double[] scoreLimits = new double[]{1e-3};
+		double[] scoreLimits = new double[]{5e-2};
 		int numInputs = ADatasetCreator.getNumberOfInputsFrom(inputFile);
 		int numOutputs = ADatasetCreator.getNumberOfOutputsFrom(inputFile);
-		int[][] hidenNodesConfigs = new int[][] { { 30, 30, 30, 30}/*, { 26, 24 }, { 24, 22 }, { 22, 20 } */};
+		int[][] hidenNodesConfigs = new int[][] { { 31, 31, 31, 31}/*, { 26, 24 }, { 24, 22 }, { 22, 20 } */};
 		double[] learningRateConfigs = new double[] { 0.05 /*,5e-3, 1e-2*/ };
-		int[] batchSizeConfigs = new int[] {80};
+		int[] batchSizeConfigs = new int[] {50};
 
-		Activation[] activationMethodConfig = new Activation[] { Activation.RELU,Activation.LEAKYRELU/*Activation.SIGMOID, Activation.TANH,  Activation.RATIONALTANH, Activation.HARDTANH*/ };
+		Activation[] activationMethodConfig = new Activation[] { Activation.RRELU,Activation.RELU,Activation.ELU/*Activation.SIGMOID, Activation.TANH,  Activation.RATIONALTANH, Activation.HARDTANH*/ };
 		Updater[] updaterConfig = new Updater[] { Updater.ADAM };
 		
 		List<Symbol> symbols = new ArrayList<>();
@@ -55,7 +55,7 @@ public class Main {
 		try(InputStream inputStream = new FileInputStream(new File(userDir,"properties/model-creation-script/script.properties"))){
 			properties.load(inputStream);
 		}
-		try(final IDataSource dataSource = new H2Database(properties)){
+		try(final IDataSource dataSource = new H2Database("script",properties)){
 
 			Multiset<String> multiset = HashMultiset.create();
 			multiset.add("A", 200);

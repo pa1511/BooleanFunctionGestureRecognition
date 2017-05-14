@@ -22,7 +22,6 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 
-import application.AbstractApplicationTab;
 import application.Application;
 import application.data.model.Expression;
 import application.data.model.ExpressionType;
@@ -36,6 +35,7 @@ import application.expressionParse.VariableValueProvider;
 import application.expressionParse.syntactic.node.IBooleanExpressionNode;
 import application.ui.draw.Canvas;
 import application.ui.draw.RectangleRepresentationView;
+import application.ui.tab.AbstractApplicationTab;
 import application.ui.table.AExpressionManagementObserver;
 import application.ui.table.ExpressionEvaluationTableModel;
 import application.ui.table.ExpressionManagementTable;

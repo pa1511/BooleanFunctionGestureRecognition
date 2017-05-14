@@ -24,7 +24,6 @@ import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
-import application.AbstractApplicationTab;
 import application.Application;
 import application.data.geometry.MouseClickType;
 import application.data.model.Expression;
@@ -35,6 +34,7 @@ import application.ui.draw.Canvas;
 import application.ui.draw.PerGestureView;
 import application.ui.draw.ACanvasObserver;
 import application.ui.draw.RectangleRepresentationView;
+import application.ui.tab.AbstractApplicationTab;
 import dataModels.Pair;
 import log.Log;
 

@@ -6,7 +6,7 @@ import javax.annotation.CheckForNull;
 import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
 
-import application.IApplicationDataSource;
+import application.data.IApplicationDataSource;
 import application.data.model.Expression;
 import application.data.model.ExpressionType;
 import application.data.model.Symbol;

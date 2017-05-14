@@ -22,10 +22,12 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
 
-import application.AbstractApplicationTab;
 import application.Application;
 import application.data.dataset.ADatasetCreator;
+import application.listener.AbstractApplicationChangeListener;
+import application.listener.ApplicationChangeListener;
 import application.symbolClassification.SymbolClassificationSystem;
+import application.ui.tab.AbstractApplicationTab;
 import application.ui.table.SymbolInformationTableModel;
 import dataset.ClassificationDataSet;
 import dataset.handeling.DataSetDepositers;
@@ -46,6 +48,8 @@ public class DatasetCreationPanel extends AbstractApplicationTab{
 	private @CheckForNull File outputFolder = null;
 	
 	private final @Nonnull ADatasetCreator datasetCreator;
+	
+	private final @Nonnull ApplicationChangeListener applicationChangeListener;
 	
 	public DatasetCreationPanel() throws Exception {
 
@@ -109,6 +113,22 @@ public class DatasetCreationPanel extends AbstractApplicationTab{
 		//Row 8
 		add(new JButton(symbolInformationTableModel.getStandardAction(SymbolInformationTableModel.ACTION_RELOAD)), "span, alignx right, wrap");
 		
+		//========================================================================================
+		applicationChangeListener = new AbstractApplicationChangeListener() {
+			
+			@Override
+			public void dataSourceChanged() {
+				symbolInformationTableModel.getStandardAction(SymbolInformationTableModel.ACTION_RELOAD).actionPerformed(null);
+			}
+		};
+		Application.getInstance().observationManager.addObserver(applicationChangeListener);
+
+	}
+	
+	@Override
+	public void close() throws Exception {
+		super.close();
+		Application.getInstance().observationManager.removeObserver(applicationChangeListener);
 	}
 	
 	private final class SelectDirectoryAction extends CommonUIActions.SelectDirectory {

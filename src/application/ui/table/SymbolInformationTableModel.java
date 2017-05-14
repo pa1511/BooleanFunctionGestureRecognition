@@ -27,14 +27,13 @@ public class SymbolInformationTableModel extends AbstractTableModel {
 
 	private final @Nonnull Action[] standardActions;
 	public static final @Nonnull String ACTION_RELOAD = "Reload";
-
 	
 	public SymbolInformationTableModel() {
 		//TODO: count
 		columnNames = new String[]{"Row#","Symbol","Simple sample",/*"Complex sample"*/};
 		
 		symbolsInfo = new UnsafeLazy<>(()->{
-			try {
+			try { 
 				List<SymbolSamplesInformation> information = Application.getInstance().getDataSource().getSymbolSamplesInformation();
 				Collections.sort(information, (inf1,inf2) -> inf1.symbol.compareTo(inf2.symbol));
 				return information;
@@ -61,7 +60,6 @@ public class SymbolInformationTableModel extends AbstractTableModel {
 				}
 		};
 
-		
 	}
 	
 	private void resetSymbolInfoCount() {

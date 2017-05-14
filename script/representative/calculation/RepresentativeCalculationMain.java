@@ -39,7 +39,7 @@ public class RepresentativeCalculationMain {
 		
 		List<Symbol> symbols = new ArrayList<>();
 
-		try(IDataSource ds = new H2Database(properties)){
+		try(IDataSource ds = new H2Database("script",properties)){
 			
 			Multiset<String> multiset = HashMultiset.create();
 			multiset.add("A", 1000);

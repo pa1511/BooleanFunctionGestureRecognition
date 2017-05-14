@@ -12,13 +12,13 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 
-import application.AbstractApplicationTab;
 import application.Application;
 import application.expressionParse.IBooleanTextParser;
 import application.expressionParse.ParserSystem;
 import application.expressionParse.VariableValueProvider;
 import application.expressionParse.syntactic.node.IBooleanExpressionNode;
 import application.ui.action.EvaluateAction;
+import application.ui.tab.AbstractApplicationTab;
 import application.ui.table.ExpressionEvaluationTableModel;
 
 public class EvaluationTab extends AbstractApplicationTab{

@@ -24,6 +24,7 @@ import application.data.model.SymbolSamplesInformation;
 import application.data.model.handling.GestureTransformations;
 import dataModels.Pair;
 import database.H2DatabaseSupport;
+import generalfactory.Factory;
 import log.Log;
 import utilities.lazy.Lazy;
 import utilities.lazy.LazyAutoCloseable;
@@ -56,12 +57,20 @@ public final class H2Database implements IDataSource {
 
 	// Database connection
 	private final @Nonnull LazyAutoCloseable<Connection> dbConnection;
+	private final @Nonnull String identifier;
 		
-	public H2Database(Properties properties) {
+	public H2Database(String sourceIdentifier, Properties properties) {
 		
-		String user = properties.getProperty(DATA_SOURCE_USER_KEY);
-		String password = properties.getProperty(DATA_SOURCE_PASSWORD_KEY);
-		String dbLocation = properties.getProperty(DATA_SOURCE_LOCATION_KEY) + properties.getProperty(DATA_SOURCE_NAME_KEY);
+		this.identifier = sourceIdentifier;
+		
+		String userKey = Factory.combine(DATA_SOURCE_USER_KEY,sourceIdentifier);
+		String passwordKey = Factory.combine(DATA_SOURCE_PASSWORD_KEY,sourceIdentifier);
+		String nameKey = Factory.combine(DATA_SOURCE_NAME_KEY,sourceIdentifier);
+		String dbLocationKey = Factory.combine(DATA_SOURCE_LOCATION_KEY,sourceIdentifier);
+		
+		String user = properties.getProperty(userKey);
+		String password = properties.getProperty(passwordKey);
+		String dbLocation = properties.getProperty(dbLocationKey) + properties.getProperty(nameKey);		
 		
 		final String dbConnectionString = "jdbc:h2:" + dbLocation;
 
@@ -91,6 +100,11 @@ public final class H2Database implements IDataSource {
 		
 		dbConnection = new LazyAutoCloseable<>(new Lazy<>(connectionSupplier));
 
+	}
+	
+	@Override
+	public String getName() {
+		return identifier;
 	}
 
 	private void initializeDBTables(Connection connection) throws SQLException {

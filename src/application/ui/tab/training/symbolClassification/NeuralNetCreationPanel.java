@@ -18,12 +18,12 @@ import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingWorker;
 
-import application.AbstractApplicationTab;
 import application.Application;
 import application.data.dataset.ADatasetCreator;
 import application.symbolClassification.ISCModelCreator;
 import application.symbolClassification.ISymbolClassifier;
 import application.symbolClassification.SymbolClassificationSystem;
+import application.ui.tab.AbstractApplicationTab;
 import log.Log;
 import net.miginfocom.swing.MigLayout;
 import ui.CommonUIActions;

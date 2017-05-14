@@ -13,6 +13,7 @@ import javax.swing.UIManager;
 import application.data.source.IDataSource;
 import generalfactory.Factory;
 import log.Log;
+import utilities.function.ExceptionMaskingSupplier;
 
 /**
  * Implementation of {@link AApplication}. <br>
@@ -31,9 +32,10 @@ public class Application extends AApplication {
 	private static final @Nonnull String LOG_LOCATION_KEY = "log.location";
 	private static final @Nonnull String LOG_KEEP_KEY = "log.keep";
 	
+	private static final @Nonnull String DATA_SOURCES_KEY = "data.sources";
 	private static final @Nonnull String DATA_SOURCE_IMPL_KEY = "data.source.impl";
 	private static final @Nonnull String DATA_SOURCE_IMPL_PATH_KEY = "data.source.impl.path";
-	private static final @Nonnull String DATA_SOURCE_DECORATION  = "data.source.impl.decoration";
+	private static final @Nonnull String DATA_SOURCE_DECORATION_KEY  = "data.source.impl.decoration";
 		
 	public static final @Nonnull String UI_TAB_PATH_KEY = "tab.path";
 	public static final @Nonnull String UI_TAB_NAMES_KEY = "tab.names";
@@ -55,22 +57,37 @@ public class Application extends AApplication {
 	}
 
 	
-	@SuppressWarnings({ "resource", "hiding" })
 	@Override
-	protected void initializeApplicationDataSource() throws Exception {
-		String className = properties.getProperty(DATA_SOURCE_IMPL_KEY);
-		String dataSourcePath = properties.getProperty(DATA_SOURCE_IMPL_PATH_KEY);
+	protected void initializeApplicationDataSources() throws Exception {
+		
+		String[] dataSources = properties.getProperty(DATA_SOURCES_KEY).split(";");
+		this.possibleDataSources.setInstance(dataSources); 
+		this.dataSource.setProvider(ExceptionMaskingSupplier.mask(()->loadSingleDataSource(dataSources[0])));
+	}
+
+	@Override
+	@SuppressWarnings({ "resource", "hiding" })
+	protected IDataSource loadSingleDataSource(String dataSourceIdentifier) throws Exception {
+		String dataSourceImplKey = Factory.combine(DATA_SOURCE_IMPL_KEY,dataSourceIdentifier);
+		String dataSourceImplPathKey = Factory.combine(DATA_SOURCE_IMPL_PATH_KEY,dataSourceIdentifier);
+		String dataSourceDecorationKey = Factory.combine(DATA_SOURCE_DECORATION_KEY,dataSourceIdentifier);
+		
+		String className = properties.getProperty(dataSourceImplKey);
+		String dataSourcePath = properties.getProperty(dataSourceImplPathKey);
 		
 		IDataSource dataSource = Factory.getInstance(
 				className,
 				dataSourcePath,
-				new Class<?>[]{ properties.getClass()},
-				new Object[]{ properties});
+				new Class<?>[]{ String.class,properties.getClass()},
+				new Object[]{ dataSourceIdentifier,properties});
 		
-		String[] decorations = properties.getProperty(DATA_SOURCE_DECORATION).split(";");
-		dataSource = Factory.decorate(IDataSource.class, dataSourcePath, dataSource, decorations);
+		String decorationsValue = properties.getProperty(dataSourceDecorationKey);
+		if(decorationsValue!=null){
+			String[] decorations = decorationsValue.split(";");
+			dataSource = Factory.decorate(IDataSource.class, dataSourcePath, dataSource, decorations);
+		}
 		
-		this.dataSource.setInstance(dataSource);
+		return dataSource;
 	}
 
 	@Override
@@ -110,7 +127,7 @@ public class Application extends AApplication {
 
 	@Override
 	public IDataSource getDataSource() {
-		return (IDataSource) dataSource.get();
+		return (IDataSource) super.dataSource.get();
 	}
 
 	
@@ -120,4 +137,5 @@ public class Application extends AApplication {
 		int fewToKeep = Integer.parseInt(properties.getProperty(LOG_KEEP_KEY));
 		Log.deleteAllExceptLast(fewToKeep);
 	}
+
 }

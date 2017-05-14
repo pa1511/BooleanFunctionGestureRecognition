@@ -20,18 +20,20 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 
-import application.AbstractApplicationTab;
 import application.Application;
 import application.data.dataset.ADatasetCreator;
 import application.data.model.Gesture;
 import application.data.model.Symbol;
 import application.data.model.handling.GestureFactory;
 import application.data.source.IDataSource;
+import application.gestureGrouping.GestureGroupingSystem;
 import application.symbolClassification.ISCModelCreator;
+import application.symbolClassification.ISymbolClassifier;
 import application.symbolClassification.SymbolClassificationSystem;
 import application.symbolClassification.classifier.CompositeSymbolClassifier;
 import application.symbolClassification.statistics.StatisticsCalculator;
 import application.ui.draw.Canvas;
+import application.ui.tab.AbstractApplicationTab;
 import log.Log;
 import net.miginfocom.swing.MigLayout;
 import ui.CommonUIActions;
@@ -67,9 +69,9 @@ public class SymbolClassificationModelTesting extends AbstractApplicationTab{
 		
 		String modelFolder = SymbolClassificationSystem.getModelFolder(properties);
 
-		setLayout(new MigLayout("","[][][][grow]","[]10[][grow][]"));
+		setLayout(new MigLayout("","[][][][grow]","[][]10[][grow][]"));
 		
-		//Row 1
+		//Row 0
 		JButton selectModelButton = new JButton(new LoadModelAction("Select",modelFolder));
 		JLabel modelNameLabel = new JLabel("current model: ");
 		modelNameLabel.setFont(modelNameLabel.getFont().deriveFont(Font.ITALIC));
@@ -79,6 +81,23 @@ public class SymbolClassificationModelTesting extends AbstractApplicationTab{
 		currentModelName = new JTextField();
 		currentModelName.setEditable(false);
 		add(currentModelName,"span, growx, wrap");
+		
+		//Row 1
+		JButton runAutomaticTestingOnGestureGroupingModel = new JButton(new AbstractAction("gesture grouping model") {
+			
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				try {
+					ISymbolClassifier classifier = GestureGroupingSystem.getBaseSymbolClassifier(properties);
+					add(classifier);
+				} catch (Exception e) {
+					Log.addError(e);
+					JOptionPane.showMessageDialog(null, "Could not load gesture grouping symbol classifier.", "Error", JOptionPane.ERROR_MESSAGE);
+				}
+			}
+		});
+		add(runAutomaticTestingOnGestureGroupingModel,"span, wrap");
+		
 				
 		//Row 2
 		predictedSymbolField = new JTextField();
@@ -142,6 +161,7 @@ public class SymbolClassificationModelTesting extends AbstractApplicationTab{
 		JButton runAutomaticTesting = new JButton(new RunAutomaticTesting("Run automatic testing"));
 		add(runAutomaticTesting,"span, alignx right, wrap");
 		
+		
 		//Initialize keyboardActions
 		registerKeyboardActions(selectModelButton);
 	}
@@ -152,7 +172,16 @@ public class SymbolClassificationModelTesting extends AbstractApplicationTab{
 		component.registerKeyboardAction(clearAction, 
 				KeyStroke.getKeyStroke(KeyEvent.VK_C, KeyEvent.CTRL_DOWN_MASK + KeyEvent.SHIFT_DOWN_MASK), JComponent.WHEN_FOCUSED);
 	}
+	
+	private void add(ISymbolClassifier symbolClassifier) {
+		compositeModel.addClassifier(symbolClassifier);
+		currentModelName.setText(currentModelName.getText()+"||"+symbolClassifier.getName());
+		testModelAction.setEnabled(true);
+	}
 
+	//=======================================================================================================================
+	//Actions
+	
 	private final class RunAutomaticTesting extends AbstractAction {
 		private RunAutomaticTesting(String name) {
 			super(name);
@@ -286,15 +315,15 @@ public class SymbolClassificationModelTesting extends AbstractApplicationTab{
 		@Override
 		public void doWithSelectedDirectory(@Nonnull File selectedFile) {
 			try {
-				compositeModel.addClassifier(modelCreator.loadSymbolClassifierFrom(selectedFile));
-				currentModelName.setText(currentModelName.getText()+"||"+selectedFile.getName());
-				testModelAction.setEnabled(true);
+				ISymbolClassifier symbolClassifier = modelCreator.loadSymbolClassifierFrom(selectedFile);
+				add(symbolClassifier);
 			} catch (Exception e) {
 				Log.addError(e);
 				JOptionPane.showMessageDialog(null, "Could not load model", "Error", JOptionPane.ERROR_MESSAGE);
 			}
 			
 		}
+
 	}
 
 }

@@ -32,6 +32,11 @@ public class BufferedDataSource implements IDataSource{
 		expressionCount = new int[all+1];
 		Arrays.fill(expressionCount, notInitialized);
 	}
+	
+	@Override
+	public String getName() {
+		return dataSource.getName();
+	}
 
 	@Override
 	public void store(@Nonnull Expression expression) throws Exception {

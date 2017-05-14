@@ -2,25 +2,29 @@ package application.ui.tab.training.gestureGrouping;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
+import java.awt.GridLayout;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
-import java.io.File;
+import java.awt.event.KeyEvent;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.Properties;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import javax.annotation.CheckForNull;
+import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
 import javax.swing.AbstractAction;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
+import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 
-import application.AbstractApplicationTab;
 import application.Application;
 import application.data.geometry.MouseClickType;
 import application.data.model.Expression;
@@ -32,11 +36,11 @@ import application.expressionParse.ParserSystem;
 import application.expressionParse.syntactic.node.IBooleanExpressionNode;
 import application.gestureGrouping.GestureGroupingSystem;
 import application.gestureGrouping.IGestureGrouper;
-import application.symbolClassification.classifier.SymbolDistanceClassifier;
 import application.ui.draw.Canvas;
 import application.ui.draw.PerGestureView;
 import application.ui.draw.ACanvasObserver;
 import application.ui.draw.RectangleRepresentationView;
+import application.ui.tab.AbstractApplicationTab;
 import dataModels.Pair;
 import log.Log;
 
@@ -47,11 +51,14 @@ public class GestureDrawingTab extends AbstractApplicationTab{
 	private final @Nonnull Canvas canvas;
 	private final @Nonnull RectangleRepresentationView rectangleRepresentationView;
 	private final @Nonnull PerGestureView perGestureView;
+	private final @Nonnull PerGestureView lastGestureView;
+	private final @Nonnull PerGestureView lastFewGestureView;
 
 	//Actions
 	private final @Nonnull UndoAction undoAction;
 	private final @Nonnull RedoAction redoAction;
 	private final @Nonnull GroupGesturesAction groupGesturesAction;
+	private final @Nonnull StoreLastGrouping storeLastGroupingAction;
 	private final @Nonnull ClearCanvasAction clearCanvasAction;
 	
 	//Listeners
@@ -60,15 +67,30 @@ public class GestureDrawingTab extends AbstractApplicationTab{
 	//Gesture grouper
 	private final @Nonnull IGestureGrouper gestureGrouper;
 	private @CheckForNull List<Symbol> lastGroupedSymbols;
+	private @CheckForNull List<Symbol> quickSingleGesturePrediction;
+	private @CheckForNull List<Symbol> quickFewGesturePrediction;
+
 	
 	//Spatial parser
 	private final @Nonnull IBooleanSpatialParser spatialParser;
+	
+	//Last few support
+	private final @CheckForNull List<Gesture> lastFewGestures;
+	private final @Nonnegative int lastFewLimit;
+	
+	//
+	private static final @Nonnull Function<? super Pair<MouseClickType, List<Point>>, ? extends Gesture> pointsToGesture = dataUnit -> new Gesture(dataUnit.right());
+
+
 
 	
 	public GestureDrawingTab() throws Exception {
 		super("Drawing");
 		
 		Properties properties = Application.getInstance().getProperties();
+		
+		lastFewGestures = new ArrayList<Gesture>();
+		lastFewLimit = GestureGroupingSystem.getMaxGesturesPerSymbol(properties);
 		
 		spatialParser = ParserSystem.getBooleanSpatialParser(properties);
 		gestureGrouper = GestureGroupingSystem.getGestureGrouper(properties);
@@ -79,11 +101,19 @@ public class GestureDrawingTab extends AbstractApplicationTab{
 		//Drawing canvas
 		canvas = new Canvas();
 		rectangleRepresentationView = new RectangleRepresentationView();
+		
+		lastGestureView = new PerGestureView();
+		lastFewGestureView = new PerGestureView();
 		perGestureView = new PerGestureView();
+		
+		JPanel perGestureViewHolder = new JPanel(new GridLayout(0, 1));
+		perGestureViewHolder.add(lastGestureView);
+		perGestureViewHolder.add(lastFewGestureView);
+		perGestureViewHolder.add(perGestureView);
 				
 		JPanel dataAbstractionPanel = new JPanel(new BorderLayout());
 		dataAbstractionPanel.add(rectangleRepresentationView, BorderLayout.CENTER);
-		dataAbstractionPanel.add(perGestureView,BorderLayout.SOUTH);
+		dataAbstractionPanel.add(perGestureViewHolder,BorderLayout.SOUTH);
 		
 		mainSplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, canvas, dataAbstractionPanel);
 		SwingUtilities.invokeLater(()->mainSplitPane.setDividerLocation(0.5));
@@ -92,8 +122,9 @@ public class GestureDrawingTab extends AbstractApplicationTab{
 		//Control panel
 		undoAction = new UndoAction();
 		redoAction = new RedoAction();
-		clearCanvasAction = new ClearCanvasAction();
 		groupGesturesAction = new GroupGesturesAction();
+		storeLastGroupingAction = new StoreLastGrouping();
+		clearCanvasAction = new ClearCanvasAction();
 		
 		undoAction.setEnabled(false);
 		redoAction.setEnabled(false);
@@ -101,38 +132,17 @@ public class GestureDrawingTab extends AbstractApplicationTab{
 		JPanel controlPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
 		controlPanel.add(new JButton(undoAction));
 		controlPanel.add(new JButton(redoAction));
-		controlPanel.add(new JButton(groupGesturesAction));
-		controlPanel.add(new JButton(new StoreLastGrouping()));
+		JButton groupButton = new JButton(groupGesturesAction);
+		controlPanel.add(groupButton);
+		controlPanel.add(new JButton(storeLastGroupingAction));
 		controlPanel.add(new JButton(clearCanvasAction));
 		add(controlPanel,BorderLayout.SOUTH);
+		registerKeyboardActions(controlPanel);
 		
 		canvasObserver = new CanvasObserver();
-		canvas.observationManager.addObserver(canvasObserver);
+		canvas.observationManager.addObserver(canvasObserver);		
 		
-		//===========================================================================================================
-		//TODO:Remove
-//		File representationFile = new File(System.getProperty("user.dir"),"training/symbol/data/output/representative-sorted-138.txt");
-//		SymbolDistanceClassifier symbolDistanceClassifier = new SymbolDistanceClassifier(representationFile);
-//		
-//		for(Map.Entry<String, double[]> representation:symbolDistanceClassifier.getRepresentations().entrySet()){
-//
-//			String symbol = representation.getKey();
-//			double[] points = representation.getValue();
-//			
-//			List<Point> gesturePoints = new ArrayList<>();
-//			
-//			for(int i=0;i<points.length;i+=2){
-//				points[i] = points[i] + 1;
-//				points[i+1] = points[i+1] + 1;
-//				gesturePoints.add(new Point((int)(points[i]*100), (int)(points[i+1]*100)));
-//			}
-//			
-//			
-//			Gesture gesture = new Gesture(gesturePoints);
-//			
-//			perGestureView.addGesture(symbol, gesture);
-//		}		
-		//===========================================================================================================
+		//SwingUtilities.invokeLater(()->groupButton.requestFocus());
 	}
 
 	private void forceRepaint() {
@@ -145,18 +155,56 @@ public class GestureDrawingTab extends AbstractApplicationTab{
 		canvas.observationManager.removeObserver(canvasObserver);
 		canvas.close();
 	}
+	
+	private void registerKeyboardActions(JPanel controlPanel) {
+		controlPanel.registerKeyboardAction(undoAction, 
+				KeyStroke.getKeyStroke(KeyEvent.VK_Z, KeyEvent.CTRL_DOWN_MASK), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+		controlPanel.registerKeyboardAction(redoAction, 
+				KeyStroke.getKeyStroke(KeyEvent.VK_Y, KeyEvent.CTRL_DOWN_MASK), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+		controlPanel.registerKeyboardAction(storeLastGroupingAction, 
+				KeyStroke.getKeyStroke(KeyEvent.VK_S, KeyEvent.CTRL_DOWN_MASK), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+		controlPanel.registerKeyboardAction(groupGesturesAction, 
+				KeyStroke.getKeyStroke(KeyEvent.VK_G, KeyEvent.CTRL_DOWN_MASK), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+		controlPanel.registerKeyboardAction(clearCanvasAction, 
+				KeyStroke.getKeyStroke(KeyEvent.VK_C, KeyEvent.CTRL_DOWN_MASK + KeyEvent.SHIFT_DOWN_MASK), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+	}
 
+	private void clearPerGestureViews() {
+		clearPerGestureViews(true, true, true);
+	}
+
+	private void clearPerGestureViews(boolean lastGroup, boolean lastFew, boolean last) {
+		if(last)
+			lastGestureView.clear();
+		if(lastFew)
+			lastFewGestureView.clear();
+		if(lastGroup)
+			perGestureView.clear();
+	}
+
+
+	private void clearGroupedSymbols() {
+		if(lastGroupedSymbols!=null)
+			lastGroupedSymbols.clear();
+		if(quickSingleGesturePrediction!=null)
+			quickSingleGesturePrediction.clear();
+		if(quickFewGesturePrediction!=null)
+			quickFewGesturePrediction.clear();
+		
+	}
 	
 	//========================================================================================================================
 
 	private final class CanvasObserver extends ACanvasObserver {
 			
+
 		@Override
 		public void clearUpdate() {
 			rectangleRepresentationView.clear();
-			perGestureView.clear();
-			if(lastGroupedSymbols!=null)
-				lastGroupedSymbols.clear();
+			if(lastFewGestures!=null)
+				lastFewGestures.clear();
+			clearPerGestureViews();
+			clearGroupedSymbols();
 
 			
 			undoAction.setEnabled(false);
@@ -165,14 +213,34 @@ public class GestureDrawingTab extends AbstractApplicationTab{
 			forceRepaint();
 		}
 
+
 		@Override
 		public void newInputUpdate(@Nonnull Pair<MouseClickType, List<Point>> relativePoints) {
 			
 			List<Point> points = relativePoints.right();
 			rectangleRepresentationView.createRectangle(points);
-			perGestureView.clear();
-			if(lastGroupedSymbols!=null)
-				lastGroupedSymbols.clear();
+			clearPerGestureViews(false,true,true);
+			
+			//============================================================================================
+			//TODO: remove
+			Gesture gesture = pointsToGesture.apply(relativePoints);
+			quickSingleGesturePrediction = gestureGrouper.group(Arrays.asList(gesture));
+			Symbol quickSymbol = quickSingleGesturePrediction.get(0);
+			lastGestureView.addGesture(quickSymbol.getSymbolAsString(), gesture);
+			
+			lastFewGestures.add(gesture);
+			if(lastFewGestures.size()>lastFewLimit){
+				lastFewGestures.remove(0);
+			}
+			quickFewGesturePrediction = gestureGrouper.group(lastFewGestures);
+			for(Symbol symbol:quickFewGesturePrediction){
+				String symbolAsString = symbol.getSymbolAsString();
+				for(Gesture symbolGesture:symbol.getGestures()){
+					lastFewGestureView.addGesture(symbolAsString, symbolGesture);
+				}
+			}
+			
+			//============================================================================================
 						
 			undoAction.setEnabled(true);
 			
@@ -184,9 +252,9 @@ public class GestureDrawingTab extends AbstractApplicationTab{
 			
 			rectangleRepresentationView.redo();
 			undoAction.setEnabled(true);
-			perGestureView.clear();
-			if(lastGroupedSymbols!=null)
-				lastGroupedSymbols.clear();
+			clearPerGestureViews();
+			clearGroupedSymbols();
+			lastFewGestures.clear();
 			
 			forceRepaint();
 		}
@@ -196,9 +264,9 @@ public class GestureDrawingTab extends AbstractApplicationTab{
 			
 			rectangleRepresentationView.undo();
 			redoAction.setEnabled(true);
-			perGestureView.clear();
-			if(lastGroupedSymbols!=null)
-				lastGroupedSymbols.clear();
+			clearPerGestureViews();
+			clearGroupedSymbols();
+			lastFewGestures.clear();
 			
 			forceRepaint();
 		}
@@ -246,9 +314,9 @@ public class GestureDrawingTab extends AbstractApplicationTab{
 		
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			perGestureView.clear();
+			clearPerGestureViews();
 
-			List<Gesture> inputData = canvas.getData().stream().map(dataUnit -> new Gesture(dataUnit.right())).collect(Collectors.toList());
+			List<Gesture> inputData = canvas.getData().stream().map(pointsToGesture).collect(Collectors.toList());
 			
 			lastGroupedSymbols = gestureGrouper.group(inputData);
 			

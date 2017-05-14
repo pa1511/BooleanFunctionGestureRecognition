@@ -42,7 +42,8 @@ public class DataTransferMain {
 		try(InputStream inStream = new FileInputStream(new File(System.getProperty("user.dir"),propFile))){
 			properties.load(inStream);
 		}
-		H2Database db = new H2Database(properties);
+		
+		H2Database db = new H2Database("db",properties);
 		return db;
 	}
 	

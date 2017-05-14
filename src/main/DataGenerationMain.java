@@ -5,8 +5,8 @@ import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
 import application.AApplication;
-import application.AApplicationFrame;
 import application.DataGenerationApplication;
+import application.ui.AApplicationFrame;
 import application.ui.ApplicationFrame;
 import log.Log;
 

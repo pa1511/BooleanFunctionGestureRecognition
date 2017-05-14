@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Properties;
 import java.util.stream.Collectors;
 
+import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
 
 import application.Application;
@@ -26,10 +27,8 @@ import utilities.lazy.ILazy;
 import utilities.lazy.UnsafeLazy;
 
 class SCModelBasedGestureGrouper implements IGestureGrouper{
-
 	
-	//TODO: extract
-	private static final @Nonnull int maxGesturesPerSymbol = 2;
+	private final @Nonnegative int maxGesturesPerSymbol;
 	
 	private final @Nonnull ILazy<ISymbolClassifier> symbolClassifierLazy;
 	private final @Nonnull ADatasetCreator datasetCreator;
@@ -42,7 +41,15 @@ class SCModelBasedGestureGrouper implements IGestureGrouper{
 	public SCModelBasedGestureGrouper() throws Exception {
 		final Properties properties = Application.getInstance().getProperties();
 		datasetCreator = GestureGroupingSystem.getBaseDatasetCreator(properties);		
-		symbolClassifierLazy = new UnsafeLazy<ISymbolClassifier>(()->GestureGroupingSystem.getBaseSymbolClassifier(properties));
+		symbolClassifierLazy = new UnsafeLazy<ISymbolClassifier>(()->{
+			try {
+				return  GestureGroupingSystem.getBaseSymbolClassifier(properties);
+			} catch (Exception e) {
+				Log.addError(e);
+				return null;
+			}
+		});
+		maxGesturesPerSymbol = GestureGroupingSystem.getMaxGesturesPerSymbol(properties);
 	}	
 	
 	
@@ -55,10 +62,8 @@ class SCModelBasedGestureGrouper implements IGestureGrouper{
 				.map(GestureTransformations::getRectangleRepresentation)
 				.collect(Collectors.toList());
 		
-		//TODO: magic numbers
-		if(combinationCount>16)
-			Log.setDisabled(true);
 		Log.addMessage("Number of gesture groupings to test: " + combinationCount , Log.Type.Plain);
+		Log.setDisabled(true);
 
 		double maxProbable = Double.MIN_VALUE; 
 		List<Symbol> bestGroupedSymbols = Collections.emptyList();
@@ -95,7 +100,7 @@ class SCModelBasedGestureGrouper implements IGestureGrouper{
 			
 			symbols.add(Pair.of(currentSymbol, currentSymbolRectangles));
 			
-			Log.addMessage("Grouping " + i, Log.Type.Plain);
+			//Log.addMessage("Grouping " + i, Log.Type.Plain);
 			
 			
 			double distanceProbability = 0.0;
@@ -137,12 +142,11 @@ class SCModelBasedGestureGrouper implements IGestureGrouper{
 			
 			//TODO: experiment + maigc numbers
 			//distanceProbability*0.3+neuralProbability*0.7 seems relatively ok :D
-			double probability =  distanceProbability*0.6+neuralProbability*0.4 + probabilityFactorModifier;
+			double probability =  distanceProbability*0.8+neuralProbability*0.2 + probabilityFactorModifier;
 			
-			Log.addMessage("Grouping " + i + " probability: " + probability + "(D:"+distanceProbability+",N:"+neuralProbability+")", Log.Type.Plain);
+			//Log.addMessage("Grouping " + i + " probability: " + probability + "(D:"+distanceProbability+",N:"+neuralProbability+")", Log.Type.Plain);
 			
-			int comparison = Double.compare(maxProbable, probability);
-			if(comparison<0 || bestGroupedSymbols==null){
+			if(maxProbable<probability || bestGroupedSymbols==null){
 				maxProbable = probability;
 				bestGroupedSymbols = symbolsList;
 			}
@@ -150,8 +154,8 @@ class SCModelBasedGestureGrouper implements IGestureGrouper{
 		}
 		
 		Log.setDisabled(false);
-
 		Log.addMessage("Max probability: " + maxProbable, Log.Type.Plain);
+		
 		return bestGroupedSymbols;
 	}
 

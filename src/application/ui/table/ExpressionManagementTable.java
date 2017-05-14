@@ -21,6 +21,8 @@ import javax.swing.table.AbstractTableModel;
 import application.Application;
 import application.data.model.Expression;
 import application.data.model.ExpressionType;
+import application.listener.AbstractApplicationChangeListener;
+import application.listener.ApplicationChangeListener;
 import log.Log;
 import observer.StrictObservationManager;
 import utilities.lazy.UnsafeLazy;
@@ -38,8 +40,11 @@ public class ExpressionManagementTable extends JTable implements AutoCloseable{
 	private final @Nonnull ListSelectionListener selectionListener;
 	
 	private final @Nonnull Action[] standardActions;
+	private final @Nonnull ApplicationChangeListener applicationChangeListener;	
+	
+	public ExpressionManagementTable() { 
 		
-	public ExpressionManagementTable() {
+		
 		model = new Model();
 		setModel(model);
 		
@@ -51,9 +56,10 @@ public class ExpressionManagementTable extends JTable implements AutoCloseable{
 		selectionListener = (e) -> 	{
 			if(!e.getValueIsAdjusting()){
 					int selectedRow = getSelectedRow();
+					int expressionCount = model.expressionCount.getAsInt();
 					if(selectedRow==-1) 
-						selectedRow = model.expressionCount.getAsInt()-1;
-					if(selectedRow!=-1)
+						selectedRow = expressionCount-1;
+					else if(selectedRow<=expressionCount)
 						observationManager.updateObservers(model.expressions.get().get(selectedRow));
 			}
 		};
@@ -105,6 +111,15 @@ public class ExpressionManagementTable extends JTable implements AutoCloseable{
 				}
 		};
 
+		applicationChangeListener = new AbstractApplicationChangeListener() {
+			
+			@Override
+			public void dataSourceChanged() {
+				getStandardAction(ACTION_RELOAD).actionPerformed(null);
+			}
+		};
+		Application.getInstance().observationManager.addObserver(applicationChangeListener);
+
 	}
 	
 	public ExpressionManagementTable(ExpressionType filterOption) {
@@ -132,6 +147,7 @@ public class ExpressionManagementTable extends JTable implements AutoCloseable{
 
 	@Override
 	public void close() throws Exception {
+		Application.getInstance().observationManager.removeObserver(applicationChangeListener);
 		selectionModel.removeListSelectionListener(selectionListener);
 		observationManager.close();
 	}

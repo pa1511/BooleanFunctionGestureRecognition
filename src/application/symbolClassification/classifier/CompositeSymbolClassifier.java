@@ -62,8 +62,14 @@ public class CompositeSymbolClassifier implements ISymbolClassifier {
 		votes.clear();
 		
 		for(ISymbolClassifier symbolClassifier:classifiers){
-			String predicted = symbolClassifier.predict(datasetCreator, gestures);
-			statisticsCalculator.updateStatistics(symbolClassifier, real, predicted);
+			if(symbolClassifier instanceof CompositeSymbolClassifier){
+				((CompositeSymbolClassifier) symbolClassifier).predict(datasetCreator, real, gestures, statisticsCalculator);
+			}
+			else{
+				String predicted = symbolClassifier.predict(datasetCreator, gestures);
+				statisticsCalculator.updateStatistics(symbolClassifier, real, predicted);
+				updateVotes(symbolClassifier);
+			}
 			updateVotes(symbolClassifier);
 		}
 		

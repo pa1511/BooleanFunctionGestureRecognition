@@ -5,8 +5,7 @@ import java.awt.BorderLayout;
 import javax.annotation.Nonnull;
 import javax.swing.JTabbedPane;
 
-import application.AApplicationFrame;
-import application.AbstractApplicationTab;
+import application.ui.AApplicationFrame;
 
 public abstract class ASectionTab extends AbstractApplicationTab{
 

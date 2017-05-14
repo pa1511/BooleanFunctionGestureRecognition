@@ -3,6 +3,7 @@ package application.gestureGrouping;
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -30,51 +31,56 @@ public class GestureGroupingSystem extends ASystem{
 	
 	private static final @Nonnull String MODELS_PATH_KEY = "gesture.grouping.model.based.path";
 	private static final @Nonnull String MODELS_IMPL_KEY = "gesture.grouping.model.based.impl";
+	
+	private static final @Nonnull String GESTURE_GROUPING_MAX_GESTURE_COUNT = "gesture.grouping.max.gesture.count";
 
 	public static IGestureGrouper getGestureGrouper(Properties properties) throws Exception {
 		return ASystem.getImplementation(properties, GestureGroupingSystem.GESTURE_GROUPING_IMPL_PATH,
 				GestureGroupingSystem.GESTURE_GROUPING_IMPL_NAME);
 	}
 	
-	public static ISymbolClassifier getBaseSymbolClassifier(Properties properties){
-		try{
-			ISCModelCreator modelCreator = SymbolClassificationSystem.getModelCreator(properties);
-			CompositeSymbolClassifier compositeSymbolClassifier = new CompositeSymbolClassifier();
-						
-			//loading models
+	public static ISymbolClassifier getBaseSymbolClassifier(Properties properties) throws Exception{
+
 			String modelImpl = properties.getProperty(MODELS_IMPL_KEY);
-			
-			Predicate<File> shouldLoadModel;
-			if(modelImpl.equals("ALL")){
-				shouldLoadModel = f->!f.getName().matches(".*\\.(metadata|txt)");
-			}
-			else{
-				Set<String> modelsToLoad = new HashSet<>(Arrays.asList(modelImpl.split(";")));
-				shouldLoadModel = f->!f.getName().matches(".*\\.(metadata|txt)") && modelsToLoad.contains(f.getName());
-			}
+			String modelsPath = properties.getProperty(MODELS_PATH_KEY);			
 
+			String implKey = modelsPath+modelImpl;
+		
+			return ASystem.getImplementationOrCreate(implKey, ()->{
+		
+				CompositeSymbolClassifier compositeSymbolClassifier = new CompositeSymbolClassifier();
+							
+				//loading models
+				
+				Predicate<File> shouldLoadModel = f->!f.getName().matches(".*\\.(metadata|txt)");
 			
-			String modelsPath = properties.getProperty(MODELS_PATH_KEY);
-			File modelsFolder = new File(modelsPath);
-			
-			List<File> modelFiles = Files.list(modelsFolder.toPath()).map(Path::toFile)
-					.filter(shouldLoadModel).collect(Collectors.toList());
-			
-			for(File modelFile:modelFiles){
-				ISymbolClassifier symbolClassifier = modelCreator.loadSymbolClassifierFrom(modelFile);
-				compositeSymbolClassifier.addClassifier(symbolClassifier);
-			}
-
-			return compositeSymbolClassifier;
-		}
-		catch(Exception e){
-			throw new RuntimeException(e);
-		}
-
+				if(!modelImpl.equals("ALL")){
+					Set<String> modelsToLoad = new HashSet<>(Arrays.asList(modelImpl.split(";")));
+					shouldLoadModel = shouldLoadModel.and(f->modelsToLoad.contains(f.getName()));
+				}
+	
+				
+				
+				ISCModelCreator modelCreator = SymbolClassificationSystem.getModelCreator(properties);
+				List<File> modelFiles = Files.list(Paths.get(modelsPath)).map(Path::toFile)
+						.filter(shouldLoadModel).collect(Collectors.toList());
+				
+				for(File modelFile:modelFiles){
+					ISymbolClassifier symbolClassifier = modelCreator.loadSymbolClassifierFrom(modelFile);
+					compositeSymbolClassifier.addClassifier(symbolClassifier);
+				}
+				
+				return compositeSymbolClassifier;
+			});
 	}
 
 	public static ADatasetCreator getBaseDatasetCreator(Properties properties) throws Exception {
 		return SymbolClassificationSystem.getDatasetCreator(properties);
+	}
+
+	public static int getMaxGesturesPerSymbol(Properties properties) {
+		String maxPerSymbol = properties.getProperty(GESTURE_GROUPING_MAX_GESTURE_COUNT);
+		return Integer.parseInt(maxPerSymbol);
 	}
 	
 }

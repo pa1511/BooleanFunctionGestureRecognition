@@ -40,7 +40,7 @@ public class RepresentationClassificationTesting {
 		try(InputStream inputStream = new FileInputStream(new File(userDir,"properties/model-creation-script/script.properties"))){
 			properties.load(inputStream);
 		}
-		try(final IDataSource dataSource = new H2Database(properties)){
+		try(final IDataSource dataSource = new H2Database("script",properties)){
 
 			Multiset<String> multiset = HashMultiset.create();
 			multiset.add("A", 200);

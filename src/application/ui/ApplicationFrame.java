@@ -9,9 +9,8 @@ import javax.annotation.Nonnull;
 import javax.swing.JTabbedPane;
 import javax.swing.WindowConstants;
 
-import application.AApplicationFrame;
-import application.AbstractApplicationTab;
 import application.Application;
+import application.ui.tab.AbstractApplicationTab;
 
 public class ApplicationFrame extends AApplicationFrame {
 	
@@ -30,7 +29,7 @@ public class ApplicationFrame extends AApplicationFrame {
 		tabs = AApplicationFrame.loadApplicationTabs(Application.UI_TAB_PATH_KEY,Application.UI_TAB_NAMES_KEY);
 		for(AbstractApplicationTab tab:tabs)
 			tabbedPane.addTab(tab.getTabName(), tab);
-
+		
 		setLayout(new BorderLayout());
 		add(tabbedPane,BorderLayout.CENTER);
 		
