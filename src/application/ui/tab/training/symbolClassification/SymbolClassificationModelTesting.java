@@ -36,7 +36,7 @@ import log.Log;
 import net.miginfocom.swing.MigLayout;
 import ui.CommonUIActions;
 
-public class ModelTesting extends AbstractApplicationTab{
+public class SymbolClassificationModelTesting extends AbstractApplicationTab{
 
 	private final @Nonnull JTextField currentModelName;
 	private final @Nonnull JTextField predictedSymbolField;
@@ -57,7 +57,7 @@ public class ModelTesting extends AbstractApplicationTab{
 	//
 	private ClearCanvasAction clearAction;
 	
-	public ModelTesting() throws Exception {
+	public SymbolClassificationModelTesting() throws Exception {
 		super("Neural net testing");
 
 		Properties properties = Application.getInstance().getProperties();

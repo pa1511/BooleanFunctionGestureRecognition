@@ -1,16 +1,11 @@
 package application.gestureGrouping.impl;
 
+import java.awt.Rectangle;
 import java.io.File;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
-import java.util.Set;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import javax.annotation.Nonnull;
@@ -20,139 +15,129 @@ import application.data.dataset.ADatasetCreator;
 import application.data.dataset.SortDatasetCreator;
 import application.data.model.Gesture;
 import application.data.model.Symbol;
+import application.data.model.handling.GestureTransformations;
+import application.gestureGrouping.GestureGroupingSystem;
 import application.gestureGrouping.IGestureGrouper;
-import application.symbolClassification.ISCModelCreator;
 import application.symbolClassification.ISymbolClassifier;
-import application.symbolClassification.SymbolClassificationSystem;
-import application.symbolClassification.classifier.CompositeSymbolClassifier;
 import application.symbolClassification.classifier.SymbolDistanceClassifier;
+import dataModels.Pair;
 import log.Log;
 import utilities.lazy.ILazy;
 import utilities.lazy.UnsafeLazy;
 
 class SCModelBasedGestureGrouper implements IGestureGrouper{
 
-	private static final @Nonnull String MODELS_PATH_KEY = "gesture.grouping.model.based.path";
-	private static final @Nonnull String MODELS_IMPL_KEY = "gesture.grouping.model.based.impl";
 	
 	//TODO: extract
 	private static final @Nonnull int maxGesturesPerSymbol = 2;
 	
 	private final @Nonnull ILazy<ISymbolClassifier> symbolClassifierLazy;
-	private final @Nonnull ISCModelCreator modelCreator;
 	private final @Nonnull ADatasetCreator datasetCreator;
 	
-	//TODO: remove
+	//TODO: extract
 	private final @Nonnull SymbolDistanceClassifier symbolDistanceClassifier = new SymbolDistanceClassifier(
 			new File(System.getProperty("user.dir"),"training/symbol/data/output/representative-sorted-138.txt"));
 	private final @Nonnull ADatasetCreator distanceDatasetCreator = new SortDatasetCreator();
 
 	public SCModelBasedGestureGrouper() throws Exception {
 		final Properties properties = Application.getInstance().getProperties();
-
-		//loading model creator
-		modelCreator = SymbolClassificationSystem.getModelCreator(properties);
-
-		//loading dataset creator
-		datasetCreator = SymbolClassificationSystem.getDatasetCreator(properties);
-
-		symbolClassifierLazy = new UnsafeLazy<ISymbolClassifier>(()->{
-			
-			try{
-				CompositeSymbolClassifier compositeSymbolClassifier = new CompositeSymbolClassifier();
-							
-				//loading models
-				String modelImpl = properties.getProperty(MODELS_IMPL_KEY);
-				
-				Predicate<File> shouldLoadModel;
-				if(modelImpl.equals("ALL")){
-					shouldLoadModel = f->!f.getName().matches(".*\\.(metadata|txt)");
-				}
-				else{
-					Set<String> modelsToLoad = new HashSet<>(Arrays.asList(modelImpl.split(";")));
-					shouldLoadModel = f->!f.getName().matches(".*\\.(metadata|txt)") && modelsToLoad.contains(f.getName());
-				}
-
-				
-				String modelsPath = properties.getProperty(MODELS_PATH_KEY);
-				File modelsFolder = new File(modelsPath);
-				
-				List<File> modelFiles = Files.list(modelsFolder.toPath()).map(Path::toFile)
-						.filter(shouldLoadModel).collect(Collectors.toList());
-				
-				for(File modelFile:modelFiles){
-					ISymbolClassifier symbolClassifier = modelCreator.loadSymbolClassifierFrom(modelFile);
-					compositeSymbolClassifier.addClassifier(symbolClassifier);
-				}
-	
-				return compositeSymbolClassifier;
-			}
-			catch(Exception e){
-				throw new RuntimeException(e);
-			}
-		});
+		datasetCreator = GestureGroupingSystem.getBaseDatasetCreator(properties);		
+		symbolClassifierLazy = new UnsafeLazy<ISymbolClassifier>(()->GestureGroupingSystem.getBaseSymbolClassifier(properties));
 	}	
+	
+	
 	@Override
 	public List<Symbol> group(List<Gesture> gestures) {		
 		int gestureCount = gestures.size();
 		int combinationCount = (int) Math.pow(2, (gestureCount-1));
+		
+		List<Rectangle> rectangles = gestures.stream()
+				.map(GestureTransformations::getRectangleRepresentation)
+				.collect(Collectors.toList());
 		
 		//TODO: magic numbers
 		if(combinationCount>16)
 			Log.setDisabled(true);
 		Log.addMessage("Number of gesture groupings to test: " + combinationCount , Log.Type.Plain);
 
-		double maxProbable = Double.MIN_VALUE;
+		double maxProbable = Double.MIN_VALUE; 
 		List<Symbol> bestGroupedSymbols = Collections.emptyList();
 
 		for(int i=0;i<combinationCount;i++){
 			
-			List<List<Gesture>> symbols = new ArrayList<>();
+			List<Pair<List<Gesture>, List<Rectangle>>> symbols = new ArrayList<>();
 			List<Gesture> currentSymbol = new ArrayList<>();
+			List<Rectangle> currentSymbolRectangles = new ArrayList<>();
+			
 			boolean skip = false;
 					
 			for(int j=0;j<gestureCount;j++){
 				Gesture gesture = gestures.get(j);
+				Rectangle rectangle = rectangles.get(j);
 				
 				currentSymbol.add(gesture);
+				currentSymbolRectangles.add(rectangle);
+				
 				if(currentSymbol.size()>maxGesturesPerSymbol){
 					skip = true;
 					break;
 				}
 				
 				if((i & 0x1<<j) != 0){
-					symbols.add(currentSymbol);
+					symbols.add(Pair.of(currentSymbol, currentSymbolRectangles));
 					currentSymbol = new ArrayList<>();
+					currentSymbolRectangles = new ArrayList<>();
 				}
 				
 			}
 			if(skip)
 				continue;
 			
+			symbols.add(Pair.of(currentSymbol, currentSymbolRectangles));
+			
 			Log.addMessage("Grouping " + i, Log.Type.Plain);
-			symbols.add(currentSymbol);
+			
 			
 			double distanceProbability = 0.0;
 			double neuralProbability = 0.0;
+			double probabilityFactorModifier = 0.0;
 			
 			List<Symbol> symbolsList = new ArrayList<>();
-			for(List<Gesture> gestureGroup:symbols){
-				//TODO: remove
-				String prediction = /*symbolClassifierLazy.getOrThrow()*/symbolDistanceClassifier.predict(distanceDatasetCreator, gestureGroup);
-				double distancePredictionProbability = /*symbolClassifierLazy.getOrThrow()*/symbolDistanceClassifier.getProbabilities().get(prediction).doubleValue();
+			for(Pair<List<Gesture>, List<Rectangle>> gestureGroup:symbols){
 				
-				prediction = symbolClassifierLazy.getOrThrow().predict(datasetCreator, gestureGroup);
+				//TODO: a lot of magic numbers
+				List<Rectangle> gestureGroupRectangles = gestureGroup.right();
+				for(int r1 = 0,limit=gestureGroupRectangles.size();r1<limit;r1++){
+					for(int r2 = r1+1; r2<limit;r2++){
+						Rectangle rectangle1 = gestureGroupRectangles.get(r1);
+						Rectangle rectangle2 = gestureGroupRectangles.get(r2);
+						if(rectangle1.intersects(rectangle2)){
+							probabilityFactorModifier+=0.02;
+						}
+						else{
+							probabilityFactorModifier-=0.005;
+						}
+					}
+				}
+				
+				List<Gesture> gestureGroupGestures = gestureGroup.left();
+				
+				String prediction = symbolDistanceClassifier.predict(distanceDatasetCreator, gestureGroupGestures);
+				double distancePredictionProbability = symbolDistanceClassifier.getProbabilities().get(prediction).doubleValue();
+				
+				prediction = symbolClassifierLazy.getOrThrow().predict(datasetCreator, gestureGroupGestures);
 				double neuralPredictionProbability = symbolClassifierLazy.getOrThrow().getProbabilities().get(prediction).doubleValue();
 				
 				distanceProbability+=distancePredictionProbability;
 				neuralProbability +=neuralPredictionProbability;
-				symbolsList.add(new Symbol(prediction.charAt(0), gestureGroup));
+				symbolsList.add(new Symbol(prediction.charAt(0), gestureGroupGestures));
 			}
 			distanceProbability/=symbols.size();
 			neuralProbability/=symbols.size();
 			
+			//TODO: experiment + maigc numbers
 			//distanceProbability*0.3+neuralProbability*0.7 seems relatively ok :D
-			double probability =  distanceProbability*0.3+neuralProbability*0.7;
+			double probability =  distanceProbability*0.6+neuralProbability*0.4 + probabilityFactorModifier;
 			
 			Log.addMessage("Grouping " + i + " probability: " + probability + "(D:"+distanceProbability+",N:"+neuralProbability+")", Log.Type.Plain);
 			

@@ -37,16 +37,16 @@ public class Main {
 		File outputFolder = new File(userDir, "training/symbol/model/output");
 		String fileNameTrain = "training/symbol/data/output/all-51-9.csv";
 		File inputFile = new File(userDir, fileNameTrain);
-		int nEpochs = 8000;
-		int iterationCount = 1;
+		int nEpochs = 10000;
+		int iterationCount = 2;
 		double[] scoreLimits = new double[]{1e-3};
 		int numInputs = ADatasetCreator.getNumberOfInputsFrom(inputFile);
 		int numOutputs = ADatasetCreator.getNumberOfOutputsFrom(inputFile);
-		int[][] hidenNodesConfigs = new int[][] { { 40, 30, 30,20}/*, { 26, 24 }, { 24, 22 }, { 22, 20 } */};
-		double[] learningRateConfigs = new double[] { 0.015 /*,5e-3, 1e-2*/ };
+		int[][] hidenNodesConfigs = new int[][] { { 30, 30, 30, 30}/*, { 26, 24 }, { 24, 22 }, { 22, 20 } */};
+		double[] learningRateConfigs = new double[] { 0.05 /*,5e-3, 1e-2*/ };
 		int[] batchSizeConfigs = new int[] {80};
 
-		Activation[] activationMethodConfig = new Activation[] { Activation.RELU/*Activation.SIGMOID, Activation.TANH,  Activation.RATIONALTANH, Activation.HARDTANH*/ };
+		Activation[] activationMethodConfig = new Activation[] { Activation.RELU,Activation.LEAKYRELU/*Activation.SIGMOID, Activation.TANH,  Activation.RATIONALTANH, Activation.HARDTANH*/ };
 		Updater[] updaterConfig = new Updater[] { Updater.ADAM };
 		
 		List<Symbol> symbols = new ArrayList<>();
@@ -96,7 +96,7 @@ public class Main {
 										batchSize, i -> {
 										});
 	
-								String modelName = activationMethod + "-" + updater + "-sm-rce-"
+								String modelName = activationMethod + "-" + updater + "-sm-l2-"
 										+ Arrays.toString(hiddenNodes)+"-"+nEpochs+"-"+batchSize+"-"+learningRate+"-"+scoreLimit;
 	
 								model.setName(modelName);
