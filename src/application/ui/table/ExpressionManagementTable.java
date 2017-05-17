@@ -71,42 +71,48 @@ public class ExpressionManagementTable extends JTable implements AutoCloseable{
 					
 					@Override
 					public void actionPerformed(@CheckForNull ActionEvent arg0) {
-						if(model.expressions.isLoaded()){
-							model.reset();
-						}
-						Log.addMessage("Reloaded expressions from db.", Log.Type.Plain);
-						model.fireTableDataChanged();
+						
+						Application.getInstance().workers.submit(()->{
+							if(model.expressions.isLoaded()){
+								model.reset();
+								Log.addMessage("Reloaded expressions from db.", Log.Type.Plain);
+								model.fireTableDataChanged();
+							}
+						});
 					}
 				},
 				new AbstractAction(ACTION_DELETE) {
 					
 					@Override
 					public void actionPerformed(ActionEvent e) {
-						int row = getSelectedRow();
-						List<Expression> expressions = model.expressions.getOrThrow();
-						Expression expression = expressions.get(row);
-						try {
-							Application.getInstance().getDataSource().delete(expression);
-						} catch (Exception e1) {
-							Log.addError(e1);
-							JOptionPane.showMessageDialog(null, "Error while deleting expression: " + expression, "Error", JOptionPane.ERROR_MESSAGE);
-						}
-						expressions.remove(row);
-						observationManager.updateObserversAbout(delete.apply(expression));
-
-						if(expressions.size()==row){
-							if(row!=0){
-								observationManager.updateObservers(expressions.get(--row));
-								selectionModel.addSelectionInterval(row, row);
-							}
-						}
-						else{
-							observationManager.updateObservers(expressions.get(row));
-						}
-						Log.addMessage("Deleted expression: " + expression + " Id: " + expression.getId(), Log.Type.Plain);
 						
-						revalidate();
-						repaint();
+						Application.getInstance().workers.submit(()->{
+							int row = getSelectedRow();
+							List<Expression> expressions = model.expressions.getOrThrow();
+							Expression expression = expressions.get(row);
+							try {
+								Application.getInstance().getDataSource().delete(expression);
+							} catch (Exception e1) {
+								Log.addError(e1);
+								JOptionPane.showMessageDialog(null, "Error while deleting expression: " + expression, "Error", JOptionPane.ERROR_MESSAGE);
+							}
+							expressions.remove(row);
+							observationManager.updateObserversAbout(delete.apply(expression));
+	
+							if(expressions.size()==row){
+								if(row!=0){
+									observationManager.updateObservers(expressions.get(--row));
+									selectionModel.addSelectionInterval(row, row);
+								}
+							}
+							else{
+								observationManager.updateObservers(expressions.get(row));
+							}
+							Log.addMessage("Deleted expression: " + expression + " Id: " + expression.getId(), Log.Type.Plain);
+							
+							revalidate();
+							repaint();
+						});						
 					}
 				}
 		};
@@ -179,8 +185,8 @@ public class ExpressionManagementTable extends JTable implements AutoCloseable{
 
 		public void reset() {
 			expressions.reset();
-			expressionCount = getExpressionCountLazy();
 			expressions.getOrThrow();
+			expressionCount = getExpressionCountLazy();
 		}
 
 		private IntSupplier getExpressionCountLazy() {

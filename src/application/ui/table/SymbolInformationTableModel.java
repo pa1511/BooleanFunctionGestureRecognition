@@ -17,8 +17,6 @@ import application.Application;
 import application.data.model.SymbolSamplesInformation;
 import log.Log;
 import utilities.lazy.UnsafeLazy;
-import utilities.lazy.UnsafeLazyInt;
-
 public class SymbolInformationTableModel extends AbstractTableModel {
 
 	private final @Nonnull String[] columnNames;
@@ -51,10 +49,13 @@ public class SymbolInformationTableModel extends AbstractTableModel {
 					
 					@Override
 					public void actionPerformed(@CheckForNull ActionEvent arg0) {
-						symbolsInfo.reset();
-						resetSymbolInfoCount();
-						Log.addMessage("Reloaded symbol info from db.", Log.Type.Plain);						
-						fireTableDataChanged();
+						
+						Application.getInstance().workers.submit(()->{
+							symbolsInfo.reset();
+							resetSymbolInfoCount();
+							Log.addMessage("Reloaded symbol info from db.", Log.Type.Plain);						
+							fireTableDataChanged();
+						});
 					}
 
 				}
@@ -68,24 +69,16 @@ public class SymbolInformationTableModel extends AbstractTableModel {
 
 	private IntSupplier getSymbolsInfoCountSupplier() {
 		return new IntSupplier() {
-			
-			private UnsafeLazyInt estimate = new UnsafeLazyInt(()->{
-				try {
-					return Application.getInstance().getDataSource().getDistinctSymbolCount(false);
+			@Override
+			public int getAsInt() {
+				try{
+					return symbolsInfo.isLoaded() ? symbolsInfo.getOrThrow().size() : 
+						Application.getInstance().getDataSource().getDistinctSymbolCount(false);
 				} catch (Exception e) {
 					Log.addError(e);
 				}
 
 				return 0;
-			});
-
-			@Override
-			public int getAsInt() {
-				if (symbolsInfo.isLoaded()) {
-					return symbolsInfo.getOrThrow().size();
-				}
-
-				return estimate.getAsInt();
 			}
 		};
 	}

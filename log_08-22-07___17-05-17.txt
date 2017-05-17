@@ -1,11 +1,11 @@
-Time: 12-49-42___14-05-17 "java.lang.reflect.InvocationTargetException" Type:Error Thread: AWT-EventQueue-0
-Time: 12-49-42___14-05-17 "java.lang.RuntimeException: java.lang.reflect.InvocationTargetException
-	at application.AApplication.lambda$0(AApplication.java:58)
-	at utilities.lazy.Lazy.getOrThrow(Lazy.java:28)
-	at application.AApplication.getInstance(AApplication.java:63)
-	at application.AApplicationFrame.loadApplicationTabs(AApplicationFrame.java:33)
-	at application.ui.ApplicationFrame.<init>(ApplicationFrame.java:38)
-	at main.Main.lambda$0(Main.java:33)
+Time: 08-22-07___17-05-17 "java.lang.reflect.InvocationTargetException" Type:Error Thread: AWT-EventQueue-0
+Time: 08-22-07___17-05-17 "java.lang.RuntimeException: java.lang.reflect.InvocationTargetException
+	at application.AApplication.lambda$0(AApplication.java:62)
+	at utilities.lazy.Lazy.getOrThrow(Lazy.java:32)
+	at application.AApplication.getInstance(AApplication.java:67)
+	at application.ui.AApplicationFrame.loadApplicationTabs(AApplicationFrame.java:73)
+	at application.ui.ApplicationFrame.<init>(ApplicationFrame.java:29)
+	at main.DataGenerationMain.lambda$0(DataGenerationMain.java:35)
 	at java.awt.event.InvocationEvent.dispatch(InvocationEvent.java:311)
 	at java.awt.EventQueue.dispatchEventImpl(EventQueue.java:756)
 	at java.awt.EventQueue.access$500(EventQueue.java:97)
@@ -27,15 +27,15 @@ Caused by: java.lang.reflect.InvocationTargetException
 	at java.lang.reflect.Constructor.newInstance(Constructor.java:423)
 	at generalfactory.Factory.getInstance(Factory.java:68)
 	at generalfactory.Factory.getInstance(Factory.java:52)
-	at application.AApplication.lambda$0(AApplication.java:56)
+	at application.AApplication.lambda$0(AApplication.java:60)
 	... 19 more
 Caused by: java.io.FileNotFoundException: /home/paf/workspace-java/BooleanFunctionGestureRecognition/properties/h2.properties (No such file or directory)
 	at java.io.FileInputStream.open0(Native Method)
 	at java.io.FileInputStream.open(FileInputStream.java:195)
 	at java.io.FileInputStream.<init>(FileInputStream.java:138)
-	at application.Application.loadApplicationProperties(Application.java:86)
-	at application.AApplication.initialize(AApplication.java:88)
-	at application.Application.<init>(Application.java:53)
-	at application.Application.<init>(Application.java:46)
+	at application.Application.loadApplicationProperties(Application.java:103)
+	at application.AApplication.initialize(AApplication.java:100)
+	at application.Application.<init>(Application.java:55)
+	at application.DataGenerationApplication.<init>(DataGenerationApplication.java:6)
 	... 26 more
 " Type:Error Thread: AWT-EventQueue-0
