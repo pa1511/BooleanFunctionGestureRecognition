@@ -20,7 +20,7 @@ import generalfactory.Factory;
 
 public abstract class ADatasetCreator {
 	
-	protected double scaleModifier = 1;
+	protected final double scaleModifier = 1;
 
 
 	protected abstract void createSamplesFrom(@Nonnull List<Symbol> symbols,@Nonnull LinkedHashMap<String, double[]> classToSampleOutput, 
@@ -69,10 +69,6 @@ public abstract class ADatasetCreator {
 		getRawFormForSymbolClassification(gestures, rawSample);
 		return rawSample;
 	}
-
-	public void setScaleModifier(double scaleModifier) {
-		this.scaleModifier = scaleModifier;
-	}
 	
 	public double getScaleModifier() {
 		return scaleModifier;
@@ -116,8 +112,8 @@ public abstract class ADatasetCreator {
 	//====================================================================================================================
 	//File support
 	
-	public static @Nonnull String createCSVFileName(@Nonnull String fileName, @Nonnegative int precision, @Nonnegative Map<String, Integer> requestedSymbolMap) {
-		return fileName+"-"+precision+"-"+requestedSymbolMap.size()+".csv";
+	public static @Nonnull String createCSVFileName(@Nonnull String fileName, @Nonnegative int precision, @Nonnegative int differentSymbolCount) {
+		return fileName+"-"+precision+"-"+differentSymbolCount+".csv";
 	}
 
 	public static @Nonnegative int getNumberOfInputsFrom(@Nonnull File inputCSVFile) {

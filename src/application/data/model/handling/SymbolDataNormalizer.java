@@ -12,6 +12,9 @@ public class SymbolDataNormalizer {
 	}
 
 	public static void normalizeSymbolSample(@Nonnull double[] rawSample, double modifier) {
+		normalizeSymbolSample(rawSample, modifier, true);
+	}
+	public static void normalizeSymbolSample(@Nonnull double[] rawSample, double modifier, boolean includeLast) {
 
 		double averageX = 0;
 		double averageY = 0;
@@ -28,7 +31,7 @@ public class SymbolDataNormalizer {
 			maxY = Math.max(maxY, rawSample[i + 1]);
 			minY = Math.min(minY, rawSample[i + 1]);
 		}
-		if(rawSample.length%2!=0){
+		if(includeLast && rawSample.length%2!=0){
 			averageX += rawSample[rawSample.length-1];
 			
 			maxX = Math.max(maxX, rawSample[rawSample.length-1]);
@@ -45,7 +48,7 @@ public class SymbolDataNormalizer {
 			rawSample[i + 1] -= averageY;
 			rawSample[i + 1] = rawSample[i + 1]/scale;
 		}		
-		if(rawSample.length%2!=0){
+		if(includeLast && rawSample.length%2!=0){
 			rawSample[rawSample.length-1] -= averageX;
 			rawSample[rawSample.length-1] = rawSample[rawSample.length-1]/scale;
 		}

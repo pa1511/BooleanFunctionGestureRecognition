@@ -55,7 +55,7 @@ public class SymbolNetworkBasedClassifierModelCreator implements ISCModelCreator
 		//TANH and SIGMOID have proven very good
 		activationMethod = Activation.SIGMOID;
 		outputActivationMethod = Activation.SOFTMAX;
-		lossFunction = LossFunction.RECONSTRUCTION_CROSSENTROPY;
+		lossFunction = LossFunction.NEGATIVELOGLIKELIHOOD;//LossFunction.RECONSTRUCTION_CROSSENTROPY;
 		optimizationAlgorithm = OptimizationAlgorithm.STOCHASTIC_GRADIENT_DESCENT;
 	    updater = Updater.ADAM;
 		useRegularization = true;

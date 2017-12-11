@@ -197,7 +197,7 @@ public class DatasetCreationPanel extends AbstractApplicationTab{
 				JOptionPane.showMessageDialog(null, "A critical error has occured during requested symbol parsing.", "Error", JOptionPane.ERROR_MESSAGE);
 				return;
 			}
-			File outputFile = new File(outputFolder, ADatasetCreator.createCSVFileName(fileName, precision, requestedSymbolMap));
+			File outputFile = new File(outputFolder, ADatasetCreator.createCSVFileName(fileName, precision, requestedSymbolMap.size()));
 			File metaOutputFile = new File(outputFolder,ADatasetCreator.getMetaFileName(outputFile.getName()));
 			
 			Log.addMessage("Creating output file: " + outputFile, Log.Type.Plain);
