@@ -16,7 +16,7 @@ public class VisualizeAccuracy {
 		
 		
 		String listName = //"FC-46-9-model-acc-list.csv";
-				"CNN-121-9-model-best_4-acc-list.csv";
+				"CNN-121-2-model-test-acc-list.csv";
 		List<String> lines = Files.readAllLines(Paths.get("./training/symbol-gesture-new/model/" + listName));
 		
 		double[] values = Arrays.stream(lines.get(0).split(",")).mapToDouble(Double::parseDouble).toArray();

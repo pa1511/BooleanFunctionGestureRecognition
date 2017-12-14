@@ -41,15 +41,15 @@ public class CreateCNNModel {
 	public static void main(String[] args) throws Exception {
 		Log.setDisabled(true);
 
-		String fileNameTrain = "./training/symbol-gesture-new/training_data_v2-121-9.csv";
-		String fileNameTest = "./training/symbol-gesture-new/test_data_v2-121-9.csv";
-		String modelName = "CNN-121-9-model-test";
+		String fileNameTrain = "./training/symbol-gesture-new/training_data-121-9.csv";
+		String fileNameTest = "./training/symbol-gesture-new/test_data-121-9.csv";
+		String modelName = "CNN-121-2-model-test";
 		
 		//File statOutputFolder = new File("./training/symbol-gesture-new/statistics/");
 		File inputFile = new File(fileNameTrain);
 		
 		int numInputs = ADatasetCreator.getNumberOfInputsFrom(inputFile);
-		int numOutputs = ADatasetCreator.getNumberOfOutputsFrom(inputFile);
+		int numOutputs = 2;//ADatasetCreator.getNumberOfOutputsFrom(inputFile); TODO: re-enable
 
         //Load the training data:
         try(RecordReader rr = new CSVRecordReader()){
@@ -105,7 +105,7 @@ public class CreateCNNModel {
 	        //Store model
 			File outputFolder = new File("./training/symbol-gesture-new/model/");
 			Evaluation bestEvaluation = null;
-			int nEpochs = 300;
+			int nEpochs = 250;
 			MultiLayerNetwork bestNetwork = null;
 	        for ( int n = 0; n < nEpochs; n++) {
 	            model.fit( trainIter );

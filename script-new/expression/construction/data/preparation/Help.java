@@ -35,7 +35,7 @@ public class Help {
 		expressions = expressions.stream()
 				.filter(expression-> !expression.getSymbols()
 						.stream()
-						.anyMatch(symbol->symbol.getSymbolAsString().equalsIgnoreCase("C") || symbol.getSymbolAsString().equalsIgnoreCase("*")))
+						.anyMatch(symbol->symbol.getSymbolAsString().equalsIgnoreCase("C")))
 				.collect(Collectors.toList());
 
 		

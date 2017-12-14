@@ -18,17 +18,23 @@ public class TestModel {
 
 	
 	public static void main(String[] args) throws IOException, InterruptedException {
-		String modelName = "FC-46-9-model";
-		String testDataFile = "test_data_v2-46-9.csv";
+		String modelName = "CNN-121-2-model-test";
+        int batchSize = 256;
+		int numOutputs = 2;//9;
 		MultiLayerNetwork network = ModelSerializer.restoreMultiLayerNetwork(new File("./training/symbol-gesture-new/model/" + modelName));
 		
 		
-        System.out.println("Evaluate model....");
+        evaluate("test_simple_data-121-9.csv", batchSize, numOutputs, network);
+        evaluate("test_complex_data-121-9.csv", batchSize, numOutputs, network);
+
+	}
+
+	private static void evaluate(String testDataFile, int batchSize, int numOutputs, MultiLayerNetwork network)
+			throws IOException, InterruptedException {
+		System.out.println("Evaluate model....");
         try(RecordReader rrTest = new CSVRecordReader()){
 			String fileNameTest = "./training/symbol-gesture-new/" + testDataFile;
 	        rrTest.initialize(new FileSplit(new File(fileNameTest)));
-	        int batchSize = 256;
-			int numOutputs = 9;
 			DataSetIterator testIter = new RecordReaderDataSetIterator(rrTest,batchSize ,0,numOutputs );
 	        
 	        
@@ -46,7 +52,6 @@ public class TestModel {
 	        //Print the evaluation statistics
 	        System.out.println(eval.stats());
         }
-
 	}
 	
 }
