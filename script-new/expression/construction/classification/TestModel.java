@@ -18,14 +18,14 @@ public class TestModel {
 
 	
 	public static void main(String[] args) throws IOException, InterruptedException {
-		String modelName = "CNN-121-2-model-test";
+		String modelName = "CNN-97-2-model-test";
         int batchSize = 256;
 		int numOutputs = 2;//9;
 		MultiLayerNetwork network = ModelSerializer.restoreMultiLayerNetwork(new File("./training/symbol-gesture-new/model/" + modelName));
 		
 		
-        evaluate("test_simple_data-121-9.csv", batchSize, numOutputs, network);
-        evaluate("test_complex_data-121-9.csv", batchSize, numOutputs, network);
+        evaluate("test_simple_data-97-2.csv", batchSize, numOutputs, network);
+        evaluate("test_complex_data-97-2.csv", batchSize, numOutputs, network);
 
 	}
 

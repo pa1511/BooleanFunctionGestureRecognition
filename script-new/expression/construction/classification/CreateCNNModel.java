@@ -41,15 +41,15 @@ public class CreateCNNModel {
 	public static void main(String[] args) throws Exception {
 		Log.setDisabled(true);
 
-		String fileNameTrain = "./training/symbol-gesture-new/training_data-121-9.csv";
-		String fileNameTest = "./training/symbol-gesture-new/test_data-121-9.csv";
-		String modelName = "CNN-121-2-model-test";
+		String fileNameTrain = "./training/symbol-gesture-new/training_data-97-2.csv";
+		String fileNameTest = "./training/symbol-gesture-new/test_simple_data-97-2.csv";
+		String modelName = "CNN-97-2-model-test";
 		
 		//File statOutputFolder = new File("./training/symbol-gesture-new/statistics/");
 		File inputFile = new File(fileNameTrain);
 		
 		int numInputs = ADatasetCreator.getNumberOfInputsFrom(inputFile);
-		int numOutputs = 2;//ADatasetCreator.getNumberOfOutputsFrom(inputFile); TODO: re-enable
+		int numOutputs = ADatasetCreator.getNumberOfOutputsFrom(inputFile); 
 
         //Load the training data:
         try(RecordReader rr = new CSVRecordReader()){
@@ -69,7 +69,6 @@ public class CreateCNNModel {
 	                .updater(Updater.ADAM)
 	                .list()
 	                .layer(0, new ConvolutionLayer.Builder(1,8)
-	                        //nIn and nOut specify depth. nIn here is the nChannels and nOut is the number of filters to be applied
 	                        .nIn(nChannels)
 	                        .stride(1,1)
 	                        .nOut(16)
@@ -116,10 +115,9 @@ public class CreateCNNModel {
 	            	bestAccuracy = accuracy;
 	            	bestEvaluation = evaluation;
 	            	bestNetwork = model.clone();
-	            	//Store best model
-	    			//TODO: store model metadata
 	            }
 	        }
+			//TODO: store model metadata
 			ModelSerializer.writeModel(bestNetwork, new File(outputFolder, modelName), false);
 	        System.out.println("Evaluate model....");
 		    System.out.println(bestEvaluation.stats());
