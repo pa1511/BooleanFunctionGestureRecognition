@@ -65,7 +65,7 @@ public class CreateTestAndTrainDataByEndDetection {
 		ClassificationDataSet dataSet = CreateTestAndTrainUtilities.createDataSet(expressions, classToSampleOutput, gestureInputCount, pointPerGesture);
 		//Storing created data set
 		String outputFolder = "./training/symbol-gesture-new/";
-		File outputFile = new File(outputFolder, ADatasetCreator.createCSVFileName("training_data", pointPerGesture*gestureInputCount+1, differentOutputCount));
+		File outputFile = new File(outputFolder, ADatasetCreator.createCSVFileName("training_data", pointPerGesture+pointPerGesture*gestureInputCount+1, differentOutputCount));
 		File metaOutputFile = new File(outputFolder,ADatasetCreator.getMetaFileName(outputFile.getName()));
 
 		try(PrintStream outputPrintStream = new PrintStream(new FileOutputStream(outputFile));
@@ -86,7 +86,7 @@ public class CreateTestAndTrainDataByEndDetection {
 		dataSet = CreateTestAndTrainUtilities.createDataSet(expressions, classToSampleOutput, gestureInputCount, pointPerGesture);
 
 		//Storing created data set
-		outputFile = new File(outputFolder, ADatasetCreator.createCSVFileName("test_simple_data", pointPerGesture*gestureInputCount+1, differentOutputCount));
+		outputFile = new File(outputFolder, ADatasetCreator.createCSVFileName("test_simple_data", pointPerGesture+pointPerGesture*gestureInputCount+1, differentOutputCount));
 		metaOutputFile = new File(outputFolder,ADatasetCreator.getMetaFileName(outputFile.getName()));
 
 		try(PrintStream outputPrintStream = new PrintStream(new FileOutputStream(outputFile));
@@ -107,7 +107,7 @@ public class CreateTestAndTrainDataByEndDetection {
 		dataSet = CreateTestAndTrainUtilities.createDataSet(expressions, classToSampleOutput, gestureInputCount, pointPerGesture);
 
 		//Storing created data set
-		outputFile = new File(outputFolder, ADatasetCreator.createCSVFileName("test_complex_data", pointPerGesture*gestureInputCount+1, differentOutputCount));
+		outputFile = new File(outputFolder, ADatasetCreator.createCSVFileName("test_complex_data", pointPerGesture+pointPerGesture*gestureInputCount+1, differentOutputCount));
 		metaOutputFile = new File(outputFolder,ADatasetCreator.getMetaFileName(outputFile.getName()));
 
 		try(PrintStream outputPrintStream = new PrintStream(new FileOutputStream(outputFile));
