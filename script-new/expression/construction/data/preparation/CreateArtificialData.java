@@ -35,12 +35,15 @@ import application.data.model.handling.SymbolTransformations;
 import application.data.source.H2Database;
 import application.data.source.IDataSource;
 import application.ui.draw.Canvas;
+import log.Log;
 
 public class CreateArtificialData {
 	
 	private CreateArtificialData() {}
 
 	public static void main(String[] args) throws Exception {
+		
+		Log.setDisabled(true);
 		
 		//Load properties
 		Properties properties = new Properties();
