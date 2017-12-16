@@ -35,7 +35,7 @@ public class CreateTestAndTrainUtilities {
 			Gesture[] pastAndPresentInputGestures = new Gesture[pastAndPresentGestureInputCount];
 			String previousOutput = "?";
 			
-			Gesture futureInputGesture = null; //TODO: perhaps and array would be even better
+			Gesture futureInputGesture = null; 
 			
 			List<Symbol> symbols = expression.getSymbols();
 			for(int s=0, symbolCount=symbols.size();s<symbolCount; s++) {
@@ -51,7 +51,6 @@ public class CreateTestAndTrainUtilities {
 					}
 					pastAndPresentInputGestures[pastAndPresentGestureInputCount-1] = gestures.get(i);
 										
-					//TODO
 					if(i<size-1) {
 						futureInputGesture = gestures.get(i+1);
 					}
@@ -64,9 +63,7 @@ public class CreateTestAndTrainUtilities {
 							futureInputGesture = null;
 						}
 					}
-					//TODO
 					
-
 					int previousId = PArrays.getHotIndex(classToSampleOutput.get(previousOutput));					
 					if(i==size-1) {
 						previousOutput = symbol.getSymbolAsString();
