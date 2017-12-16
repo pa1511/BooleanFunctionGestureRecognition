@@ -107,7 +107,7 @@ public class CreateCNNModel {
 			File outputFolder = new File("./training/symbol-gesture-new/model/");
 			Evaluation bestEvaluation = null;
 			MultiLayerNetwork bestNetwork = null;
-			int nEpochs = 250;
+			int nEpochs = 1200;
 	        for ( int n = 0; n < nEpochs; n++) {
 	            model.fit( trainIter );
 

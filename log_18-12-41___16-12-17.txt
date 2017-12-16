@@ -1,3 +1,0 @@
-Time: 18-12-41___16-12-17 "Connecting to database" Type:Plain Thread: main
-Time: 18-12-41___16-12-17 "Connection to database established" Type:Plain Thread: main
-Time: 18-12-42___16-12-17 "Closed lazy autoclosable Lazy: conn1: url=jdbc:h2:./data/boolean_gesture_recognition user=ADMIN" Type:Plain Thread: Thread-2
