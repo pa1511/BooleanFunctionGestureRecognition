@@ -41,11 +41,10 @@ public class CreateCNNModel {
 	public static void main(String[] args) throws Exception {
 		Log.setDisabled(true);
 
-		String fileNameTrain = "./training/symbol-gesture-new/training_data-97-2.csv";
-		String fileNameTest = "./training/symbol-gesture-new/test_simple_data-97-2.csv";
-		String modelName = "CNN-97-2-model-test";
+		String fileNameTrain = "./training/symbol-gesture-new/training_data-97-10.csv";
+		String fileNameTest = "./training/symbol-gesture-new/test_simple_data-97-10.csv";
+		String modelName = "CNN-97-10-model-test";
 		
-		//File statOutputFolder = new File("./training/symbol-gesture-new/statistics/");
 		File inputFile = new File(fileNameTrain);
 		
 		int numInputs = ADatasetCreator.getNumberOfInputsFrom(inputFile);
@@ -54,7 +53,7 @@ public class CreateCNNModel {
         //Load the training data:
         try(RecordReader rr = new CSVRecordReader()){
 	        rr.initialize(new FileSplit(new File(fileNameTrain)));
-			int batchSize = 256;
+			int batchSize = 64;
 	        DataSetIterator trainIter = new RecordReaderDataSetIterator(rr,batchSize,0,numOutputs);
 	
 			int nChannels = 1;
@@ -71,12 +70,12 @@ public class CreateCNNModel {
 	                .layer(0, new ConvolutionLayer.Builder(1,8)
 	                        .nIn(nChannels)
 	                        .stride(1,1)
-	                        .nOut(16)
+	                        .nOut(8)
 	                        .activation(Activation.RELU)
 	                        .build())
 	                .layer(1, new ConvolutionLayer.Builder(1,8)
 	                        .stride(1,1)
-	                        .nOut(32)
+	                        .nOut(16)
 	                        .activation(Activation.RELU)
 	                        .build())
 	                .layer(2, new SubsamplingLayer.Builder(SubsamplingLayer.PoolingType.MAX)
@@ -84,9 +83,9 @@ public class CreateCNNModel {
 	                        .stride(1,4)
 	                        .build())
 	                .layer(3, new DenseLayer.Builder().activation(Activation.RELU)
-	                        .nOut(512).build())
+	                        .nOut(32).build())
 	                .layer(4, new DenseLayer.Builder().activation(Activation.RELU)
-	                        .nOut(256).build())
+	                        .nOut(32).build())
 	                .layer(5, new OutputLayer.Builder(LossFunctions.LossFunction.NEGATIVELOGLIKELIHOOD)
 	                        .nOut(numOutputs)
 	                        .activation(Activation.SOFTMAX)
@@ -104,7 +103,7 @@ public class CreateCNNModel {
 	        //Store model
 			File outputFolder = new File("./training/symbol-gesture-new/model/");
 			Evaluation bestEvaluation = null;
-			int nEpochs = 250;
+			int nEpochs = 200;//TODO
 			MultiLayerNetwork bestNetwork = null;
 	        for ( int n = 0; n < nEpochs; n++) {
 	            model.fit( trainIter );

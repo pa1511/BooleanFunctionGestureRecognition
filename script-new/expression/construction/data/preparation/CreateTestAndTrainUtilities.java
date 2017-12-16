@@ -28,24 +28,43 @@ public class CreateTestAndTrainUtilities {
 	}
 
 	public static ClassificationDataSet createDataSet(List<Expression> expressions,
-			LinkedHashMap<String, double[]> classToSampleOutput, int gestureInputCount, int pointPerGesture) {
+			LinkedHashMap<String, double[]> classToSampleOutput, int pastAndPresentGestureInputCount, int pointPerGesture) {
 		List<Pair<double[], double[]>> classificationData = new ArrayList<>();
 		for(Expression expression:expressions) {
 			
-			Gesture[] inputGestures = new Gesture[gestureInputCount];
+			Gesture[] pastAndPresentInputGestures = new Gesture[pastAndPresentGestureInputCount];
 			String previousOutput = "?";
 			
-			for(Symbol symbol:expression.getSymbols()) {
+			Gesture futureInputGesture = null; //TODO: perhaps and array would be even better
+			
+			List<Symbol> symbols = expression.getSymbols();
+			for(int s=0, symbolCount=symbols.size();s<symbolCount; s++) {
 
+				Symbol symbol = symbols.get(s);
 				
-				List<Gesture> gestres = symbol.getGestures();
+				List<Gesture> gestures = symbol.getGestures();
 				
-				for(int i=0,size=gestres.size(); i<size;i++) {
+				for(int i=0,size=gestures.size(); i<size;i++) {
 					
-					for(int j=0; j<gestureInputCount-1;j++) {
-						inputGestures[j] = inputGestures[j+1];
+					for(int j=0; j<pastAndPresentGestureInputCount-1;j++) {
+						pastAndPresentInputGestures[j] = pastAndPresentInputGestures[j+1];
 					}
-					inputGestures[gestureInputCount-1] = gestres.get(i);
+					pastAndPresentInputGestures[pastAndPresentGestureInputCount-1] = gestures.get(i);
+										
+					//TODO
+					if(i<size-1) {
+						futureInputGesture = gestures.get(i+1);
+					}
+					else {
+						if(s<symbolCount-1) {
+							Symbol nextSymbol = symbols.get(s+1);
+							futureInputGesture = nextSymbol.getGestures().get(0);
+						}
+						else {
+							futureInputGesture = null;
+						}
+					}
+					//TODO
 					
 
 					int previousId = PArrays.getHotIndex(classToSampleOutput.get(previousOutput));					
@@ -57,7 +76,23 @@ public class CreateTestAndTrainUtilities {
 					}
 					double[] sampleOutput = classToSampleOutput.get(previousOutput);
 					
-					double[] sample = createSample(inputGestures,pointPerGesture,previousId);
+					//make past and present raw sample
+					double[] rawRepresentation = new double[pointPerGesture*pastAndPresentInputGestures.length];
+					sampleGestures(rawRepresentation,pastAndPresentInputGestures,pointPerGesture);
+					normalizeRawSample(rawRepresentation, 0, rawRepresentation.length);
+					
+					//make future raw sample
+					double[] futureRaw = new double[pointPerGesture];
+					sampleGestures(futureRaw, new Gesture[] {futureInputGesture}, pointPerGesture);
+					normalizeRawSample(futureRaw, 0, futureRaw.length);
+					
+					//join raw samples
+					double[] sample = new double[rawRepresentation.length+futureRaw.length+1];
+					System.arraycopy(rawRepresentation, 0, sample, 0, rawRepresentation.length);
+					System.arraycopy(futureRaw, 0, sample, rawRepresentation.length, futureRaw.length);
+					sample[sample.length-1] = previousId;
+					
+					//add to data set
 					classificationData.add(Pair.of(sample, sampleOutput));
 				}
 				
@@ -79,11 +114,16 @@ public class CreateTestAndTrainUtilities {
 		return dataSet;
 	}
 
-	public static double[] createSample(Gesture[] gestures, int pointPerGesture, int previousId) {
-
-		double scaleModifier = 1.0;
+	/**
+	 * Samples pointPerGesture points for each of the given gestures and stores them in the rawRepresentation array. <br/>
+	 * A point in this instance does not refer to one (x,y) point, but to one data point so either x or y. <br/>
+	 * 
+	 * @param rawRepresentation
+	 * @param gestures
+	 * @param pointPerGesture
+	 */
+	public static void sampleGestures(double[] rawRepresentation, Gesture[] gestures,int pointPerGesture) {
 		
-		double[] rawRepresentation = new double[pointPerGesture*gestures.length+1];
 		Arrays.fill(rawRepresentation, -1);
 		
 		for(int i=0; i<gestures.length;i++) {
@@ -113,89 +153,80 @@ public class CreateTestAndTrainUtilities {
 			}
 		}
 		
-		normalizeSymbolSample(rawRepresentation,scaleModifier,false);
-		rawRepresentation[rawRepresentation.length-1] = previousId;
-
-		return rawRepresentation;
 	}
-	
-	public static void normalizeSymbolSample(@Nonnull double[] rawSample, double modifier, boolean includeLast) {
 
+	/**
+	 * 
+	 * @param rawSample
+	 * @param startIndex - Index of the first element which will be affected by normalization. Interval including start.
+	 * @param endIndex - Index of the first element which will not be affected by normalization. Interval excluding  end.
+	 */
+	public static void normalizeRawSample(@Nonnull double[] rawSample, int startIndex, int endIndex) {
+
+		int intervalLength = endIndex-startIndex;
+		
 		double averageX = 0;
 		double averageY = 0;
 		
 		int xCount = 0;
 		int yCount = 0;
 		
-		for (int i = 0; i < rawSample.length-1; i += 2) {
-			if(rawSample[i]!=-1) {
-				averageX += rawSample[i];
-				xCount++;
-			}
-			if(rawSample[i + 1]!=-1) {
-				averageY += rawSample[i + 1];
-				yCount++;
-			}
-		}
-		if(includeLast && rawSample.length%2!=0){
-			if(rawSample[rawSample.length-1]!=-1) {
-				averageX += rawSample[rawSample.length-1];
-				xCount++;
+		for (int i = 0; i < intervalLength; i++) {
+			int elementId = startIndex+i;
+			double elementValue = rawSample[elementId];
+			if(elementValue!=-1) {
+				if(i%2!=0) {
+					averageY += elementValue;
+					yCount++;
+				}
+				else {
+					averageX += elementValue;
+					xCount++;
+				}
 			}
 		}
 		
 		averageX /= xCount;
 		averageY /= yCount;
 		
-		for (int i = 0; i < rawSample.length-1; i += 2) {
-			if(rawSample[i]!=-1) {
-				rawSample[i] -= averageX;
+		for (int i = 0; i < intervalLength; i++) {
+			int elementId = startIndex+i;
+			if(rawSample[elementId]!=-1) {
+				if(i%2!=0) {
+					rawSample[elementId] -= averageY;
+				}
+				else {
+					rawSample[elementId] -= averageX;
+				}
 			}
 			else {
-				rawSample[i] = 0;
-			}
-			//
-			if(rawSample[i + 1]!=-1) {
-				rawSample[i + 1] -= averageY;
-			}
-			else {
-				rawSample[i + 1] = 0;
+				rawSample[elementId] = 0;
 			}
 		}		
-		if(includeLast && rawSample.length%2!=0){
-			if(rawSample[rawSample.length-1]!=-1) {
-				rawSample[rawSample.length-1] -= averageX;
-			}
-			else {
-				rawSample[rawSample.length-1] = 0;
-			}
-		}
 		
 		//===========================================================================================
 		
 		double maxX = Double.MIN_VALUE, minX = Double.MAX_VALUE;
 		double maxY = Double.MIN_VALUE, minY = Double.MAX_VALUE;
 
-		for (int i = 0; i < rawSample.length-1; i += 2) {
-			maxX = Math.max(maxX, rawSample[i]);
-			minX = Math.min(minX, rawSample[i]);
-			maxY = Math.max(maxY, rawSample[i + 1]);
-			minY = Math.min(minY, rawSample[i + 1]);
-		}
-		if(includeLast && rawSample.length%2!=0){
-			maxX = Math.max(maxX, rawSample[rawSample.length-1]);
-			minX = Math.min(minX, rawSample[rawSample.length-1]);
+		for (int i = 0; i < intervalLength; i++) {
+			int elementId = startIndex+i;
+			if(i%2!=0) {
+				maxY = Math.max(maxY, rawSample[elementId]);
+				minY = Math.min(minY, rawSample[elementId]);
+			}
+			else {
+				maxX = Math.max(maxX, rawSample[elementId]);
+				minX = Math.min(minX, rawSample[elementId]);
+			}
 		}
 		
-		double scale = Math.max(maxX-minX, maxY-minY)*modifier;
+		double scale = Math.max(maxX-minX, maxY-minY);
 
-		for (int i = 0; i < rawSample.length-1; i += 2) {
-			rawSample[i] = rawSample[i]/scale;
-			rawSample[i + 1] = rawSample[i + 1]/scale;
+		for (int i = 0; i <intervalLength; i++) {
+			int elementId = startIndex+i;
+			rawSample[elementId] /= scale;
 		}		
-		if(includeLast && rawSample.length%2!=0){
-			rawSample[rawSample.length-1] = rawSample[rawSample.length-1]/scale;
-		}
 		
 	}
 

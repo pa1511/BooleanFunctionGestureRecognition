@@ -63,13 +63,13 @@ public class CreateTestAndTrainDataByClass {
 		classToSampleOutput.put("?", oneHotCode);
 		
 		//Create data set for new network
-		int gestureInputCount = 3;
-		int pointPerGesture = 32;
+		int gestureInputCount = 4;
+		int pointPerGesture = 36;
 
 		ClassificationDataSet dataSet = CreateTestAndTrainUtilities.createDataSet(expressions, classToSampleOutput, gestureInputCount, pointPerGesture);
 		//Storing created data set
 		String outputFolder = "./training/symbol-gesture-new/";
-		File outputFile = new File(outputFolder, ADatasetCreator.createCSVFileName("training_data", pointPerGesture*gestureInputCount+1, differentOutputCount));
+		File outputFile = new File(outputFolder, ADatasetCreator.createCSVFileName("training_data", pointPerGesture+pointPerGesture*gestureInputCount+1, differentOutputCount));
 		File metaOutputFile = new File(outputFolder,ADatasetCreator.getMetaFileName(outputFile.getName()));
 
 		try(PrintStream outputPrintStream = new PrintStream(new FileOutputStream(outputFile));
@@ -90,7 +90,7 @@ public class CreateTestAndTrainDataByClass {
 		dataSet = CreateTestAndTrainUtilities.createDataSet(expressions, classToSampleOutput, gestureInputCount, pointPerGesture);
 
 		//Storing created data set
-		outputFile = new File(outputFolder, ADatasetCreator.createCSVFileName("test_simple_data", pointPerGesture*gestureInputCount+1, differentOutputCount));
+		outputFile = new File(outputFolder, ADatasetCreator.createCSVFileName("test_simple_data", pointPerGesture+pointPerGesture*gestureInputCount+1, differentOutputCount));
 		metaOutputFile = new File(outputFolder,ADatasetCreator.getMetaFileName(outputFile.getName()));
 
 		try(PrintStream outputPrintStream = new PrintStream(new FileOutputStream(outputFile));
@@ -111,7 +111,7 @@ public class CreateTestAndTrainDataByClass {
 		dataSet = CreateTestAndTrainUtilities.createDataSet(expressions, classToSampleOutput, gestureInputCount, pointPerGesture);
 
 		//Storing created data set
-		outputFile = new File(outputFolder, ADatasetCreator.createCSVFileName("test_complex_data", pointPerGesture*gestureInputCount+1, differentOutputCount));
+		outputFile = new File(outputFolder, ADatasetCreator.createCSVFileName("test_complex_data", pointPerGesture+pointPerGesture*gestureInputCount+1, differentOutputCount));
 		metaOutputFile = new File(outputFolder,ADatasetCreator.getMetaFileName(outputFile.getName()));
 
 		try(PrintStream outputPrintStream = new PrintStream(new FileOutputStream(outputFile));

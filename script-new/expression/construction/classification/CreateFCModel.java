@@ -26,7 +26,6 @@ import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
 import org.nd4j.linalg.lossfunctions.LossFunctions.LossFunction;
 
 import application.data.dataset.ADatasetCreator;
-import application.symbolClassification.SymbolClassificationSystem;
 import gnu.trove.list.array.TDoubleArrayList;
 import log.Log;
 import utilities.PStrings;
@@ -38,9 +37,9 @@ public class CreateFCModel {
 	public static void main(String[] args) throws Exception {
 		Log.setDisabled(true);
 
-		String fileNameTrain = "./training/symbol-gesture-new/training_data_v2-46-9.csv";
-		String fileNameTest = "./training/symbol-gesture-new/test_data_v2-46-9.csv";
-		String modelName = "FC-46-9-model";
+		String fileNameTrain = "./training/symbol-gesture-new/training_data-181-10.csv";
+		String fileNameTest = "./training/symbol-gesture-new/test_simple_data-181-10.csv";
+		String modelName = "FC-181-10-model-test";
 		
 		//File statOutputFolder = new File("./training/symbol-gesture-new/statistics/");
 		File inputFile = new File(fileNameTrain);
@@ -94,7 +93,7 @@ public class CreateFCModel {
 			File outputFolder = new File("./training/symbol-gesture-new/model/");
 			Evaluation bestEvaluation = null;
 			MultiLayerNetwork bestnet = null;
-			int nEpochs = 1000;
+			int nEpochs = 350;
 	        for ( int n = 0; n < nEpochs; n++) {
 	            model.fit( trainIter );
 	            Evaluation evaluation = evaluate(fileNameTest, numOutputs, batchSize, model);
