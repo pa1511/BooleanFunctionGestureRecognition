@@ -15,26 +15,45 @@ public class VisualizeAccuracy {
 		
 		
 		
-		String listName = //"CNN-97-10-model-test-acc-list.csv";
-				"FC-181-10-model-test-acc-list.csv";
+		String listName = "FC-181-10-model1-acc-list.csv";
 		List<String> lines = Files.readAllLines(Paths.get("./training/symbol-gesture-new/model/" + listName));
 		
-		double[] values = Arrays.stream(lines.get(0).split(",")).mapToDouble(Double::parseDouble).toArray();
-
-		SimpleGraph graph = new SimpleGraph(values.length, 1, values.length/10, 0.1);
+		double[] testValues = Arrays.stream(lines.get(0).split(",")).mapToDouble(Double::parseDouble).toArray();
+		
+		SimpleGraph graph = new SimpleGraph(testValues.length, 1, testValues.length/10, 0.1);
 		graph.setPointSize(6);
 				
-		for(int i=0; i<values.length;i++) {
-			graph.addPoint(i, values[i]);
-			if(i!=values.length-1) {
-				graph.addShape(new SimpleGraph.Line(i, values[i], i+1, values[i+1], Color.BLUE));
+		addPoints(testValues, graph, Color.BLUE);
+
+		if(lines.size()>1) {//Plot test complex error if present in file
+			String string = lines.get(1);
+			if(!string.trim().isEmpty()) {
+				double[] testComplexValues = Arrays.stream(string.split(",")).mapToDouble(Double::parseDouble).toArray(); 
+				addPoints(testComplexValues, graph, Color.GREEN);
+			}
+		}		
+		
+		if(lines.size()>2) {//Plot train error if present in file
+			String string = lines.get(2);
+			if(!string.trim().isEmpty()) {
+				double[] trainValues = Arrays.stream(string.split(",")).mapToDouble(Double::parseDouble).toArray(); 
+				addPoints(trainValues, graph, Color.ORANGE);
 			}
 		}
-		
+
 		
 		graph.display();
 		
 		
+	}
+
+	private static void addPoints(double[] values, SimpleGraph graph, Color color) {
+		for(int i=0; i<values.length;i++) {
+			graph.addPoint(i, values[i]);
+			if(i!=values.length-1) {
+				graph.addShape(new SimpleGraph.Line(i, values[i], i+1, values[i+1], color));
+			}
+		}
 	}
 
 }

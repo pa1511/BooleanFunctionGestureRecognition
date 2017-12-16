@@ -36,10 +36,11 @@ public class CreateFCModel {
 	
 	public static void main(String[] args) throws Exception {
 		Log.setDisabled(true);
-
+		
 		String fileNameTrain = "./training/symbol-gesture-new/training_data-181-10.csv";
-		String fileNameTest = "./training/symbol-gesture-new/test_simple_data-181-10.csv";
-		String modelName = "FC-181-10-model-test";
+		String fileNameSimpleTest = "./training/symbol-gesture-new/test_simple_data-181-10.csv";
+		String fileNameComplexTest = "./training/symbol-gesture-new/test_complex_data-181-10.csv";
+		String modelName = "FC-181-10-model1";
 		
 		//File statOutputFolder = new File("./training/symbol-gesture-new/statistics/");
 		File inputFile = new File(fileNameTrain);
@@ -55,6 +56,7 @@ public class CreateFCModel {
 	
 	        MultiLayerConfiguration conf = new NeuralNetConfiguration.Builder()
 	                .iterations(1)
+	                .regularization(true).l2(0.0005)
 	                .optimizationAlgo(OptimizationAlgorithm.STOCHASTIC_GRADIENT_DESCENT)
 	                .learningRate(0.025)
 	                .updater(Updater.ADAM)
@@ -81,41 +83,60 @@ public class CreateFCModel {
 	                        .nIn(32).nOut(numOutputs).build())
 	                .backprop(true).build();
 	
-	
 	        MultiLayerNetwork model = new MultiLayerNetwork(conf);
 	        model.init();
-	        model.setListeners(new ScoreIterationListener(50));  
+	        model.setListeners(new ScoreIterationListener(100));
 
 	        double bestAccuracy = 0;
-			TDoubleArrayList accuracyList = new TDoubleArrayList();
+			TDoubleArrayList testSimpleAccuracyList = new TDoubleArrayList();
+			TDoubleArrayList testComplexAccuracyList = new TDoubleArrayList();
+			TDoubleArrayList trainAccuracyList = new TDoubleArrayList();
 			
 	        //Store model
 			File outputFolder = new File("./training/symbol-gesture-new/model/");
 			Evaluation bestEvaluation = null;
-			MultiLayerNetwork bestnet = null;
+			MultiLayerNetwork bestNetwork = null;
 			int nEpochs = 350;
 	        for ( int n = 0; n < nEpochs; n++) {
 	            model.fit( trainIter );
-	            Evaluation evaluation = evaluate(fileNameTest, numOutputs, batchSize, model);
-	            double accuracy = evaluation.accuracy();
-	            accuracyList.add(accuracy);
+
+	            //test simple evaluation
+	            Evaluation testSimpleEvaluation = evaluate(fileNameSimpleTest, numOutputs, batchSize, model);
+	            testSimpleAccuracyList.add(testSimpleEvaluation.accuracy());
+	            	         
+	            //test complex evaluation
+	            Evaluation testComplexEvaluation = evaluate(fileNameComplexTest, numOutputs, batchSize, model);
+	            testComplexAccuracyList.add(testComplexEvaluation.accuracy());
+	            
+	            //train evaluation
+	            Evaluation trainEvaluation = evaluate(fileNameTrain, numOutputs, batchSize, model);
+	            trainAccuracyList.add(trainEvaluation.accuracy());
+	            
+	            //update best model
+	            double accuracy = testSimpleEvaluation.accuracy();
+
 	            if(bestAccuracy<accuracy) {
 	            	bestAccuracy = accuracy;
-	            	bestEvaluation = evaluation;
-	            	//Store best model
-	            	bestnet = model.clone();
-	    			//TODO: store model metadata
+	            	bestEvaluation = testSimpleEvaluation;
+	            	bestNetwork = model.clone();
 	            }
 	        }
-			ModelSerializer.writeModel(bestnet, new File(outputFolder, modelName), false);
+	        
+			//TODO: store model metadata
+			ModelSerializer.writeModel(bestNetwork, new File(outputFolder, modelName), false);
 	        System.out.println("Evaluate model....");
 		    System.out.println(bestEvaluation.stats());
 			
 		    try(PrintStream output = new PrintStream(new File(outputFolder, modelName+"-acc-list.csv"))){
-		    	String accuracyListStr = PStrings.toCSV(accuracyList.toArray());
-		    	output.println(accuracyListStr);
+		    	String testSimpleAccuracyListStr = PStrings.toCSV(testSimpleAccuracyList.toArray());
+		    	output.println(testSimpleAccuracyListStr);
+		    	
+		    	String testComplexAccuracyListStr = PStrings.toCSV(testComplexAccuracyList.toArray());
+		    	output.println(testComplexAccuracyListStr);
+		    	
+		    	String trainAccuracyListStr = PStrings.toCSV(trainAccuracyList.toArray());
+		    	output.println(trainAccuracyListStr);
 		    }
-
         }
 
 		

@@ -9,6 +9,8 @@ import javax.annotation.Nonnull;
 
 import application.data.geometry.PointTransformations;
 import application.data.model.Gesture;
+import application.data.model.Relative2DPoint;
+import application.data.model.RelativeGesture;
 
 public class GestureTransformations {
 
@@ -83,6 +85,60 @@ public class GestureTransformations {
 		}
 
 		return array;
+	}
+
+	public static RelativeGesture getRelativeGesture(Gesture gesture) {
+		
+		List<Point> points = gesture.getPoints();
+
+		double averageX = 0;
+		double averageY = 0;
+		
+		for(Point point:points) {
+			averageX+=point.getX();
+			averageY+=point.getY();
+		}
+		
+		averageX/=points.size();
+		averageY/=points.size();
+		
+		List<Relative2DPoint> relativePoints = new ArrayList<>(points.size());
+		
+		for(Point point:points) {
+			
+			double relativeX = point.getX()-averageX;
+			double relativeY = point.getY()-averageY;
+			
+			Relative2DPoint relativePoint = new Relative2DPoint(relativeX, relativeY);
+			relativePoints.add(relativePoint);
+		}
+		
+		//===========================================================================================
+
+		double maxX = Double.MIN_VALUE, minX = Double.MAX_VALUE;
+		double maxY = Double.MIN_VALUE, minY = Double.MAX_VALUE;
+
+		for (Relative2DPoint relativePoint:relativePoints) {
+			maxX = Math.max(maxX, relativePoint.x);
+			minX = Math.min(minX, relativePoint.x);
+			
+			maxY = Math.max(maxY, relativePoint.y);
+			minY = Math.min(minY, relativePoint.y);
+		}
+		
+		double scale = Math.max(maxX-minX, maxY-minY);
+
+		for (Relative2DPoint relativePoint:relativePoints) {
+			relativePoint.x/=scale;
+			relativePoint.y/=scale;
+		}		
+		
+		RelativeGesture relativeGesture = new RelativeGesture();
+		for (Relative2DPoint relativePoint:relativePoints) {
+			relativeGesture.addPoint(relativePoint);
+		}		
+			
+		return relativeGesture;
 	}
 
 }

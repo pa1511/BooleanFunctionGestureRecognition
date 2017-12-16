@@ -11,6 +11,8 @@ import javax.annotation.Nonnull;
 
 import application.data.geometry.PointTransformations;
 import application.data.model.Gesture;
+import application.data.model.RelativeGesture;
+import application.data.model.RelativeSymbol;
 import application.data.model.Symbol;
 import utilities.random.RNGProvider;
 
@@ -144,5 +146,18 @@ public class SymbolTransformations {
 				.flatMap(points->points.stream())
 				.collect(Collectors.toList());
 		return PointTransformations.getRectangleRepresentation(relativePoints);
+	}
+	
+	
+	public static @Nonnull RelativeSymbol getRelativeSymbol(Symbol symbol) {
+		
+		RelativeSymbol relativeSymbol = new RelativeSymbol(symbol.getSymbol());
+		
+		for(Gesture gesture:symbol.getGestures()) {
+			RelativeGesture relativeGesture = GestureTransformations.getRelativeGesture(gesture);
+			relativeSymbol.addGesture(relativeGesture);
+		}
+		
+		return relativeSymbol;
 	}
 }
