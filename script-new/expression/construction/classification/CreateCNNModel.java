@@ -44,7 +44,7 @@ public class CreateCNNModel {
 		String fileNameTrain = "./training/symbol-gesture-new/training_data-181-10.csv";
 		String fileNameSimpleTest = "./training/symbol-gesture-new/test_simple_data-181-10.csv";
 		String fileNameComplexTest = "./training/symbol-gesture-new/test_complex_data-181-10.csv";
-		String modelName = "CNN-181-10-model1";
+		String modelName = "CNN-181-10-model5";
 		
 		File inputFile = new File(fileNameTrain);
 		
@@ -76,18 +76,25 @@ public class CreateCNNModel {
 	                        .build())
 	                .layer(1, new ConvolutionLayer.Builder(1,8)
 	                        .stride(1,1)
-	                        .nOut(64)
+	                        .nOut(32)
 	                        .activation(Activation.RELU)
 	                        .build())
 	                .layer(2, new SubsamplingLayer.Builder(SubsamplingLayer.PoolingType.MAX)
 	                        .kernelSize(1,4)
 	                        .stride(1,4)
 	                        .build())
-	                .layer(3, new DenseLayer.Builder().activation(Activation.RELU)
-	                        .nOut(128).build())
+	                .layer(3, new ConvolutionLayer.Builder(1,4)
+	                        .stride(1,1)
+	                        .nOut(32)
+	                        .activation(Activation.RELU)
+	                        .build())
 	                .layer(4, new DenseLayer.Builder().activation(Activation.RELU)
 	                        .nOut(32).build())
-	                .layer(5, new OutputLayer.Builder(LossFunctions.LossFunction.NEGATIVELOGLIKELIHOOD)
+	                .layer(5, new DenseLayer.Builder().activation(Activation.RELU)
+	                        .nOut(32).build())
+	                .layer(6, new DenseLayer.Builder().activation(Activation.RELU)
+	                        .nOut(32).build())
+	                .layer(7, new OutputLayer.Builder(LossFunctions.LossFunction.NEGATIVELOGLIKELIHOOD)
 	                        .nOut(numOutputs)
 	                        .activation(Activation.SOFTMAX)
 	                        .build())
@@ -96,7 +103,7 @@ public class CreateCNNModel {
 
 	        MultiLayerNetwork model = new MultiLayerNetwork(conf);
 	        model.init();
-	        model.setListeners(new ScoreIterationListener(100));
+	        model.setListeners(new ScoreIterationListener(500));
 
 	        double bestAccuracy = 0;
 			TDoubleArrayList testSimpleAccuracyList = new TDoubleArrayList();
@@ -107,9 +114,10 @@ public class CreateCNNModel {
 			File outputFolder = new File("./training/symbol-gesture-new/model/");
 			Evaluation bestEvaluation = null;
 			MultiLayerNetwork bestNetwork = null;
-			int nEpochs = 1200;
+			int nEpochs = 250;
 	        for ( int n = 0; n < nEpochs; n++) {
-	            model.fit( trainIter );
+	        	System.out.println("Epoch: " + n);
+	            model.fit(trainIter);
 
 	            //test simple evaluation
 	            Evaluation testSimpleEvaluation = evaluate(fileNameSimpleTest, numOutputs, batchSize, model);

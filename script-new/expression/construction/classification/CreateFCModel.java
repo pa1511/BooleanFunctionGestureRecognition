@@ -37,50 +37,55 @@ public class CreateFCModel {
 	public static void main(String[] args) throws Exception {
 		Log.setDisabled(true);
 		
-		String fileNameTrain = "./training/symbol-gesture-new/training_data-181-10.csv";
-		String fileNameSimpleTest = "./training/symbol-gesture-new/test_simple_data-181-10.csv";
-		String fileNameComplexTest = "./training/symbol-gesture-new/test_complex_data-181-10.csv";
-		String modelName = "FC-181-10-model1";
+		String fileNameTrainReal = "./training/symbol-gesture-new/training_data-78-2.csv";
+		String fileNameSimpleTest = "./training/symbol-gesture-new/test_simple_data-78-2.csv";
+//		String fileNameComplexTest = "./training/symbol-gesture-new/test_complex_data-180-10.csv";
+//		String fileNameTrainArtificial = "./training/symbol-gesture-new/artificial_training_data-180-10.csv";
+		//
+		String modelName = "FC-78-2-model1";
 		
 		//File statOutputFolder = new File("./training/symbol-gesture-new/statistics/");
-		File inputFile = new File(fileNameTrain);
+		File inputFile = new File(fileNameTrainReal);
 		
 		int numInputs = ADatasetCreator.getNumberOfInputsFrom(inputFile);
 		int numOutputs = ADatasetCreator.getNumberOfOutputsFrom(inputFile);
 
         //Load the training data:
-        try(RecordReader rr = new CSVRecordReader()){
-	        rr.initialize(new FileSplit(new File(fileNameTrain)));
-			int batchSize = 256;
-	        DataSetIterator trainIter = new RecordReaderDataSetIterator(rr,batchSize,0,numOutputs);
+        try(RecordReader rr1 = new CSVRecordReader();/*RecordReader rr2 = new CSVRecordReader()*/){
+	        rr1.initialize(new FileSplit(new File(fileNameTrainReal)));
+//	        rr2.initialize(new FileSplit(new File(fileNameTrainArtificial)));
+			int width = 32;
+			int batchSize = width;
+	        DataSetIterator trainIterReal = new RecordReaderDataSetIterator(rr1,batchSize,0,numOutputs);
+//	        DataSetIterator trainIterArtificial = new RecordReaderDataSetIterator(rr2,batchSize,0,numOutputs);
 	
 	        MultiLayerConfiguration conf = new NeuralNetConfiguration.Builder()
 	                .iterations(1)
 	                .regularization(true).l2(0.0005)
 	                .optimizationAlgo(OptimizationAlgorithm.STOCHASTIC_GRADIENT_DESCENT)
-	                .learningRate(0.025)
+	                .learningRate(0.025).biasLearningRate(0.02)
 	                .updater(Updater.ADAM)
 	                .list()
-	                .layer(0, new DenseLayer.Builder().nIn(numInputs).nOut(32)
+	                .layer(0, new DenseLayer.Builder().nIn(numInputs).nOut(width)
 	                        .weightInit(WeightInit.XAVIER)
 	                        .activation(Activation.RELU)
 	                        .build())
-	                .layer(1, new DenseLayer.Builder().nIn(32).nOut(32)
+	                .layer(1, new DenseLayer.Builder().nIn(width).nOut(width)
 	                        .weightInit(WeightInit.XAVIER)
 	                        .activation(Activation.RELU)
 	                        .build())
-	                .layer(2, new DenseLayer.Builder().nIn(32).nOut(32)
+	                .layer(2, new DenseLayer.Builder().nIn(width).nOut(width)
 	                        .weightInit(WeightInit.XAVIER)
 	                        .activation(Activation.RELU)
 	                        .build())
-	                .layer(3, new DenseLayer.Builder().nIn(32).nOut(32)
-	                        .weightInit(WeightInit.XAVIER)
-	                        .activation(Activation.RELU)
-	                        .build())
-	                .layer(4, new OutputLayer.Builder(LossFunction.NEGATIVELOGLIKELIHOOD)
+//	                .layer(3, new DenseLayer.Builder().nIn(width).nOut(width)
+//	                        .weightInit(WeightInit.XAVIER)
+//	                        .activation(Activation.RELU)
+//	                        .build())
+	                .layer(3, new OutputLayer.Builder(LossFunction.NEGATIVELOGLIKELIHOOD)
 	                        .weightInit(WeightInit.XAVIER)
 	                        .activation(Activation.SOFTMAX)
-	                        .nIn(32).nOut(numOutputs).build())
+	                        .nIn(width).nOut(numOutputs).build())
 	                .backprop(true).build();
 	
 	        MultiLayerNetwork model = new MultiLayerNetwork(conf);
@@ -89,27 +94,29 @@ public class CreateFCModel {
 
 	        double bestAccuracy = 0;
 			TDoubleArrayList testSimpleAccuracyList = new TDoubleArrayList();
-			TDoubleArrayList testComplexAccuracyList = new TDoubleArrayList();
+//			TDoubleArrayList testComplexAccuracyList = new TDoubleArrayList();
 			TDoubleArrayList trainAccuracyList = new TDoubleArrayList();
 			
 	        //Store model
 			File outputFolder = new File("./training/symbol-gesture-new/model/");
 			Evaluation bestEvaluation = null;
 			MultiLayerNetwork bestNetwork = null;
-			int nEpochs = 350;
+			int nEpochs = 200;
 	        for ( int n = 0; n < nEpochs; n++) {
-	            model.fit( trainIter );
+	        	System.out.println("Epoch: " + n);
+	            model.fit(trainIterReal);
+	//            model.fit( trainIterArtificial);
 
 	            //test simple evaluation
 	            Evaluation testSimpleEvaluation = evaluate(fileNameSimpleTest, numOutputs, batchSize, model);
 	            testSimpleAccuracyList.add(testSimpleEvaluation.accuracy());
 	            	         
 	            //test complex evaluation
-	            Evaluation testComplexEvaluation = evaluate(fileNameComplexTest, numOutputs, batchSize, model);
-	            testComplexAccuracyList.add(testComplexEvaluation.accuracy());
+//	            Evaluation testComplexEvaluation = evaluate(fileNameComplexTest, numOutputs, batchSize, model);
+//	            testComplexAccuracyList.add(testComplexEvaluation.accuracy());
 	            
 	            //train evaluation
-	            Evaluation trainEvaluation = evaluate(fileNameTrain, numOutputs, batchSize, model);
+	            Evaluation trainEvaluation = evaluate(fileNameTrainReal, numOutputs, batchSize, model);
 	            trainAccuracyList.add(trainEvaluation.accuracy());
 	            
 	            //update best model
@@ -131,7 +138,7 @@ public class CreateFCModel {
 		    	String testSimpleAccuracyListStr = PStrings.toCSV(testSimpleAccuracyList.toArray());
 		    	output.println(testSimpleAccuracyListStr);
 		    	
-		    	String testComplexAccuracyListStr = PStrings.toCSV(testComplexAccuracyList.toArray());
+		    	String testComplexAccuracyListStr = "";//PStrings.toCSV(testComplexAccuracyList.toArray());
 		    	output.println(testComplexAccuracyListStr);
 		    	
 		    	String trainAccuracyListStr = PStrings.toCSV(trainAccuracyList.toArray());

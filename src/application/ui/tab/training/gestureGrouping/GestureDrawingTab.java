@@ -75,7 +75,7 @@ public class GestureDrawingTab extends AbstractApplicationTab{
 	private final @Nonnull IBooleanSpatialParser spatialParser;
 	
 	//Last few support
-	private final @CheckForNull List<Gesture> lastFewGestures;
+	private final @Nonnull List<Gesture> lastFewGestures;
 	private final @Nonnegative int lastFewLimit;
 	
 	//

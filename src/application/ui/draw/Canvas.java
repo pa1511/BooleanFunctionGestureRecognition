@@ -2,6 +2,7 @@ package application.ui.draw;
 
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -124,7 +125,13 @@ public class Canvas extends JPanel implements AutoCloseable {
 			for (int i = 0, size = pointsList.size() - 1; i < size; i++) {
 				Point first = pointsList.get(i);
 				Point second = pointsList.get(i + 1);
-				g.drawLine(first.x, first.y, second.x, second.y);
+				
+//				if(size>2)
+					g.drawLine(first.x, first.y, second.x, second.y);
+//				else {
+//					Graphics2D g2d = (Graphics2D)g;
+//					g2d.fillOval(first.x, first.y, 10, 10);//TODO: remove!!!
+//				}
 			}
 		}
 		g.setColor(oldColor);

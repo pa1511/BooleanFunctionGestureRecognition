@@ -14,14 +14,13 @@ public class VisualizeAccuracy {
 	public static void main(String[] args) throws IOException {
 		
 		
-		
-		String listName = "FC-181-10-model1-acc-list.csv";
+		String listName = "FC-78-2-model1-acc-list.csv";
 		List<String> lines = Files.readAllLines(Paths.get("./training/symbol-gesture-new/model/" + listName));
 		
 		double[] testValues = Arrays.stream(lines.get(0).split(",")).mapToDouble(Double::parseDouble).toArray();
 		
 		SimpleGraph graph = new SimpleGraph(testValues.length, 1, testValues.length/10, 0.1);
-		graph.setPointSize(6);
+		graph.setPointSize(2);
 				
 		addPoints(testValues, graph, Color.BLUE);
 

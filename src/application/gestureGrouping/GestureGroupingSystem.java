@@ -26,8 +26,10 @@ public class GestureGroupingSystem extends ASystem{
 	private GestureGroupingSystem() {
 	}
 
+
 	private static final @Nonnull String GESTURE_GROUPING_IMPL_PATH = "gesture.grouping.impl.path";
 	private static final @Nonnull String GESTURE_GROUPING_IMPL_NAME = "gesture.grouping.impl.name";
+	private static final @Nonnull String FSD_GESTURE_GROUPING_IMPL_NAME = "gesture.grouping.impl.fsd.name";
 	
 	private static final @Nonnull String MODELS_PATH_KEY = "gesture.grouping.model.based.path";
 	private static final @Nonnull String MODELS_IMPL_KEY = "gesture.grouping.model.based.impl";
@@ -37,6 +39,11 @@ public class GestureGroupingSystem extends ASystem{
 	public static IGestureGrouper getGestureGrouper(Properties properties) throws Exception {
 		return ASystem.getImplementation(properties, GestureGroupingSystem.GESTURE_GROUPING_IMPL_PATH,
 				GestureGroupingSystem.GESTURE_GROUPING_IMPL_NAME);
+	}
+	
+	public static IGestureGrouper getFSDGestureGrouper(Properties properties) throws Exception {
+		return ASystem.getImplementation(properties, GestureGroupingSystem.GESTURE_GROUPING_IMPL_PATH,
+				GestureGroupingSystem.FSD_GESTURE_GROUPING_IMPL_NAME);
 	}
 	
 	public static ISymbolClassifier getBaseSymbolClassifier(Properties properties) throws Exception{
@@ -82,5 +89,6 @@ public class GestureGroupingSystem extends ASystem{
 		String maxPerSymbol = properties.getProperty(GESTURE_GROUPING_MAX_GESTURE_COUNT);
 		return Integer.parseInt(maxPerSymbol);
 	}
+
 	
 }

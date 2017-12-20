@@ -10,8 +10,11 @@ import java.util.List;
 
 import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
+import javax.swing.WindowConstants;
 
 import application.data.geometry.RelativePoint;
 import application.data.model.Gesture;
@@ -39,6 +42,15 @@ public class GesturePanel extends JPanel{
 		add(gestureSymbolLabel, BorderLayout.SOUTH);
 	}
 	
+	public void display() {
+		SwingUtilities.invokeLater(()->{
+			JFrame frame = new JFrame();
+			frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+			frame.setBounds(400, 400, 200, 200);
+			frame.add(this);
+			frame.setVisible(true);
+		});
+	}
 	
 	private final static class DrawingPane extends JPanel{
 		

@@ -1,3 +1,4 @@
+
 package expression.construction.classification;
 
 import java.io.File;
@@ -21,23 +22,24 @@ public class TestModel {
 		String folder = 
 				"./training/symbol-gesture-new/model/";
 				//"./training/archive/181-10/model/";
-		String modelName = "FC-181-10-model1";
+				//"./training/archive/old/";
+		String modelName = "FC-180-10-artf-model1";
 		
-        int batchSize = 256;
+        int batchSize = 512;
 		int numOutputs = 10;
 		MultiLayerNetwork network = ModelSerializer.restoreMultiLayerNetwork(new File(folder + modelName));
 		
 		
-        evaluate("test_simple_data-181-10.csv", batchSize, numOutputs, network);
-        evaluate("test_complex_data-181-10.csv", batchSize, numOutputs, network);
-
+        evaluate("./training/symbol-gesture-new/", "test_simple_data-180-10.csv", batchSize, numOutputs, network);
+        evaluate("./training/symbol-gesture-new/", "test_complex_data-180-10.csv", batchSize, numOutputs, network);
+        //
 	}
 
-	private static void evaluate(String testDataFile, int batchSize, int numOutputs, MultiLayerNetwork network)
+	private static void evaluate(String folder, String testDataFile, int batchSize, int numOutputs, MultiLayerNetwork network)
 			throws IOException, InterruptedException {
 		System.out.println("Evaluate model....");
         try(RecordReader rrTest = new CSVRecordReader()){
-			String fileNameTest = "./training/symbol-gesture-new/" + testDataFile;
+			String fileNameTest = folder + testDataFile;
 	        rrTest.initialize(new FileSplit(new File(fileNameTest)));
 			DataSetIterator testIter = new RecordReaderDataSetIterator(rrTest,batchSize ,0,numOutputs );
 	        

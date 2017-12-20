@@ -31,12 +31,7 @@ public class Help {
 		try(IDataSource ds = new H2Database("train",properties)){
 			expressions = ds.getExpressions();
 		}
-		expressions = expressions.stream()
-				.filter(expression-> !expression.getSymbols()
-						.stream()
-						.anyMatch(symbol->symbol.getSymbolAsString().equalsIgnoreCase("C")))
-				.collect(Collectors.toList());
-
+		expressions = CreateTestAndTrainUtilities.filterExpressions(expressions);
 		
 		int gestureCount = 0;
 		int pointsPerGesture = 0;
