@@ -3,7 +3,8 @@
 /logs/
 /test_logs/
 /symbol
-/training/symbol/model
 /data
 /data/old
 /training/archive
+/training/symbol/model
+/training
