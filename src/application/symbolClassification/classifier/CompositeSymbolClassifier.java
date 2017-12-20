@@ -158,12 +158,13 @@ public class CompositeSymbolClassifier implements ISymbolClassifier {
 	public String getName() {
 		
 		if(name!=null)
-			return null;
+			return name;
 		
 		StringBuilder stringBuilder = new StringBuilder();
 		for(ISymbolClassifier symbolClassifier:classifiers)
 			stringBuilder.append(symbolClassifier.getName()).append("||");
-		return stringBuilder.toString();
+		name = stringBuilder.toString();
+		return name;
 	}
 
 	@Override

@@ -1,51 +1,65 @@
 package application.gestureGrouping.impl;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.annotation.Nonnegative;
+import javax.annotation.Nonnull;
 
 import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
+import org.deeplearning4j.util.ModelSerializer;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.factory.Nd4j;
 
+import application.Application;
 import application.data.model.Gesture;
 import application.data.model.Symbol;
 import application.gestureGrouping.IGestureGrouper;
+import application.utility.ClassificationUtilities;
 import expression.construction.data.preparation.CreateTestAndTrainUtilities;
+import utilities.lazy.Lazy;
 
 public class FSDGestureGrouper implements IGestureGrouper{
 
-	private final int pointsPerGesture = 36;
-	private final int pastAndPresentGestureCount = 4;
+	//TODO: some of the arguments should be read from meta-data files. Like this they are hard-coded. 
 	
-	private final char[] symbolChar = new char[] {'!','(',')','*','+','0','1','A','B','?'};
-	private MultiLayerNetwork[] models;
-//			!=0
-//			(=1
-//			)=2
-//			*=3
-//			+=4
-//			0=5
-//			1=6
-//			A=7
-//			B=8
-//			?=9
+	private final @Nonnegative int pointsPerGesture = 36;
+	private final @Nonnegative int pastAndPresentGestureCount = 4;
+	
+	private final @Nonnull char[] symbolChar = new char[] {'!','(',')','*','+','0','1','A','B','?'};
+	private final @Nonnull Lazy<MultiLayerNetwork[]> symbolModels;
 
 	
 	public FSDGestureGrouper() throws Exception {
-		// TODO: load metadata file
-		//TODO: load models
+		String folder = "./training/symbol-gesture-new/model/";
 		
-//		String folder = "./training/symbol-gesture-new/model/";
+		//Loading symbol classifiers
+		 symbolModels = new Lazy<>(()->{
+			 try {
+				String modelName_1 = "FC-180-10-model1";
+				MultiLayerNetwork network_1 = ModelSerializer.restoreMultiLayerNetwork(new File(folder + modelName_1));
 
-//		String modelName_1 = "FC-180-10-artf-model1";
-//		MultiLayerNetwork network_1 = ModelSerializer.restoreMultiLayerNetwork(new File(folder + modelName_1));
-
-		models = null;		
+				String modelName_2 = "FC-180-10-model2";
+				MultiLayerNetwork network_2 = ModelSerializer.restoreMultiLayerNetwork(new File(folder + modelName_2));
+				
+				String modelName_3 = "FC-180-10-model3";
+				MultiLayerNetwork network_3 = ModelSerializer.restoreMultiLayerNetwork(new File(folder + modelName_3));
+				
+				return new MultiLayerNetwork[] {network_1, network_2, network_3};
+			 }catch(Exception e) {
+				 throw new RuntimeException(e);
+			 }
+		 });
+		 
+		 //Loading models in a different thread
+		 Application.getInstance().workers.submit(()->{
+			 symbolModels.get();
+		 });
 	}
 	
 	@Override
-	public List<Symbol> group(List<Gesture> gestures) {
+	public List<Symbol> group(@Nonnull List<Gesture> gestures) {
 		
 		Gesture[] inputGestures = new Gesture[pastAndPresentGestureCount+1];
 		
@@ -70,7 +84,7 @@ public class FSDGestureGrouper implements IGestureGrouper{
 			
 			INDArray netInput = Nd4j.create(sample);
 			
-			int predicted = predict(netInput);
+			int predicted = ClassificationUtilities.predict(netInput,symbolChar.length,symbolModels.getOrThrow());
 			
 			current.addGesture(gesture);
 			if(predicted!=symbolChar.length-1) {//symbol over
@@ -81,32 +95,6 @@ public class FSDGestureGrouper implements IGestureGrouper{
 		}
 		
 		return symbols;
-	}
-
-	private int predict(INDArray netInput) {
-		
-		double[] predictions = new double[symbolChar.length];
-		
-		for(MultiLayerNetwork network:models) {
-			INDArray prediction = network.output(netInput, false);
-			
-			for(int i=0; i<prediction.length(); i++) {
-				predictions[i]+=prediction.getDouble(i);
-			}
-			
-		}
-
-		int maxArg = 0;
-		double maxValue = 0;
-		
-		for(int i=0; i<predictions.length; i++) {
-			if(maxValue<predictions[i]) {
-				maxValue = predictions[i];
-				maxArg = i;
-			}
-		}
-		
-		return maxArg;
 	}
 
 }

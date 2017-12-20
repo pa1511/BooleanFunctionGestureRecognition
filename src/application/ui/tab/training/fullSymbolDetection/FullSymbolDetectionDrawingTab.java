@@ -5,6 +5,8 @@ import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.awt.event.KeyEvent;
 import java.util.List;
 import java.util.Properties;
@@ -40,6 +42,7 @@ import application.ui.draw.RectangleRepresentationView;
 import application.ui.tab.AbstractApplicationTab;
 import dataModels.Pair;
 import log.Log;
+import utilities.lazy.Lazy;
 
 public class FullSymbolDetectionDrawingTab extends AbstractApplicationTab{
 			
@@ -60,11 +63,14 @@ public class FullSymbolDetectionDrawingTab extends AbstractApplicationTab{
 	private final @Nonnull CanvasObserver canvasObserver;
 	
 	//Gesture grouper
-	private final @Nonnull IGestureGrouper gestureGrouper; 
+	private final @Nonnull Lazy<IGestureGrouper> gestureGrouper; 
 	private @CheckForNull List<Symbol> lastGroupedSymbols;
 	
 	//Spatial parser
 	private final @Nonnull IBooleanSpatialParser spatialParser;
+	
+	//Listeners
+	private final @Nonnull ComponentAdapter componentVisibilityListener;
 	
 	//
 	private static final @Nonnull Function<? super Pair<MouseClickType, List<Point>>, ? extends Gesture> pointsToGesture = dataUnit -> new Gesture(dataUnit.right());
@@ -75,7 +81,14 @@ public class FullSymbolDetectionDrawingTab extends AbstractApplicationTab{
 		Properties properties = Application.getInstance().getProperties();
 				
 		spatialParser = ParserSystem.getBooleanSpatialParser(properties);
-		gestureGrouper = GestureGroupingSystem.getFSDGestureGrouper(properties);
+		gestureGrouper = new Lazy<>(()->{
+			try {
+				return GestureGroupingSystem.getFSDGestureGrouper(properties);
+			}
+			catch(Exception e) {
+				throw new RuntimeException(e);
+			}
+		});
 		
 		//set tab  layout
 		setLayout(new BorderLayout());
@@ -120,7 +133,16 @@ public class FullSymbolDetectionDrawingTab extends AbstractApplicationTab{
 		canvasObserver = new CanvasObserver();
 		canvas.observationManager.addObserver(canvasObserver);		
 		
-		//SwingUtilities.invokeLater(()->groupButton.requestFocus());
+		//Start loading when the panel is shown
+		componentVisibilityListener = new ComponentAdapter() {
+			@Override
+			public void componentShown(ComponentEvent e) {
+				if(!gestureGrouper.isLoaded()) {
+					gestureGrouper.get();
+				}
+			}
+		};
+		addComponentListener(componentVisibilityListener);
 	}
 
 	private void forceRepaint() {
@@ -130,6 +152,7 @@ public class FullSymbolDetectionDrawingTab extends AbstractApplicationTab{
 	
 	@Override
 	public void close() throws Exception {
+		removeComponentListener(componentVisibilityListener);
 		canvas.observationManager.removeObserver(canvasObserver);
 		canvas.close();
 	}
@@ -262,7 +285,7 @@ public class FullSymbolDetectionDrawingTab extends AbstractApplicationTab{
 
 			List<Gesture> inputData = canvas.getData().stream().map(pointsToGesture).collect(Collectors.toList());
 			
-			lastGroupedSymbols = gestureGrouper.group(inputData);
+			lastGroupedSymbols = gestureGrouper.getOrThrow().group(inputData);
 			
 			for(int i=0,limit=lastGroupedSymbols.size();i<limit;i++){
 				Symbol symbol = lastGroupedSymbols.get(i);

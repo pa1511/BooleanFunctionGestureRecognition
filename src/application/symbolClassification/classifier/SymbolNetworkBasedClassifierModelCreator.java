@@ -41,6 +41,10 @@ import log.Log;
 
 public class SymbolNetworkBasedClassifierModelCreator implements ISCModelCreator {
 
+	static {
+	    Nd4j.ENFORCE_NUMERICAL_STABILITY = false;
+	}
+	
 	private @Nonnull WeightInit weightInit;
 	private @Nonnull Activation activationMethod;
 	private @Nonnull Activation outputActivationMethod;
@@ -70,9 +74,7 @@ public class SymbolNetworkBasedClassifierModelCreator implements ISCModelCreator
 			@Nonnegative double scoreLimit,
 			@Nonnegative double learningRate, @Nonnegative int batchSize,
 			@Nonnull IntConsumer progressReporter) throws Exception{
-					    
-	    Nd4j.ENFORCE_NUMERICAL_STABILITY = false;
-		
+					    		
 		ListBuilder builder =  new NeuralNetConfiguration.Builder()
 	            .iterations(iterationCount)
 	            .optimizationAlgo(optimizationAlgorithm)

@@ -13,6 +13,7 @@ import javax.annotation.CheckForNull;
 import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
 import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -118,7 +119,9 @@ public class DatasetCreationPanel extends AbstractApplicationTab{
 			
 			@Override
 			public void dataSourceChanged() {
-				symbolInformationTableModel.getStandardAction(SymbolInformationTableModel.ACTION_RELOAD).actionPerformed(null);
+				Action standardAction = symbolInformationTableModel.getStandardAction(SymbolInformationTableModel.ACTION_RELOAD);
+				if(standardAction!=null)
+					standardAction.actionPerformed(null);
 			}
 		};
 		Application.getInstance().observationManager.addObserver(applicationChangeListener);
