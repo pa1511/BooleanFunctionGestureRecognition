@@ -1,6 +1,7 @@
 package application.ui.tab.expression;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.util.Properties;
 
 import javax.annotation.CheckForNull;
@@ -20,6 +21,7 @@ import application.expressionParse.syntactic.node.IBooleanExpressionNode;
 import application.ui.action.EvaluateAction;
 import application.ui.tab.AbstractApplicationTab;
 import application.ui.table.ExpressionEvaluationTableModel;
+import application.ui.table.FunctionTableModel;
 
 public class EvaluationTab extends AbstractApplicationTab{
 
@@ -27,6 +29,7 @@ public class EvaluationTab extends AbstractApplicationTab{
 	private @Nonnull JButton evaluateButton;
 	
 	private @Nonnull JTable truthTable;
+	private @Nonnull JTable functionTable;
 	
 	private final @Nonnull IBooleanTextParser booleanParser;
 	private @CheckForNull IBooleanExpressionNode expression;
@@ -48,10 +51,15 @@ public class EvaluationTab extends AbstractApplicationTab{
 		expressionInputField.addActionListener(evaluateAction);
 		evaluateButton = new JButton(evaluateAction);
 		
+		functionTable = new JTable();
+		
 		//Upper panel content
 		JPanel upperPanel = new JPanel(new BorderLayout());
 		upperPanel.add(expressionInputField, BorderLayout.CENTER);
 		upperPanel.add(evaluateButton,BorderLayout.EAST);
+		JScrollPane functionScrollPane = new JScrollPane(functionTable);
+		functionScrollPane.setPreferredSize(new Dimension(100, 80));
+		upperPanel.add(functionScrollPane,BorderLayout.SOUTH);
 		add(upperPanel,BorderLayout.NORTH);
 
 		//Main panel content
@@ -67,8 +75,11 @@ public class EvaluationTab extends AbstractApplicationTab{
 	}
 
 	private void updateExpressionUI() {
-		if(variableValueProvider!=null && expression!=null)
+		if(variableValueProvider!=null && expression!=null) {
 			truthTable.setModel(new ExpressionEvaluationTableModel(variableValueProvider, expression));
+			functionTable.setModel(new FunctionTableModel(expression));
+		}
+		
 	}
 
 }

@@ -23,6 +23,8 @@ public class LexicalToken {
 		
 		TRUE('1'),
 		FALSE('0'),
+		FUNCTION('F'),
+		EQUALS('='),
 		VARIABLE(c->Character.isUpperCase(c),'\0'),
 		NOT('!'),
 		AND('*'),
@@ -32,13 +34,15 @@ public class LexicalToken {
 
 		//TODO: since this is used in syntax analysis I am not sure if it should be here
 		static{
+			EQUALS.nextPossibleTypes = new Type[] {VARIABLE,FUNCTION,LEFT_BRACKET,NOT,TRUE,FALSE};
 			TRUE.nextPossibleTypes = new Type[]{AND,OR,RIGHT_BRACKET};
 			FALSE.nextPossibleTypes = new Type[]{AND,OR,RIGHT_BRACKET};
+			FUNCTION.nextPossibleTypes = new Type[]{EQUALS,AND,OR,RIGHT_BRACKET};
 			VARIABLE.nextPossibleTypes = new Type[]{AND,OR,RIGHT_BRACKET};
-			NOT.nextPossibleTypes = new Type[]{TRUE,FALSE,VARIABLE,LEFT_BRACKET,NOT};
-			AND.nextPossibleTypes = new Type[]{TRUE,FALSE,VARIABLE,LEFT_BRACKET,NOT};
-			OR.nextPossibleTypes = new Type[]{TRUE,FALSE,VARIABLE,LEFT_BRACKET,NOT};
-			LEFT_BRACKET.nextPossibleTypes = new Type[]{TRUE,FALSE,VARIABLE,LEFT_BRACKET,NOT};
+			NOT.nextPossibleTypes = new Type[]{TRUE,FALSE,VARIABLE,LEFT_BRACKET,NOT,FUNCTION};
+			AND.nextPossibleTypes = new Type[]{TRUE,FALSE,VARIABLE,LEFT_BRACKET,NOT,FUNCTION};
+			OR.nextPossibleTypes = new Type[]{TRUE,FALSE,VARIABLE,LEFT_BRACKET,NOT,FUNCTION};
+			LEFT_BRACKET.nextPossibleTypes = new Type[]{TRUE,FALSE,VARIABLE,LEFT_BRACKET,NOT,FUNCTION};
 			RIGHT_BRACKET.nextPossibleTypes = new Type[]{AND,OR,RIGHT_BRACKET};
 		}
 		

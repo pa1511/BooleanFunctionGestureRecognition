@@ -2,11 +2,13 @@ package application.expressionParse.syntactic.node;
 
 import javax.annotation.Nonnull;
 
+import application.expressionParse.MemoryTable;
 import application.expressionParse.exception.BooleanExpressionSyntacticExceptiona;
 import application.expressionParse.lexic.token.LexicalToken;
 import application.expressionParse.syntactic.node.leaf.AndNode;
 import application.expressionParse.syntactic.node.leaf.BracketsNode;
 import application.expressionParse.syntactic.node.leaf.FalseNode;
+import application.expressionParse.syntactic.node.leaf.FunctionNode;
 import application.expressionParse.syntactic.node.leaf.NotNode;
 import application.expressionParse.syntactic.node.leaf.OrNode;
 import application.expressionParse.syntactic.node.leaf.TrueNode;
@@ -45,6 +47,11 @@ public class BooleanNodeFactory {
 			break;
 		case VARIABLE:
 			node = new VariableNode(symbolAsString);
+			break;
+		case FUNCTION:
+			node = MemoryTable.getMemoryTable().getFunctionNode(symbolAsString);
+			if(node==null)
+				node = new FunctionNode(symbolAsString);
 			break;
 		case LEFT_BRACKET:
 			node = new BracketsNode(LexicalToken.Type.LEFT_BRACKET.getSymbolAsString(), LexicalToken.Type.RIGHT_BRACKET.getSymbolAsString(),Type.LEFT);

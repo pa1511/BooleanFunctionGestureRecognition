@@ -9,6 +9,7 @@ import application.expressionParse.lexic.ILexicalAnalyzer;
 import application.expressionParse.lexic.token.LexicalToken;
 import application.expressionParse.syntactic.ISyntacticAnalyzer;
 import application.expressionParse.syntactic.node.IBooleanExpressionNode;
+import application.expressionParse.syntactic.node.leaf.FunctionNode;
 import log.Log;
 
 class BooleanTextParser implements IBooleanTextParser {
@@ -32,6 +33,10 @@ class BooleanTextParser implements IBooleanTextParser {
 		
 		IBooleanExpressionNode syntacticTopNode = syntacticAnalyzer.analyze(tokens);
 		Log.addMessage("Syntactic analysis result: " + syntacticTopNode, Log.Type.Plain);
+		
+		if(syntacticTopNode instanceof FunctionNode) {
+			MemoryTable.getMemoryTable().storeFunction(syntacticTopNode.toString(), (FunctionNode)syntacticTopNode);
+		}
 				
 		return syntacticTopNode;
 	}

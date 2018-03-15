@@ -1,5 +1,6 @@
 package application.expressionParse.syntactic;
 
+import java.util.Arrays;
 import java.util.Stack;
 
 import javax.annotation.Nonnull;
@@ -12,6 +13,7 @@ import application.expressionParse.syntactic.node.BooleanNodeFactory;
 import application.expressionParse.syntactic.node.IBooleanExpressionNode;
 import application.expressionParse.syntactic.node.leaf.BracketsNode;
 import application.expressionParse.syntactic.node.leaf.FalseNode;
+import application.expressionParse.syntactic.node.leaf.FunctionNode;
 import application.expressionParse.syntactic.node.leaf.TrueNode;
 import application.expressionParse.syntactic.node.leaf.VariableNode;
 
@@ -30,40 +32,11 @@ public class SyntacticAnalyzer implements ISyntacticAnalyzer {
 	@Override
 	public IBooleanExpressionNode analyze(@Nonnull LexicalToken[] tokens) throws BooleanExpressionSyntacticExceptiona {
 		
-		LexicalToken.Type currentTokenType = null;
-		int bracketCounter = 0;
+		checkLexicalTokenStreamValidity(tokens);
 		
-		for(LexicalToken lexicalToken:tokens){
-			
-			LexicalToken.Type tokenType = lexicalToken.getType();
-			
-			if(currentTokenType!=null){
-				if(!currentTokenType.canComeBefore(tokenType)){
-					throw new BooleanExpressionSyntacticExceptiona(currentTokenType + " can not be followed by " + tokenType);
-				}
-			}
-			else if(tokenType == LexicalToken.Type.AND || 
-					tokenType == LexicalToken.Type.OR ||
-					tokenType == LexicalToken.Type.RIGHT_BRACKET){
-				throw new BooleanExpressionSyntacticExceptiona("Expression can not start with: " + lexicalToken);
-			}
-			
-			currentTokenType = tokenType;
-			
-			if(currentTokenType==Type.LEFT_BRACKET)
-				bracketCounter++;
-			else if(currentTokenType==Type.RIGHT_BRACKET){
-				bracketCounter--;
-				if(bracketCounter<0){
-					throw new BooleanExpressionSyntacticExceptiona("Too many right brackets");
-				}
-			}
-			
-		}
-		
-		if(bracketCounter>0){
-			throw new BooleanExpressionSyntacticExceptiona("Too many left brackets");
-		}
+		FunctionNode assigmentFunctionNode = null;
+		boolean equalsOccurred = false;
+		boolean containsEquals = Arrays.stream(tokens).map(t->t.getType()).anyMatch(t->t==LexicalToken.Type.EQUALS);
 		
 		/*
 		 * If everything is working correctly the stacks should be empty at each beginning and end of this method. <br> 
@@ -82,11 +55,18 @@ public class SyntacticAnalyzer implements ISyntacticAnalyzer {
 				reduceSyntacticTree();
 				
 			}
+			else if(token.getType()==Type.EQUALS) {
+				equalsOccurred = true;
+			}
 			else{
 			
 				node = BooleanNodeFactory.getNodeFor(token);
 				
-				if(node instanceof VariableNode || node instanceof TrueNode || node instanceof FalseNode){
+				if(!equalsOccurred && node instanceof FunctionNode && containsEquals) {
+					assigmentFunctionNode = (FunctionNode) node;
+					
+				}
+				else if(node instanceof FunctionNode || node instanceof VariableNode || node instanceof TrueNode || node instanceof FalseNode){
 					operandStack.push(node);
 				}
 				else{
@@ -112,8 +92,13 @@ public class SyntacticAnalyzer implements ISyntacticAnalyzer {
 			reduceSyntacticTree();
 		}
 		
+		IBooleanExpressionNode node = operandStack.pop();
+		if(assigmentFunctionNode!=null) {
+			assigmentFunctionNode.addChild(node, 0);
+			node = assigmentFunctionNode;
+		}
 		
-		return operandStack.pop();
+		return node;
 	}
 
 	private void reduceSyntacticTree() {
@@ -122,6 +107,54 @@ public class SyntacticAnalyzer implements ISyntacticAnalyzer {
 			previousOperationNode.addChild(operandStack.pop(),j);
 		}
 		operandStack.push(previousOperationNode);
+	}
+
+	/**
+	 * This will throw an exception if something is wrong. </br>
+	 */
+	private void checkLexicalTokenStreamValidity(LexicalToken[] tokens) {
+		LexicalToken.Type currentTokenType = null;
+		int bracketCounter = 0;
+		int equalsCount = 0;
+		
+		for(LexicalToken lexicalToken:tokens){
+			
+			LexicalToken.Type tokenType = lexicalToken.getType();
+			
+			if(currentTokenType!=null){
+				if(!currentTokenType.canComeBefore(tokenType)){
+					throw new BooleanExpressionSyntacticExceptiona(currentTokenType + " can not be followed by " + tokenType);
+				}
+			}
+			else if(tokenType == LexicalToken.Type.EQUALS ||
+					tokenType == LexicalToken.Type.AND || 
+					tokenType == LexicalToken.Type.OR ||
+					tokenType == LexicalToken.Type.RIGHT_BRACKET){
+				throw new BooleanExpressionSyntacticExceptiona("Expression can not start with: " + lexicalToken);
+			}
+			
+			currentTokenType = tokenType;
+			
+			if(currentTokenType==Type.LEFT_BRACKET)
+				bracketCounter++;
+			else if(currentTokenType==Type.RIGHT_BRACKET){
+				bracketCounter--;
+				if(bracketCounter<0){
+					throw new BooleanExpressionSyntacticExceptiona("Too many right brackets");
+				}
+			}
+			
+			if(currentTokenType==Type.EQUALS)
+				equalsCount++;
+			
+		}
+		
+		if(bracketCounter>0){
+			throw new BooleanExpressionSyntacticExceptiona("Too many left brackets");
+		}
+		
+		if(equalsCount>1)
+			throw new BooleanExpressionSyntacticExceptiona("Too many equals signs");
 	}
 
 }
