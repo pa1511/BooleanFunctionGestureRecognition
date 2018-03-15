@@ -23,15 +23,16 @@ public class TestModel {
 				"./training/symbol-gesture-new/model/";
 				//"./training/archive/181-10/model/";
 				//"./training/archive/old/";
-		String modelName = "FC-78-2-model1";
+		String modelName = "FC-180-10-model3";
 		
         int batchSize = 512;
-		int numOutputs = 2;
+		int numOutputs = 10;
 		MultiLayerNetwork network = ModelSerializer.restoreMultiLayerNetwork(new File(folder + modelName));
 		
 		
-        evaluate("./training/symbol-gesture-new/", "test_simple_data-78-2.csv", batchSize, numOutputs, network);
-//        evaluate("./training/symbol-gesture-new/", "test_complex_data-180-10.csv", batchSize, numOutputs, network);
+//        evaluate("./training/symbol-gesture-new/", "test_simple_data-78-2.csv", batchSize, numOutputs, network);
+        evaluate("./training/symbol-gesture-new/", "test_simple_data-180-10.csv", batchSize, numOutputs, network);
+        evaluate("./training/symbol-gesture-new/", "test_complex_data-180-10.csv", batchSize, numOutputs, network);
         //
 	}
 

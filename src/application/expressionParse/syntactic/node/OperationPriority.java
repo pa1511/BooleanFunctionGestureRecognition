@@ -9,6 +9,7 @@ import javax.annotation.Nonnegative;
  */
 public enum OperationPriority {
 
+	LVLN(-1),
 	LVL0(0),
 	LVL1(1),
 	LVL2(2);

@@ -79,7 +79,7 @@ class BooleanSpatialParser implements IBooleanSpatialParser {
 				IBooleanExpressionNode exNode = node.left();
 				if(exNode instanceof BracketsNode){
 					BracketsNode bracketsNode = (BracketsNode) exNode;
-					if(bracketsNode.type==BracketsNode.Type.LEFT){
+					if(bracketsNode.type==BracketsNode.Type.LEFT && !bracketsNode.isConnected()){
 						leftBracketNode = node;
 					}
 					else if(bracketsNode.type==BracketsNode.Type.RIGHT){
