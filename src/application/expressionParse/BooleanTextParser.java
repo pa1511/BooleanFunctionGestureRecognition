@@ -33,10 +33,11 @@ class BooleanTextParser implements IBooleanTextParser {
 		
 		IBooleanExpressionNode syntacticTopNode = syntacticAnalyzer.analyze(tokens);
 		Log.addMessage("Syntactic analysis result: " + syntacticTopNode, Log.Type.Plain);
-		
-		if(syntacticTopNode instanceof FunctionNode) {
-			MemoryTable.getMemoryTable().storeFunction(syntacticTopNode.toString(), (FunctionNode)syntacticTopNode);
-		}
+
+		//TODO: remove
+//		if(syntacticTopNode instanceof FunctionNode) {
+//			MemoryTable.getMemoryTable().storeFunction(syntacticTopNode.toString(), (FunctionNode)syntacticTopNode);
+//		}
 				
 		return syntacticTopNode;
 	}

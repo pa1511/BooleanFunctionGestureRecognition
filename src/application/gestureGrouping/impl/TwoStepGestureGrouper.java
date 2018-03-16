@@ -43,9 +43,17 @@ public class TwoStepGestureGrouper implements IGestureGrouper{
 		//Loading grouping models
 		groupingModels = new Lazy<>(()->{
 			try {
-				String groupModelName_1 = "FC-78-2-model1";
+				String groupModelName_1 = "FC-78-2-exp-model1";
 				MultiLayerNetwork groupNetwork_1 = ModelSerializer.restoreMultiLayerNetwork(new File(folder + groupModelName_1));
-				return new MultiLayerNetwork[] {groupNetwork_1};
+
+				String groupModelName_2 = "FC-78-2-exp-model2";
+				MultiLayerNetwork groupNetwork_2 = ModelSerializer.restoreMultiLayerNetwork(new File(folder + groupModelName_2));
+
+				String groupModelName_3 = "FC-78-2-exp-model3";
+				MultiLayerNetwork groupNetwork_3 = ModelSerializer.restoreMultiLayerNetwork(new File(folder + groupModelName_3));
+
+				
+				return new MultiLayerNetwork[] {groupNetwork_1, groupNetwork_2, groupNetwork_3};
 			}catch(Exception e) {
 				throw new RuntimeException(e);
 			}

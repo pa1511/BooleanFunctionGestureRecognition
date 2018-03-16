@@ -20,6 +20,7 @@ import application.expressionParse.syntactic.node.BooleanNodeFactory;
 import application.expressionParse.syntactic.node.IBooleanExpressionNode;
 import application.expressionParse.syntactic.node.leaf.AndNode;
 import application.expressionParse.syntactic.node.leaf.BracketsNode;
+import application.expressionParse.syntactic.node.leaf.EqualsNode;
 import application.expressionParse.syntactic.node.leaf.NotNode;
 import application.expressionParse.syntactic.node.leaf.OrNode;
 import dataModels.Pair;
@@ -35,7 +36,10 @@ class BooleanSpatialParser implements IBooleanSpatialParser {
 	};
 	private final @Nonnull Function<Symbol, Pair<IBooleanExpressionNode,Rectangle>> symbolToStructureMapper;
 
-	
+
+	/**
+	 * Constructor
+	 */
 	public BooleanSpatialParser(ILexicalAnalyzer lexicalAnalyzer) {
 		this.lexicalAnalizer = lexicalAnalyzer;
 		symbolToStructureMapper = symbol->{
@@ -57,7 +61,7 @@ class BooleanSpatialParser implements IBooleanSpatialParser {
 				.collect(Collectors.toList());
 		
 		//TODO: remove
-		//System.out.println(Arrays.toString(symbols.stream().toArray()));
+		System.out.println(Arrays.toString(symbols.stream().toArray()));
 
 		return innerParse(symbolsAsToken).left();
 	}
@@ -72,6 +76,15 @@ class BooleanSpatialParser implements IBooleanSpatialParser {
 		
 		if(nodeCount==1)
 			return nodes.get(0);
+		//=================================================================================
+		//Equals handling
+		//TODO: perhaps it will not be needed
+		
+		//if(nodes.stream().anyMatch(node->node.left() instanceof EqualsNode))
+		
+		
+		//=================================================================================
+		//Parsing
 		
 		Pair<IBooleanExpressionNode,Rectangle> leftBracketNode = null;
 		Pair<IBooleanExpressionNode,Rectangle> rightBracketNode = null;
@@ -122,7 +135,6 @@ class BooleanSpatialParser implements IBooleanSpatialParser {
 			}
 		}while(leftBracketNode!=null && rightBracketNode!=null);
 		
-		
 		//finding negation
 		reduceOperation(NotNode.class, nodes,BooleanSpatialParser::negationReduce);
 		
@@ -131,7 +143,11 @@ class BooleanSpatialParser implements IBooleanSpatialParser {
 		
 		//OR operation reduce
 		reduceOperation(OrNode.class, nodes,BooleanSpatialParser::binaryReduceOperation);
-
+		
+		//TODO: newly added
+		//EQUALS operation reduce
+		reduceOperation(EqualsNode.class, nodes, BooleanSpatialParser::binaryReduceOperation);
+		
 		//return result
 		nodeCount = nodes.size();
 		if(nodeCount==1)

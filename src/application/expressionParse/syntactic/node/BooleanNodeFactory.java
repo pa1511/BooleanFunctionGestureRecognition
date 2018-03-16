@@ -7,6 +7,7 @@ import application.expressionParse.exception.BooleanExpressionSyntacticException
 import application.expressionParse.lexic.token.LexicalToken;
 import application.expressionParse.syntactic.node.leaf.AndNode;
 import application.expressionParse.syntactic.node.leaf.BracketsNode;
+import application.expressionParse.syntactic.node.leaf.EqualsNode;
 import application.expressionParse.syntactic.node.leaf.FalseNode;
 import application.expressionParse.syntactic.node.leaf.FunctionNode;
 import application.expressionParse.syntactic.node.leaf.NotNode;
@@ -59,7 +60,9 @@ public class BooleanNodeFactory {
 		case RIGHT_BRACKET:
 			node = new BracketsNode(LexicalToken.Type.LEFT_BRACKET.getSymbolAsString(), LexicalToken.Type.RIGHT_BRACKET.getSymbolAsString(),Type.RIGHT);
 			break;
-			
+		case EQUALS:
+			node = new EqualsNode(symbolAsString);
+			break;
 		default:
 			throw new BooleanExpressionSyntacticExceptiona("Unknown syntactic node requested: " + token);
 		}
