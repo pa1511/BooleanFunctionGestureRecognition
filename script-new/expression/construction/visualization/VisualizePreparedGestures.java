@@ -46,7 +46,6 @@ public class VisualizePreparedGestures {
 		try(IDataSource ds = new H2Database("train",properties)){
 			expressions = ds.getExpressions();
 		}
-		expressions = CreateTestAndTrainUtilities.filterExpressions(expressions);
 		Collections.shuffle(expressions);
 
 		//Creating a classToSampleOutput map

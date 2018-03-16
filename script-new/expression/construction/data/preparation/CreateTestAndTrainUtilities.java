@@ -220,15 +220,6 @@ public class CreateTestAndTrainUtilities {
 		}		
 		
 	}
-//============================================================================================================================
-	public static List<Expression> filterExpressions(List<Expression> expressions) {
-		expressions = expressions.stream()
-				.filter(expression-> !expression.getSymbols()
-						.stream()
-						.anyMatch(symbol->symbol.getSymbolAsString().equalsIgnoreCase("C")))
-				.collect(Collectors.toList());
-		return expressions;
-	}
 	
 //============================================================================================================================
 //  TODO: the original implementations
@@ -301,79 +292,4 @@ public class CreateTestAndTrainUtilities {
 		return rawRepresentation;
 	}
 	
-//	
-//	/**
-//	 * 
-//	 * @param rawSample
-//	 * @param startIndex - Index of the first element which will be affected by normalization. Interval including start.
-//	 * @param endIndex - Index of the first element which will not be affected by normalization. Interval excluding  end.
-//	 */
-//	public static void normalizeRawSample(@Nonnull double[] rawSample, int startIndex, int endIndex) {
-//
-//		int intervalLength = endIndex-startIndex;
-//		
-//		double averageX = 0;
-//		double averageY = 0;
-//		
-//		int xCount = 0;
-//		int yCount = 0;
-//		
-//		for (int i = 0; i < intervalLength; i++) {
-//			int elementId = startIndex+i;
-//			double elementValue = rawSample[elementId];
-//			if(elementValue!=-1) {
-//				if(i%2!=0) {
-//					averageY += elementValue;
-//					yCount++;
-//				}
-//				else {
-//					averageX += elementValue;
-//					xCount++;
-//				}
-//			}
-//		}
-//		
-//		averageX /= xCount;
-//		averageY /= yCount;
-//		
-//		for (int i = 0; i < intervalLength; i++) {
-//			int elementId = startIndex+i;
-//			if(rawSample[elementId]!=-1) {
-//				if(i%2!=0) {
-//					rawSample[elementId] -= averageY;
-//				}
-//				else {
-//					rawSample[elementId] -= averageX;
-//				}
-//			}
-//			else {
-//				rawSample[elementId] = 0;
-//			}
-//		}		
-//		
-//		//===========================================================================================
-//		
-//		double maxX = Double.MIN_VALUE, minX = Double.MAX_VALUE;
-//		double maxY = Double.MIN_VALUE, minY = Double.MAX_VALUE;
-//
-//		for (int i = 0; i < intervalLength; i++) {
-//			int elementId = startIndex+i;
-//			if(i%2!=0) {
-//				maxY = Math.max(maxY, rawSample[elementId]);
-//				minY = Math.min(minY, rawSample[elementId]);
-//			}
-//			else {
-//				maxX = Math.max(maxX, rawSample[elementId]);
-//				minX = Math.min(minX, rawSample[elementId]);
-//			}
-//		}
-//		
-//		double scale = Math.max(maxX-minX, maxY-minY);
-//
-//		for (int i = 0; i <intervalLength; i++) {
-//			int elementId = startIndex+i;
-//			rawSample[elementId] /= scale;
-//		}		
-//		
-//	}
 }

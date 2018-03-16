@@ -50,7 +50,6 @@ public class CreateTestAndTrainDataByGestureGrouping {
 		try(IDataSource ds = new H2Database("complex",properties)){
 			expressions = ds.getExpressions();
 		}
-		expressions = CreateTestAndTrainUtilities.filterExpressions(expressions);
 		Collections.shuffle(expressions);
 
 		//Create data set
@@ -71,7 +70,6 @@ public class CreateTestAndTrainDataByGestureGrouping {
 		try(IDataSource ds = new H2Database("expression",properties)){
 			expressions = ds.getExpressions();
 		}
-		expressions = CreateTestAndTrainUtilities.filterExpressions(expressions);
 		Collections.shuffle(expressions);
 		
 		//Create data set

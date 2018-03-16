@@ -37,12 +37,12 @@ public class CreateFCModel {
 	public static void main(String[] args) throws Exception {
 		Log.setDisabled(true);
 		
-		String fileNameTrainReal = "./training/symbol-gesture-new/training_data-78-2.csv";
-		String fileNameSimpleTest = "./training/symbol-gesture-new/test_simple_data-78-2.csv";
+		String fileNameTrainReal = "./training/symbol-gesture-new/training_data_exp-180-14.csv";
+		String fileNameSimpleTest = "./training/symbol-gesture-new/test_simple_data_exp-180-14.csv";
 //		String fileNameComplexTest = "./training/symbol-gesture-new/test_complex_data-180-10.csv";
 //		String fileNameTrainArtificial = "./training/symbol-gesture-new/artificial_training_data-180-10.csv";
 		//
-		String modelName = "FC-78-2-model1";
+		String modelName = "FC-180-14-model3";
 		
 		//File statOutputFolder = new File("./training/symbol-gesture-new/statistics/");
 		File inputFile = new File(fileNameTrainReal);
@@ -101,7 +101,7 @@ public class CreateFCModel {
 			File outputFolder = new File("./training/symbol-gesture-new/model/");
 			Evaluation bestEvaluation = null;
 			MultiLayerNetwork bestNetwork = null;
-			int nEpochs = 200;
+			int nEpochs = 100;
 	        for ( int n = 0; n < nEpochs; n++) {
 	        	System.out.println("Epoch: " + n);
 	            model.fit(trainIterReal);

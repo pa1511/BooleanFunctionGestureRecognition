@@ -38,7 +38,6 @@ public class CreateTestAndTrainDataByEndDetection {
 		try(IDataSource ds = new H2Database("train",properties)){
 			expressions = ds.getExpressions();
 		}
-		expressions = CreateTestAndTrainUtilities.filterExpressions(expressions);
 		Collections.shuffle(expressions);
 
 		//Creating a classToSampleOutput map
@@ -79,7 +78,6 @@ public class CreateTestAndTrainDataByEndDetection {
 		try(IDataSource ds = new H2Database("test",properties)){
 			expressions = ds.getExpressions();
 		}
-		expressions = CreateTestAndTrainUtilities.filterExpressions(expressions);
 		Collections.shuffle(expressions);
 		
 		//Create data set
@@ -100,7 +98,6 @@ public class CreateTestAndTrainDataByEndDetection {
 		try(IDataSource ds = new H2Database("expression",properties)){
 			expressions = ds.getExpressions();
 		}
-		expressions = CreateTestAndTrainUtilities.filterExpressions(expressions);
 		Collections.shuffle(expressions);
 		
 		//Create data set

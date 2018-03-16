@@ -38,7 +38,6 @@ public class CreateTestAndTrainDataByClass {
 		try(IDataSource ds = new H2Database("train",properties)){
 			expressions = ds.getExpressions();
 		}
-		expressions = CreateTestAndTrainUtilities.filterExpressions(expressions);
 		Collections.shuffle(expressions);
 
 		//Creating a classToSampleOutput map
@@ -69,7 +68,7 @@ public class CreateTestAndTrainDataByClass {
 		ClassificationDataSet dataSet = CreateTestAndTrainUtilities.createDataSet(expressions, classToSampleOutput, gestureInputCount, pointPerGesture);
 		//Storing created data set
 		String outputFolder = "./training/symbol-gesture-new/";
-		File outputFile = new File(outputFolder, ADatasetCreator.createCSVFileName("training_data", dataSet.getSampleSize(0), differentOutputCount));
+		File outputFile = new File(outputFolder, ADatasetCreator.createCSVFileName("training_data_exp", dataSet.getSampleSize(0), differentOutputCount));
 		File metaOutputFile = new File(outputFolder,ADatasetCreator.getMetaFileName(outputFile.getName()));
 
 		try(PrintStream outputPrintStream = new PrintStream(new FileOutputStream(outputFile));
@@ -83,14 +82,13 @@ public class CreateTestAndTrainDataByClass {
 		try(IDataSource ds = new H2Database("test",properties)){
 			expressions = ds.getExpressions();
 		}
-		expressions = CreateTestAndTrainUtilities.filterExpressions(expressions);
 		Collections.shuffle(expressions);
 		
 		//Create data set
 		dataSet = CreateTestAndTrainUtilities.createDataSet(expressions, classToSampleOutput, gestureInputCount, pointPerGesture);
 		
 		//Storing created data set
-		outputFile = new File(outputFolder, ADatasetCreator.createCSVFileName("test_simple_data", dataSet.getSampleSize(0), differentOutputCount));
+		outputFile = new File(outputFolder, ADatasetCreator.createCSVFileName("test_simple_data_exp", dataSet.getSampleSize(0), differentOutputCount));
 		metaOutputFile = new File(outputFolder,ADatasetCreator.getMetaFileName(outputFile.getName()));
 
 		try(PrintStream outputPrintStream = new PrintStream(new FileOutputStream(outputFile));
@@ -101,24 +99,24 @@ public class CreateTestAndTrainDataByClass {
 		
 		//==================================================================================================
 		//Create complex expression test data set
-		try(IDataSource ds = new H2Database("expression",properties)){
-			expressions = ds.getExpressions();
-		}
-		expressions = CreateTestAndTrainUtilities.filterExpressions(expressions);
-		Collections.shuffle(expressions);
-		
-		//Create data set
-		dataSet = CreateTestAndTrainUtilities.createDataSet(expressions, classToSampleOutput, gestureInputCount, pointPerGesture);
-
-		//Storing created data set
-		outputFile = new File(outputFolder, ADatasetCreator.createCSVFileName("test_complex_data", dataSet.getSampleSize(0), differentOutputCount));
-		metaOutputFile = new File(outputFolder,ADatasetCreator.getMetaFileName(outputFile.getName()));
-
-		try(PrintStream outputPrintStream = new PrintStream(new FileOutputStream(outputFile));
-				PrintStream metaOutputPrintStream = new PrintStream(new FileOutputStream(metaOutputFile))){
-			DataSetDepositers.depositToCSV(dataSet, outputPrintStream, false);
-			DataSetDepositers.depositClassificationMeta(dataSet, metaOutputPrintStream, false);
-		}		
+//		try(IDataSource ds = new H2Database("expression",properties)){
+//			expressions = ds.getExpressions();
+//		}
+//		expressions = CreateTestAndTrainUtilities.filterExpressions(expressions);
+//		Collections.shuffle(expressions);
+//		
+//		//Create data set
+//		dataSet = CreateTestAndTrainUtilities.createDataSet(expressions, classToSampleOutput, gestureInputCount, pointPerGesture);
+//
+//		//Storing created data set
+//		outputFile = new File(outputFolder, ADatasetCreator.createCSVFileName("test_complex_data", dataSet.getSampleSize(0), differentOutputCount));
+//		metaOutputFile = new File(outputFolder,ADatasetCreator.getMetaFileName(outputFile.getName()));
+//
+//		try(PrintStream outputPrintStream = new PrintStream(new FileOutputStream(outputFile));
+//				PrintStream metaOutputPrintStream = new PrintStream(new FileOutputStream(metaOutputFile))){
+//			DataSetDepositers.depositToCSV(dataSet, outputPrintStream, false);
+//			DataSetDepositers.depositClassificationMeta(dataSet, metaOutputPrintStream, false);
+//		}		
 
 	}
 	

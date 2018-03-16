@@ -1,6 +1,7 @@
 package application.expressionParse;
 
 import java.awt.Rectangle;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.function.BiConsumer;
@@ -54,6 +55,9 @@ class BooleanSpatialParser implements IBooleanSpatialParser {
 				.map(symbolToStructureMapper)
 				.sorted(leftToRight)
 				.collect(Collectors.toList());
+		
+		//TODO: remove
+		//System.out.println(Arrays.toString(symbols.stream().toArray()));
 
 		return innerParse(symbolsAsToken).left();
 	}

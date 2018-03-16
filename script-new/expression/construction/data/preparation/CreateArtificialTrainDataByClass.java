@@ -38,7 +38,6 @@ public class CreateArtificialTrainDataByClass {
 		try(IDataSource ds = new H2Database("artificial",properties)){
 			expressions = ds.getExpressions();
 		}
-		expressions = CreateTestAndTrainUtilities.filterExpressions(expressions);
 		Collections.shuffle(expressions);
 
 		//Creating a classToSampleOutput map
