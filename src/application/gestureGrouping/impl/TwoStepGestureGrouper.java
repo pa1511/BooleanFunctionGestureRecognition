@@ -31,7 +31,9 @@ public class TwoStepGestureGrouper implements IGestureGrouper{
 	private final @Nonnull char[] groupingOptions = new char[] {'S','T'};
 	
 	private final @Nonnull Lazy<MultiLayerNetwork[]> symbolModels;
-	private final @Nonnull char[] symbolChar = new char[] {'!','(',')','*','+','0','1','A','B','?'};
+	//private final @Nonnull char[] symbolChar = new char[] {'!','(',')','*','+','0','1','A','B','?'};
+	private final @Nonnull char[] symbolChar = new char[] {'!','(',')','*','+','0','1','=','A','B','C','D','F','?'};
+
 
 	
 	public TwoStepGestureGrouper() throws Exception {
@@ -52,13 +54,13 @@ public class TwoStepGestureGrouper implements IGestureGrouper{
 		//Loading symbol classifiers
 		 symbolModels = new Lazy<>(()->{
 			 try {
-				String modelName_1 = "FC-180-10-model1";
+				String modelName_1 = "FC-180-14-model1";
 				MultiLayerNetwork network_1 = ModelSerializer.restoreMultiLayerNetwork(new File(folder + modelName_1));
 
-				String modelName_2 = "FC-180-10-model2";
+				String modelName_2 = "FC-180-14-model2";
 				MultiLayerNetwork network_2 = ModelSerializer.restoreMultiLayerNetwork(new File(folder + modelName_2));
 				
-				String modelName_3 = "FC-180-10-model3";
+				String modelName_3 = "FC-180-14-model3";
 				MultiLayerNetwork network_3 = ModelSerializer.restoreMultiLayerNetwork(new File(folder + modelName_3));
 				
 				return new MultiLayerNetwork[] {network_1, network_2, network_3};
