@@ -1,8 +1,9 @@
 package application.expressionParse.lexic.token;
 
-import javax.annotation.Nonnull;
+import java.util.function.Predicate;
 
-import utilities.function.CharacterPredicate;
+import javax.annotation.CheckForNull;
+import javax.annotation.Nonnull;
 
 /**
  * This class represents a lexical token. <br>
@@ -23,9 +24,9 @@ public class LexicalToken {
 		
 		TRUE('1'),
 		FALSE('0'),
-		FUNCTION('F'),
+		FUNCTION(s->s.matches("F[A-D|0|1]*"),'F'),
 		EQUALS('='),
-		VARIABLE(c->Character.isUpperCase(c),'\0'),
+		VARIABLE(c->Character.isUpperCase(c.charAt(0))&&c.length()==1,'\0'),
 		NOT('!'),
 		AND('*'),
 		OR('+'),
@@ -47,22 +48,22 @@ public class LexicalToken {
 		}
 		
 
-		private final @Nonnull CharacterPredicate matcher;
+		private final @Nonnull Predicate<String> matcher;
 		private final char symbol;
 		private Type[] nextPossibleTypes;
 		
 		private Type(char c) {
-			this(ch->ch==c,c);
+			this(ch->ch.equals(Character.toString(c)),c);
 		}
 		
-		private Type(@Nonnull CharacterPredicate matcher,char c){
+		private Type(@Nonnull Predicate<String> matcher,char c){
 			this.matcher = matcher;
 			symbol = c;
 		}
 
 		
-		public boolean matches(char c){
-			return matcher.test(c);
+		public boolean matches(String s){
+			return matcher.test(s);
 		}
 		
 		public char getSymbol() {
@@ -80,6 +81,16 @@ public class LexicalToken {
 			}
 			
 			return false;
+		}
+
+		public static @CheckForNull Type decodeType(String str) {
+			
+			for(LexicalToken.Type type:LexicalToken.Type.values()) {
+				if(type.matches(str))
+					return type;
+			}
+			
+			return null;
 		}
 
 	}
