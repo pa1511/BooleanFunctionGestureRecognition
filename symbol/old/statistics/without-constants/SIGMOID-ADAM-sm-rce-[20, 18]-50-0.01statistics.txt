@@ -1,7 +1,0 @@
-ll_1000-24-5.csv
-Total statistics: Percent: 0.925% Hit: 925 Total: 1000
-A: Percent: 0.885% Hit: 177 Total: 200
-!: Percent: 0.88% Hit: 176 Total: 200
-B: Percent: 0.985% Hit: 197 Total: 200
-*: Percent: 0.995% Hit: 199 Total: 200
-+: Percent: 0.88% Hit: 176 Total: 200

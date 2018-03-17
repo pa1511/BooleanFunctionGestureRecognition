@@ -42,7 +42,7 @@ public class CreateFCModel {
 //		String fileNameComplexTest = "./training/symbol-gesture-new/test_complex_data-180-10.csv";
 //		String fileNameTrainArtificial = "./training/symbol-gesture-new/artificial_training_data-180-10.csv";
 		//
-		String modelName = "FC-78-2-exp-model3";
+		String modelName = "FC-78-2-exp-model4";
 		
 		//File statOutputFolder = new File("./training/symbol-gesture-new/statistics/");
 		File inputFile = new File(fileNameTrainReal);
@@ -74,15 +74,15 @@ public class CreateFCModel {
 	                        .weightInit(WeightInit.XAVIER)
 	                        .activation(Activation.RELU)
 	                        .build())
-	                .layer(2, new DenseLayer.Builder().nIn(width).nOut(width)
-	                        .weightInit(WeightInit.XAVIER)
-	                        .activation(Activation.RELU)
-	                        .build())
+//	                .layer(2, new DenseLayer.Builder().nIn(width).nOut(width)
+//	                        .weightInit(WeightInit.XAVIER)
+//	                        .activation(Activation.RELU)
+//	                        .build())
 //	                .layer(3, new DenseLayer.Builder().nIn(width).nOut(width)
 //	                        .weightInit(WeightInit.XAVIER)
 //	                        .activation(Activation.RELU)
 //	                        .build())
-	                .layer(3, new OutputLayer.Builder(LossFunction.NEGATIVELOGLIKELIHOOD)
+	                .layer(2, new OutputLayer.Builder(LossFunction.NEGATIVELOGLIKELIHOOD)
 	                        .weightInit(WeightInit.XAVIER)
 	                        .activation(Activation.SOFTMAX)
 	                        .nIn(width).nOut(numOutputs).build())
