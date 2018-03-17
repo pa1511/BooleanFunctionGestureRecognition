@@ -6,7 +6,7 @@ import javax.annotation.Nonnull;
 public abstract class ABooleanExpressionNode implements IBooleanExpressionNode{
 
 	protected final @Nonnull IBooleanExpressionNode[] children;
-	protected final @Nonnull String symbol;
+	protected @Nonnull String symbol;
 
 
 	public ABooleanExpressionNode(@Nonnegative int childCount, @Nonnull String symbol) {
@@ -39,6 +39,16 @@ public abstract class ABooleanExpressionNode implements IBooleanExpressionNode{
 			}
 		}		
 		return connected;
+	}
+	
+	@Override
+	public String getSymbol() {
+		return symbol;
+	}
+	
+	@Override
+	public void setSymbol(String symbol) {
+		this.symbol = symbol;
 	}
 
 }

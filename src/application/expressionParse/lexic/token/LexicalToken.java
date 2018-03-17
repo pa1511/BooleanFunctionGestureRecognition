@@ -35,10 +35,10 @@ public class LexicalToken {
 		//TODO: since this is used in syntax analysis I am not sure if it should be here
 		static{
 			EQUALS.nextPossibleTypes = new Type[] {VARIABLE,FUNCTION,LEFT_BRACKET,NOT,TRUE,FALSE};
-			TRUE.nextPossibleTypes = new Type[]{AND,OR,RIGHT_BRACKET};
-			FALSE.nextPossibleTypes = new Type[]{AND,OR,RIGHT_BRACKET};
-			FUNCTION.nextPossibleTypes = new Type[]{EQUALS,AND,OR,RIGHT_BRACKET};
-			VARIABLE.nextPossibleTypes = new Type[]{AND,OR,RIGHT_BRACKET};
+			TRUE.nextPossibleTypes = new Type[]{AND,OR,RIGHT_BRACKET,EQUALS};
+			FALSE.nextPossibleTypes = new Type[]{AND,OR,RIGHT_BRACKET,EQUALS};
+			FUNCTION.nextPossibleTypes = new Type[]{EQUALS,AND,OR,RIGHT_BRACKET,VARIABLE,TRUE,FALSE};
+			VARIABLE.nextPossibleTypes = new Type[]{AND,OR,RIGHT_BRACKET,EQUALS};
 			NOT.nextPossibleTypes = new Type[]{TRUE,FALSE,VARIABLE,LEFT_BRACKET,NOT,FUNCTION};
 			AND.nextPossibleTypes = new Type[]{TRUE,FALSE,VARIABLE,LEFT_BRACKET,NOT,FUNCTION};
 			OR.nextPossibleTypes = new Type[]{TRUE,FALSE,VARIABLE,LEFT_BRACKET,NOT,FUNCTION};
@@ -86,26 +86,20 @@ public class LexicalToken {
 
 	//==============================================================================================================
 	
-	private final @Nonnull char symbol;
+	private final @Nonnull String symbol;
 	private final @Nonnull Type type;
 
-	public LexicalToken(@Nonnull char symbol,@Nonnull Type type) {
+	public LexicalToken(@Nonnull String symbol,@Nonnull Type type) {
 		this.symbol = symbol;
 		this.type = type;
 	}
 	
-	/**
-	 * Returns the symbol representing the current token. <br>
-	 */
-	public char getSymbol() {
-		return symbol;
-	}
 	
 	/**
 	 * Returns the symbol representing the current token as string. <br>
 	 */
-	public @Nonnull String getSymbolAsString() {
-		return Character.toString(symbol);
+	public @Nonnull String getSymbol() {
+		return symbol;
 	}
 	
 	/**

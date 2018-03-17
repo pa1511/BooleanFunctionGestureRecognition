@@ -32,7 +32,7 @@ public class SyntacticAnalyzer implements ISyntacticAnalyzer {
 	public IBooleanExpressionNode analyze(@Nonnull LexicalToken[] tokens) throws BooleanExpressionSyntacticExceptiona {
 		
 		checkLexicalTokenStreamValidity(tokens);
-		
+				
 		/*
 		 * If everything is working correctly the stacks should be empty at each beginning and end of this method. <br> 
 		 */
@@ -48,7 +48,6 @@ public class SyntacticAnalyzer implements ISyntacticAnalyzer {
 					reduceSyntacticTree();
 				}
 				reduceSyntacticTree();
-				
 			} else{
 			
 				node = BooleanNodeFactory.getNodeFor(token);
@@ -57,7 +56,6 @@ public class SyntacticAnalyzer implements ISyntacticAnalyzer {
 					operandStack.push(node);
 				}
 				else{
-					
 					boolean currentNodeIncorporated = false;
 					do{
 						AOperationNode current = (AOperationNode)node;

@@ -28,6 +28,10 @@ public class MemoryTable {
 		memory.put(functionId, node);
 	}
 	
+	public void removeFunction(@Nonnull String functionId) {
+		memory.remove(functionId);
+	}
+	
 	public @CheckForNull FunctionNode getFunctionNode(@Nonnull String functionId) {
 		return memory.get(functionId);
 	}

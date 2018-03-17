@@ -27,7 +27,7 @@ public class BooleanNodeFactory {
 	public static @Nonnull IBooleanExpressionNode getNodeFor(@Nonnull LexicalToken token) {
 		
 		IBooleanExpressionNode node;
-		String symbolAsString = token.getSymbolAsString();
+		String symbolAsString = token.getSymbol();
 		
 		switch (token.getType()) {
 

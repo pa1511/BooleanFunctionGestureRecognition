@@ -37,7 +37,7 @@ public class LexicalAnalyzer implements ILexicalAnalyzer {
 	public @Nonnull LexicalToken decodeToken(char character) {
 		for(LexicalToken.Type tokenType:tokenTypes){
 			if(tokenType.matches(character)){
-				return new LexicalToken(character, tokenType);
+				return new LexicalToken(Character.toString(character), tokenType);
 			}
 		}
 		throw new IllegalArgumentException("Unknown lexical token requested.");

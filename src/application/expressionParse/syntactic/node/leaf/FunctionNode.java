@@ -14,7 +14,7 @@ public class FunctionNode extends ABooleanExpressionNode{
 	@Override
 	public void addChild(IBooleanExpressionNode child, int j) {
 		super.addChild(child, j);
-		MemoryTable.getMemoryTable().storeFunction(this.toString(), this);
+		MemoryTable.getMemoryTable().storeFunction(symbol, this);
 	}
 
 	@Override
@@ -22,6 +22,13 @@ public class FunctionNode extends ABooleanExpressionNode{
 		return children[0].evaluate(variableValueProvider);
 	}
 
+	@Override
+	public void setSymbol(String symbol) {
+		MemoryTable.getMemoryTable().removeFunction(this.symbol);
+		super.setSymbol(symbol);
+		MemoryTable.getMemoryTable().storeFunction(symbol, this);
+	}
+	
 	@Override
 	public String toString() {
 		return symbol;

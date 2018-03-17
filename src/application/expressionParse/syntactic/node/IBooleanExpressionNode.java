@@ -17,6 +17,10 @@ public interface IBooleanExpressionNode {
 	
 	public boolean isConnected();
 	
+	public void setSymbol(String symbol);
+	
+	public String getSymbol();
+	
 	@Override
 	public @Nonnull String toString();
 	
