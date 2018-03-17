@@ -7,6 +7,7 @@ import javax.annotation.Nonnull;
 
 import application.expressionParse.exception.BooleanExpressionLexicalException;
 import application.expressionParse.lexic.token.LexicalToken;
+import application.expressionParse.lexic.token.LexicalToken.Type;
 
 /**
  * Implementation of the {@link ILexicalAnalyzer} interface. <br>
@@ -52,7 +53,7 @@ public class LexicalAnalyzer implements ILexicalAnalyzer {
 				end++;
 				if(end<=length) {
 					String tokenSubStr = expression.substring(start, end);
-					if(LexicalToken.Type.decodeType(tokenSubStr)!=null) {
+					if(decodeTokenType(tokenSubStr)!=null) {
 						hasMatch = true;
 					}
 				}
@@ -60,7 +61,7 @@ public class LexicalAnalyzer implements ILexicalAnalyzer {
 			end--;
 			
 			String tokenSubStr = expression.substring(start, end);
-			LexicalToken.Type tokenType = LexicalToken.Type.decodeType(tokenSubStr);
+			LexicalToken.Type tokenType = decodeTokenType(tokenSubStr);
 			
 			tokens.add(new LexicalToken(tokenSubStr, tokenType));
 			start = end;
@@ -77,6 +78,11 @@ public class LexicalAnalyzer implements ILexicalAnalyzer {
 			}
 		}
 		throw new IllegalArgumentException("Unknown lexical token requested.");
+	}
+	
+	@Override
+	public Type decodeTokenType(String symbol) {
+		return LexicalToken.Type.decodeType(symbol);
 	}
 
 }

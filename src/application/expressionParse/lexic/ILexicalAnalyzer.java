@@ -25,4 +25,6 @@ public interface ILexicalAnalyzer {
 
 	public @Nonnull LexicalToken decodeToken(char symbol);
 	
+	public @Nonnull LexicalToken.Type decodeTokenType(String symbol);
+	
 }

@@ -24,17 +24,17 @@ public class TestMultipleModel {
 		String folder = "./training/symbol-gesture-new/model/";
 				//"./training/archive/181-10/model/";
 		
-		String modelName_1 = "FC-78-2-exp-model8";
+		String modelName_1 = "CNN-78-2-model4";
 		MultiLayerNetwork network_1 = ModelSerializer.restoreMultiLayerNetwork(new File(folder + modelName_1));
-		String modelName_2 = "FC-78-2-exp-model5";
+		String modelName_2 = "CNN-78-2-model3";
 		MultiLayerNetwork network_2 = ModelSerializer.restoreMultiLayerNetwork(new File(folder + modelName_2));
-		String modelName_3 = "FC-78-2-exp-model6";
-		MultiLayerNetwork network_3 = ModelSerializer.restoreMultiLayerNetwork(new File(folder + modelName_3));
+//		String modelName_3 = "FC-78-2-exp-model6";
+//		MultiLayerNetwork network_3 = ModelSerializer.restoreMultiLayerNetwork(new File(folder + modelName_3));
 		
         int batchSize = 512;
 		int numOutputs = 2;
 		long start = System.nanoTime();
-        evaluate("test_simple_data_exp-78-2.csv", batchSize, numOutputs, network_1, network_2, network_3);
+        evaluate("test_simple_data_exp-78-2.csv", batchSize, numOutputs, network_1, network_2/*, network_3*/);
         //evaluate("test_complex_data-180-10.csv", batchSize, numOutputs, network_1, network_2, network_3);
         
         long end = System.nanoTime();

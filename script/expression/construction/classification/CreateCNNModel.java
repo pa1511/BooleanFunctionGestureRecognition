@@ -41,10 +41,10 @@ public class CreateCNNModel {
 	public static void main(String[] args) throws Exception {
 		Log.setDisabled(true);
 		
-		String fileNameTrain = "./training/symbol-gesture-new/training_data-181-10.csv";
-		String fileNameSimpleTest = "./training/symbol-gesture-new/test_simple_data-181-10.csv";
-		String fileNameComplexTest = "./training/symbol-gesture-new/test_complex_data-181-10.csv";
-		String modelName = "CNN-181-10-model5";
+		String fileNameTrain = "./training/symbol-gesture-new/training_data_exp-78-2.csv";
+		String fileNameSimpleTest = "./training/symbol-gesture-new/test_simple_data_exp-78-2.csv";
+		//String fileNameComplexTest = "./training/symbol-gesture-new/test_complex_data-181-10.csv";
+		String modelName = "CNN-78-2-model4";
 		
 		File inputFile = new File(fileNameTrain);
 		
@@ -54,7 +54,7 @@ public class CreateCNNModel {
         //Load the training data:
         try(RecordReader rr = new CSVRecordReader()){
 	        rr.initialize(new FileSplit(new File(fileNameTrain)));
-			int batchSize = 256;
+			int batchSize = 16;
 	        DataSetIterator trainIter = new RecordReaderDataSetIterator(rr,batchSize,0,numOutputs);
 	
 			int nChannels = 1;
@@ -68,33 +68,26 @@ public class CreateCNNModel {
 	                .optimizationAlgo(OptimizationAlgorithm.STOCHASTIC_GRADIENT_DESCENT)
 	                .updater(Updater.ADAM)
 	                .list()
-	                .layer(0, new ConvolutionLayer.Builder(1,8)
+	                .layer(0, new ConvolutionLayer.Builder(1,32)
 	                        .nIn(nChannels)
 	                        .stride(1,1)
 	                        .nOut(32)
 	                        .activation(Activation.RELU)
 	                        .build())
-	                .layer(1, new ConvolutionLayer.Builder(1,8)
-	                        .stride(1,1)
-	                        .nOut(32)
-	                        .activation(Activation.RELU)
-	                        .build())
-	                .layer(2, new SubsamplingLayer.Builder(SubsamplingLayer.PoolingType.MAX)
+	                .layer(1, new SubsamplingLayer.Builder(SubsamplingLayer.PoolingType.MAX)
 	                        .kernelSize(1,4)
 	                        .stride(1,4)
 	                        .build())
-	                .layer(3, new ConvolutionLayer.Builder(1,4)
+	                .layer(2, new ConvolutionLayer.Builder(1,8)
 	                        .stride(1,1)
 	                        .nOut(32)
 	                        .activation(Activation.RELU)
 	                        .build())
+	                .layer(3, new DenseLayer.Builder().activation(Activation.RELU)
+	                        .nOut(32).build())
 	                .layer(4, new DenseLayer.Builder().activation(Activation.RELU)
 	                        .nOut(32).build())
-	                .layer(5, new DenseLayer.Builder().activation(Activation.RELU)
-	                        .nOut(32).build())
-	                .layer(6, new DenseLayer.Builder().activation(Activation.RELU)
-	                        .nOut(32).build())
-	                .layer(7, new OutputLayer.Builder(LossFunctions.LossFunction.NEGATIVELOGLIKELIHOOD)
+	                .layer(5, new OutputLayer.Builder(LossFunctions.LossFunction.NEGATIVELOGLIKELIHOOD)
 	                        .nOut(numOutputs)
 	                        .activation(Activation.SOFTMAX)
 	                        .build())
@@ -107,7 +100,7 @@ public class CreateCNNModel {
 
 	        double bestAccuracy = 0;
 			TDoubleArrayList testSimpleAccuracyList = new TDoubleArrayList();
-			TDoubleArrayList testComplexAccuracyList = new TDoubleArrayList();
+//			TDoubleArrayList testComplexAccuracyList = new TDoubleArrayList();
 			TDoubleArrayList trainAccuracyList = new TDoubleArrayList();
 			
 	        //Store model
@@ -124,8 +117,8 @@ public class CreateCNNModel {
 	            testSimpleAccuracyList.add(testSimpleEvaluation.accuracy());
 	            	         
 	            //test complex evaluation
-	            Evaluation testComplexEvaluation = evaluate(fileNameComplexTest, numOutputs, batchSize, model);
-	            testComplexAccuracyList.add(testComplexEvaluation.accuracy());
+//	            Evaluation testComplexEvaluation = evaluate(fileNameComplexTest, numOutputs, batchSize, model);
+//	            testComplexAccuracyList.add(testComplexEvaluation.accuracy());
 	            
 	            //train evaluation
 	            Evaluation trainEvaluation = evaluate(fileNameTrain, numOutputs, batchSize, model);
@@ -150,8 +143,8 @@ public class CreateCNNModel {
 		    	String testSimpleAccuracyListStr = PStrings.toCSV(testSimpleAccuracyList.toArray());
 		    	output.println(testSimpleAccuracyListStr);
 		    	
-		    	String testComplexAccuracyListStr = PStrings.toCSV(testComplexAccuracyList.toArray());
-		    	output.println(testComplexAccuracyListStr);
+//		    	String testComplexAccuracyListStr = PStrings.toCSV(testComplexAccuracyList.toArray());
+//		    	output.println(testComplexAccuracyListStr);
 		    	
 		    	String trainAccuracyListStr = PStrings.toCSV(trainAccuracyList.toArray());
 		    	output.println(trainAccuracyListStr);

@@ -1,6 +1,7 @@
 package application.expressionParse;
 
 import java.awt.Rectangle;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
@@ -54,14 +55,72 @@ class BooleanSpatialParser implements IBooleanSpatialParser {
 	@Override
 	public @Nonnull IBooleanExpressionNode parse(@Nonnull List<Symbol> symbols) throws Exception{
 
+		//===================================================================================================
+		//Experimental new spatial lexical analysis
+		List<Pair<String,Rectangle>> symbolsAndRect  = symbols.stream().map(symbol->{
+			return Pair.of(symbol.getSymbolAsString(), SymbolTransformations.getRectangleRepresentation(symbol));
+		})
+		.sorted((e1,e2)->{
+			return Double.compare(e1.right().getCenterX(), e2.right().getCenterX());
+		})
+		.collect(Collectors.toList());
 		
-		List<Pair<IBooleanExpressionNode,Rectangle>> symbolsAsToken = symbols.stream()
-				.map(symbolToStructureMapper)
-				.sorted(leftToRight)
-				.collect(Collectors.toList());
+		List<Pair<IBooleanExpressionNode,Rectangle>> symbolsAsToken = new ArrayList<>();
+		while(!symbolsAndRect.isEmpty()) {
+			Pair<String,Rectangle> symbolAndRect = symbolsAndRect.remove(0);
+			
+			LexicalToken.Type type = lexicalAnalizer.decodeTokenType(symbolAndRect.left());
+			if(type==null) {
+				throw new IllegalArgumentException("Unknown lexical token");
+			}
+			
+			if(type!=LexicalToken.Type.FUNCTION) {
+				LexicalToken token = new LexicalToken(symbolAndRect.left(), type);
+				Pair<IBooleanExpressionNode,Rectangle> nodeAndRect = Pair.of(BooleanNodeFactory.getNodeFor(token), symbolAndRect.right());
+				symbolsAsToken.add(nodeAndRect);
+				continue;
+			}
+			
+			//function mode
+			while(!symbolsAndRect.isEmpty()){
+				Pair<String,Rectangle> currentSAR = symbolsAndRect.remove(0);
+				String currentSymbol = currentSAR.left();
+				type = lexicalAnalizer.decodeTokenType(symbolAndRect.left() + currentSymbol);
+				if(type==LexicalToken.Type.FUNCTION) {
+					symbolAndRect.setLeft(symbolAndRect.left()+currentSymbol);
+					symbolAndRect.setRight(symbolAndRect.right().union(currentSAR.right()));
+				}
+				else {
+					type = lexicalAnalizer.decodeTokenType(currentSymbol);
+					if(type==LexicalToken.Type.NOT) {
+						LexicalToken token = new LexicalToken(currentSymbol, type);
+						Pair<IBooleanExpressionNode,Rectangle> nodeAndRect = Pair.of(BooleanNodeFactory.getNodeFor(token), currentSAR.right());
+						symbolsAsToken.add(nodeAndRect);
+					}
+					else {
+						symbolsAndRect.add(0, currentSAR);
+						break;
+					}
+				}
+			}
+			//
+			LexicalToken token = new LexicalToken(symbolAndRect.left(), LexicalToken.Type.FUNCTION);
+			Pair<IBooleanExpressionNode,Rectangle> nodeAndRect = Pair.of(BooleanNodeFactory.getNodeFor(token), symbolAndRect.right());
+			symbolsAsToken.add(nodeAndRect);
+
+		}
+		symbolsAsToken = symbolsAsToken.stream().sorted(leftToRight).collect(Collectors.toList());
 		
-		//TODO: remove
-		System.out.println(Arrays.toString(symbols.stream().toArray()));
+		
+		//===================================================================================================
+		//old implementation
+//		List<Pair<IBooleanExpressionNode,Rectangle>> symbolsAsToken = symbols.stream()
+//				.map(symbolToStructureMapper)
+//				.sorted(leftToRight)
+//				.collect(Collectors.toList());
+//		
+//		//TODO: remove
+//		System.out.println(Arrays.toString(symbols.stream().toArray()));
 
 		return innerParse(symbolsAsToken).left();
 	}
