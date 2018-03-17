@@ -42,7 +42,7 @@ public class CreateFCModel {
 //		String fileNameComplexTest = "./training/symbol-gesture-new/test_complex_data-180-10.csv";
 //		String fileNameTrainArtificial = "./training/symbol-gesture-new/artificial_training_data-180-10.csv";
 		//
-		String modelName = "FC-78-2-exp-model6";
+		String modelName = "FC-78-2-exp-model8";
 		
 		//File statOutputFolder = new File("./training/symbol-gesture-new/statistics/");
 		File inputFile = new File(fileNameTrainReal);

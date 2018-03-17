@@ -52,7 +52,7 @@ public class TwoStepGestureGrouper implements IGestureGrouper{
 //				String groupModelName_3 = "FC-78-2-exp-model3";
 //				MultiLayerNetwork groupNetwork_3 = ModelSerializer.restoreMultiLayerNetwork(new File(folder + groupModelName_3));
 
-				String groupModelName_4 = "FC-78-2-exp-model4";
+				String groupModelName_4 = "FC-78-2-exp-model6";
 				MultiLayerNetwork groupNetwork_4 = ModelSerializer.restoreMultiLayerNetwork(new File(folder + groupModelName_4));
 				
 				return new MultiLayerNetwork[] {/*groupNetwork_1, groupNetwork_2, groupNetwork_3,*/ groupNetwork_4};

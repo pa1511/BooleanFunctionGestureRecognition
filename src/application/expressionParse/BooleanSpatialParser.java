@@ -76,12 +76,6 @@ class BooleanSpatialParser implements IBooleanSpatialParser {
 		
 		if(nodeCount==1)
 			return nodes.get(0);
-		//=================================================================================
-		//Equals handling
-		//TODO: perhaps it will not be needed
-		
-		//if(nodes.stream().anyMatch(node->node.left() instanceof EqualsNode))
-		
 		
 		//=================================================================================
 		//Parsing
@@ -144,7 +138,6 @@ class BooleanSpatialParser implements IBooleanSpatialParser {
 		//OR operation reduce
 		reduceOperation(OrNode.class, nodes,BooleanSpatialParser::binaryReduceOperation);
 		
-		//TODO: newly added
 		//EQUALS operation reduce
 		reduceOperation(EqualsNode.class, nodes, BooleanSpatialParser::binaryReduceOperation);
 		
