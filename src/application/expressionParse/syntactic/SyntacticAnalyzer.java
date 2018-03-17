@@ -1,6 +1,5 @@
 package application.expressionParse.syntactic;
 
-import java.util.Arrays;
 import java.util.Stack;
 
 import javax.annotation.Nonnull;
@@ -34,10 +33,6 @@ public class SyntacticAnalyzer implements ISyntacticAnalyzer {
 		
 		checkLexicalTokenStreamValidity(tokens);
 		
-		FunctionNode assigmentFunctionNode = null;
-		boolean equalsOccurred = false;
-		boolean containsEquals = Arrays.stream(tokens).map(t->t.getType()).anyMatch(t->t==LexicalToken.Type.EQUALS);
-		
 		/*
 		 * If everything is working correctly the stacks should be empty at each beginning and end of this method. <br> 
 		 */
@@ -54,19 +49,11 @@ public class SyntacticAnalyzer implements ISyntacticAnalyzer {
 				}
 				reduceSyntacticTree();
 				
-			}
-			else if(token.getType()==Type.EQUALS) {
-				equalsOccurred = true;
-			}
-			else{
+			} else{
 			
 				node = BooleanNodeFactory.getNodeFor(token);
 				
-				if(!equalsOccurred && node instanceof FunctionNode && containsEquals) {
-					assigmentFunctionNode = (FunctionNode) node;
-					
-				}
-				else if(node instanceof FunctionNode || node instanceof VariableNode || node instanceof TrueNode || node instanceof FalseNode){
+				if(node instanceof FunctionNode || node instanceof VariableNode || node instanceof TrueNode || node instanceof FalseNode){
 					operandStack.push(node);
 				}
 				else{
@@ -92,13 +79,7 @@ public class SyntacticAnalyzer implements ISyntacticAnalyzer {
 			reduceSyntacticTree();
 		}
 		
-		IBooleanExpressionNode node = operandStack.pop();
-		if(assigmentFunctionNode!=null) {
-			assigmentFunctionNode.addChild(node, 0);
-			node = assigmentFunctionNode;
-		}
-		
-		return node;
+		return operandStack.pop();
 	}
 
 	private void reduceSyntacticTree() {

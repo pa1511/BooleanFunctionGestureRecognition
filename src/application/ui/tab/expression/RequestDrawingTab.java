@@ -70,8 +70,9 @@ public class RequestDrawingTab extends AbstractApplicationTab{
 	public RequestDrawingTab() {
 		super("Drawing");
 		
-		requestedSymbols = new String[]{"A","B","+","*","(",")","!","1","0","A+B","A*B","A+1","A*1","A+0","A*0","B+1","B*1","B+0","B*0","!A","!!A","!B","!!B","(A)","(B)","!A+B","A+!B","!A+!B","!(A*B)","(A*B)","!(!A+!B)"};
-		requestedSymbolCounts = new int[]{ 0, 0, 0, 0, 0 ,0, 0, 0, 0,    15,    15,   15 ,    15,    15,   15,   15 ,    15,    15,    15,   15,    15,   15,    15,    15,    15,     15,     15,      15,       15,      15,       15};
+		requestedSymbols = new String[]{"F=A","F=B","F=C","F=D","F=1","F=0","F=!A","F=!B","F=!C","F=!D","F=!1","F=!0"};
+		requestedSymbolCounts = new int[requestedSymbols.length];
+		Arrays.fill(requestedSymbolCounts, 2);
 		remaining = Arrays.stream(requestedSymbolCounts).sum();
 		totalCount = remaining;
 		selected = selectRequest();
