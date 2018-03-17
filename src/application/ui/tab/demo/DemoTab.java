@@ -13,7 +13,6 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import javax.annotation.CheckForNull;
-import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
@@ -44,6 +43,7 @@ import application.ui.draw.Canvas;
 import application.ui.draw.ACanvasObserver;
 import application.ui.tab.AbstractApplicationTab;
 import application.ui.table.ExpressionEvaluationTableModel;
+import application.ui.table.FunctionTableModel;
 import dataModels.Pair;
 import log.Log;
 import utilities.lazy.Lazy;
@@ -55,10 +55,12 @@ public class DemoTab extends AbstractApplicationTab{
 	private final @Nonnull Canvas canvas;
 	
 	private final @Nonnull JTextField detectedExpressionField;
+	//
 	private final @Nonnull JTable evaluationTable;
 	private @CheckForNull ExpressionEvaluationTableModel expressionEvaluationTableModel;
-	private static final @Nonnegative int visibleRowCount = 6;
-
+	//
+	private final @Nonnull JTable functionTable;
+	private @CheckForNull FunctionTableModel functionTableModel;
 
 	//Actions
 	private final @Nonnull UndoAction undoAction;
@@ -106,6 +108,7 @@ public class DemoTab extends AbstractApplicationTab{
 		//Evaluation table
 		detectedExpressionField = new JTextField();
 		evaluationTable = new JTable();
+		functionTable = new JTable();
 		
 		JPanel detectedExpressionHolder = new JPanel(new BorderLayout());
 		detectedExpressionHolder.add(new JLabel("Detected expression: "),BorderLayout.WEST);
@@ -114,9 +117,9 @@ public class DemoTab extends AbstractApplicationTab{
 		
 		JPanel detectedInfoHolder = new JPanel(new BorderLayout());
 		detectedInfoHolder.add(detectedExpressionHolder,BorderLayout.NORTH);
-		detectedInfoHolder.add(new JScrollPane(evaluationTable),BorderLayout.CENTER);
+		detectedInfoHolder.add(new JScrollPane(evaluationTable), BorderLayout.CENTER);
+		detectedInfoHolder.add(new JScrollPane(functionTable), BorderLayout.SOUTH);
 
-		
 		//Main split
 		mainSplit = new JSplitPane(JSplitPane.VERTICAL_SPLIT, canvas, new JScrollPane(detectedInfoHolder));
 		SwingUtilities.invokeLater(()->mainSplit.setDividerLocation(0.5));
@@ -185,8 +188,9 @@ public class DemoTab extends AbstractApplicationTab{
 	}
 	
 	private void clearEvaluationTable() {
-		evaluationTable.setModel(new DefaultTableModel());
 		detectedExpressionField.setText("");
+		evaluationTable.setModel(new DefaultTableModel());
+		functionTable.setModel(new DefaultTableModel());
 	}
 	
 	//========================================================================================================================
@@ -250,6 +254,8 @@ public class DemoTab extends AbstractApplicationTab{
 				VariableValueProvider decodedVariableValueProvider = new VariableValueProvider(node);
 				expressionEvaluationTableModel = new ExpressionEvaluationTableModel(decodedVariableValueProvider, node);
 				evaluationTable.setModel(expressionEvaluationTableModel);
+				functionTableModel = new FunctionTableModel(node);
+				functionTable.setModel(functionTableModel);
 				detectedExpressionField.setText(node.toString());
 
 			} catch (Exception ex) {
