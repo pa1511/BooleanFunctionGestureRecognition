@@ -44,7 +44,7 @@ public class CreateCNNModel {
 		String fileNameTrain = "./training/symbol-gesture-new/training_data_exp-78-2.csv";
 		String fileNameSimpleTest = "./training/symbol-gesture-new/test_simple_data_exp-78-2.csv";
 		//String fileNameComplexTest = "./training/symbol-gesture-new/test_complex_data-181-10.csv";
-		String modelName = "CNN-78-2-model4";
+		String modelName = "CNN-78-2-model5";
 		
 		File inputFile = new File(fileNameTrain);
 		

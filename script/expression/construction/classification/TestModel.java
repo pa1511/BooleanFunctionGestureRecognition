@@ -23,7 +23,7 @@ public class TestModel {
 				"./training/symbol-gesture-new/model/";
 				//"./training/archive/181-10/model/";
 				//"./training/archive/old/";
-		String modelName = "FC-78-2-exp-model6";
+		String modelName = "CNN-78-2-model5";
 		
         int batchSize = 32;
 		int numOutputs = 2;
