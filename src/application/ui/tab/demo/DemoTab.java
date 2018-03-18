@@ -60,7 +60,7 @@ public class DemoTab extends AbstractApplicationTab{
 	private @CheckForNull ExpressionEvaluationTableModel expressionEvaluationTableModel;
 	//
 	private final @Nonnull JTable functionTable;
-	private @CheckForNull FunctionTableModel functionTableModel;
+	private final @Nonnull FunctionTableModel functionTableModel;
 
 	//Actions
 	private final @Nonnull UndoAction undoAction;
@@ -108,7 +108,8 @@ public class DemoTab extends AbstractApplicationTab{
 		//Evaluation table
 		detectedExpressionField = new JTextField();
 		evaluationTable = new JTable();
-		functionTable = new JTable();
+		functionTableModel = new FunctionTableModel();
+		functionTable = new JTable(functionTableModel);
 		
 		JPanel detectedExpressionHolder = new JPanel(new BorderLayout());
 		detectedExpressionHolder.add(new JLabel("Detected expression: "),BorderLayout.WEST);
@@ -159,6 +160,9 @@ public class DemoTab extends AbstractApplicationTab{
 	}
 
 	private void forceRepaint() {
+		functionTable.revalidate();
+		functionTable.repaint();
+
 		revalidate();
 		repaint();
 	}
@@ -190,7 +194,6 @@ public class DemoTab extends AbstractApplicationTab{
 	private void clearEvaluationTable() {
 		detectedExpressionField.setText("");
 		evaluationTable.setModel(new DefaultTableModel());
-		functionTable.setModel(new DefaultTableModel());
 	}
 	
 	//========================================================================================================================
@@ -254,8 +257,6 @@ public class DemoTab extends AbstractApplicationTab{
 				VariableValueProvider decodedVariableValueProvider = new VariableValueProvider(node);
 				expressionEvaluationTableModel = new ExpressionEvaluationTableModel(decodedVariableValueProvider, node);
 				evaluationTable.setModel(expressionEvaluationTableModel);
-				functionTableModel = new FunctionTableModel(node);
-				functionTable.setModel(functionTableModel);
 				detectedExpressionField.setText(node.toString());
 
 			} catch (Exception ex) {

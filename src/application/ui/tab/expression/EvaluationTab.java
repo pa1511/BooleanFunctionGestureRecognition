@@ -51,7 +51,7 @@ public class EvaluationTab extends AbstractApplicationTab{
 		expressionInputField.addActionListener(evaluateAction);
 		evaluateButton = new JButton(evaluateAction);
 		
-		functionTable = new JTable();
+		functionTable = new JTable(new FunctionTableModel());
 		
 		//Upper panel content
 		JPanel upperPanel = new JPanel(new BorderLayout());
@@ -77,7 +77,6 @@ public class EvaluationTab extends AbstractApplicationTab{
 	private void updateExpressionUI() {
 		if(variableValueProvider!=null && expression!=null) {
 			truthTable.setModel(new ExpressionEvaluationTableModel(variableValueProvider, expression));
-			functionTable.setModel(new FunctionTableModel(expression));
 		}
 		
 	}

@@ -25,6 +25,7 @@ import application.expressionParse.syntactic.node.leaf.EqualsNode;
 import application.expressionParse.syntactic.node.leaf.NotNode;
 import application.expressionParse.syntactic.node.leaf.OrNode;
 import dataModels.Pair;
+import log.Log;
 
 class BooleanSpatialParser implements IBooleanSpatialParser {
 
@@ -111,16 +112,7 @@ class BooleanSpatialParser implements IBooleanSpatialParser {
 		}
 		symbolsAsToken = symbolsAsToken.stream().sorted(leftToRight).collect(Collectors.toList());
 		
-		
-		//===================================================================================================
-		//old implementation
-//		List<Pair<IBooleanExpressionNode,Rectangle>> symbolsAsToken = symbols.stream()
-//				.map(symbolToStructureMapper)
-//				.sorted(leftToRight)
-//				.collect(Collectors.toList());
-//		
-//		//TODO: remove
-//		System.out.println(Arrays.toString(symbols.stream().toArray()));
+		Log.addMessage(Arrays.toString(symbols.stream().toArray()),Log.Type.Plain);
 
 		return innerParse(symbolsAsToken).left();
 	}

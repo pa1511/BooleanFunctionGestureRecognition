@@ -1,10 +1,9 @@
 package application.expressionParse;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
+
+import com.twelvemonkeys.util.LinkedMap;
 
 import application.expressionParse.syntactic.node.leaf.FunctionNode;
 
@@ -18,10 +17,10 @@ public class MemoryTable {
 		return memoryTable;
 	}
 	
-	private final @Nonnull Map<String, FunctionNode> memory;
+	private final @Nonnull LinkedMap<String, FunctionNode> memory;
 	
 	private MemoryTable() {
-		memory = new HashMap<>();
+		memory = new LinkedMap<>();
 	}
 	
 	public void storeFunction(@Nonnull String functionId, @Nonnull FunctionNode node) {
@@ -34,6 +33,10 @@ public class MemoryTable {
 	
 	public @CheckForNull FunctionNode getFunctionNode(@Nonnull String functionId) {
 		return memory.get(functionId);
+	}
+	
+	public LinkedMap<String, FunctionNode> getMemory() {
+		return memory;
 	}
 	
 

@@ -9,6 +9,7 @@ import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
 
 import application.expressionParse.syntactic.node.IBooleanExpressionNode;
+import application.expressionParse.syntactic.node.leaf.FunctionNode;
 import application.expressionParse.syntactic.node.leaf.VariableNode;
 
 /**
@@ -41,6 +42,10 @@ public class VariableValueProvider {
 			}
 			
 			for(IBooleanExpressionNode child:node.getChildren()){
+				
+				if(node instanceof FunctionNode && child==null)
+					throw new IllegalArgumentException("Undefined function used");
+				
 				nodeQueue.add(child);
 			}
 			
