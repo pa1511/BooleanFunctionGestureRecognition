@@ -17,6 +17,7 @@ import application.data.model.Symbol;
 import application.data.model.handling.SymbolTransformations;
 import application.expressionParse.lexic.ILexicalAnalyzer;
 import application.expressionParse.lexic.token.LexicalToken;
+import application.expressionParse.lexic.token.LexicalToken.Type;
 import application.expressionParse.syntactic.node.BooleanNodeFactory;
 import application.expressionParse.syntactic.node.IBooleanExpressionNode;
 import application.expressionParse.syntactic.node.leaf.AndNode;
@@ -71,6 +72,23 @@ class BooleanSpatialParser implements IBooleanSpatialParser {
 				LexicalToken token = new LexicalToken(symbolAndRect.left(), type);
 				Pair<IBooleanExpressionNode,Rectangle> nodeAndRect = Pair.of(BooleanNodeFactory.getNodeFor(token), symbolAndRect.right());
 				symbolsAsToken.add(nodeAndRect);
+				
+				if((type==Type.VARIABLE || type==Type.TRUE || type==Type.FALSE) && !symbolsAndRect.isEmpty()) {
+					Pair<String,Rectangle> nextSAR = symbolsAndRect.get(0);
+					LexicalToken.Type nextType = lexicalAnalizer.decodeTokenType(nextSAR.left());
+					if(nextType==Type.VARIABLE||nextType==Type.TRUE||nextType==Type.FALSE||nextType==Type.FUNCTION) {
+						LexicalToken andToken = new LexicalToken(LexicalToken.Type.AND.getSymbolAsString(), Type.AND);
+						Rectangle currentRect = nodeAndRect.right();
+						Rectangle nextRect = nextSAR.right();
+						int diffX = (nextRect.x-(currentRect.x+currentRect.width))/3;
+						Rectangle andRectangle = new Rectangle(currentRect.x+currentRect.width+diffX, currentRect.y, diffX, 10);
+						
+						
+						Pair<IBooleanExpressionNode,Rectangle> andNodeAndRect = Pair.of(BooleanNodeFactory.getNodeFor(andToken), andRectangle);
+						symbolsAsToken.add(andNodeAndRect);
+					}
+				}
+				
 				continue;
 			}
 			
