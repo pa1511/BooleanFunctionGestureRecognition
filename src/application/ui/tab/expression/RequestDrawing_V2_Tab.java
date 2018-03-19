@@ -63,8 +63,6 @@ public class RequestDrawing_V2_Tab extends AbstractApplicationTab{
 	private final @Nonnull PerGestureView perGestureView;
 
 	//Actions
-	private final @Nonnull UndoAction undoAction;
-	private final @Nonnull RedoAction redoAction;
 	private final @Nonnull StoreExpressionAction storeExpressionAction;
 	private final @Nonnull ClearCanvasAction clearCanvasAction;
 	
@@ -78,7 +76,7 @@ public class RequestDrawing_V2_Tab extends AbstractApplicationTab{
 	private final @Nonnull int[] requestedSymbolCounts;
 	private int totalCount;
 	private int remaining;
-	
+	//
 	private int selected = 0;
 	//
 	//Used in generating artificial data
@@ -120,7 +118,7 @@ public class RequestDrawing_V2_Tab extends AbstractApplicationTab{
 		}
 		
 		//==============================================================================================
-		requestedSymbols = new String[]{"AB","BC","CD","D0","01"};
+		requestedSymbols = new String[]{"A+B"};
 		requestedSymbolCounts = new int[requestedSymbols.length];
 		Arrays.fill(requestedSymbolCounts, 2);
 		remaining = Arrays.stream(requestedSymbolCounts).sum();
@@ -154,8 +152,6 @@ public class RequestDrawing_V2_Tab extends AbstractApplicationTab{
 				+ "Simbols are read from left to right in order. <br> "
 				+ "! means negation and please write it as a line above a symbol or just a horizontal line if it is the only symbol requested. <br>"
 				+ "CTRL+S save to database <br>"
-				+ "CTRL+Z undo <br>"
-				+ "CTRL+Y redo <br>"
 				+ "CTRL+SHIFT+C clear</html>");
 		Font tipFont = canvasInstruction.getFont().deriveFont(Font.ITALIC).deriveFont(Font.BOLD);
 		canvasInstruction.setFont(tipFont);
@@ -169,17 +165,10 @@ public class RequestDrawing_V2_Tab extends AbstractApplicationTab{
 		add(canvasHolderPanel,BorderLayout.CENTER);
 		
 		//Control panel
-		undoAction = new UndoAction();
-		redoAction = new RedoAction();
 		clearCanvasAction = new ClearCanvasAction();
 		storeExpressionAction = new StoreExpressionAction();
-		
-		undoAction.setEnabled(false);
-		redoAction.setEnabled(false);
-				
+						
 		JPanel controlPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-		controlPanel.add(new JButton(undoAction));
-		controlPanel.add(new JButton(redoAction));
 		controlPanel.add(new JButton(storeExpressionAction));
 		controlPanel.add(new JButton(clearCanvasAction));
 		
@@ -231,10 +220,6 @@ public class RequestDrawing_V2_Tab extends AbstractApplicationTab{
 	}
 
 	private void registerKeyboardActions() {
-		conceptDescriptionField.registerKeyboardAction(undoAction, 
-				KeyStroke.getKeyStroke(KeyEvent.VK_Z, KeyEvent.CTRL_DOWN_MASK), JComponent.WHEN_FOCUSED);
-		conceptDescriptionField.registerKeyboardAction(redoAction, 
-				KeyStroke.getKeyStroke(KeyEvent.VK_Y, KeyEvent.CTRL_DOWN_MASK), JComponent.WHEN_FOCUSED);
 		conceptDescriptionField.registerKeyboardAction(storeExpressionAction, 
 				KeyStroke.getKeyStroke(KeyEvent.VK_S, KeyEvent.CTRL_DOWN_MASK), JComponent.WHEN_FOCUSED);
 		conceptDescriptionField.registerKeyboardAction(clearCanvasAction, 
@@ -288,10 +273,7 @@ public class RequestDrawing_V2_Tab extends AbstractApplicationTab{
 		public void clearUpdate() {
 			perGestureView.clear();
 			currentSy = 0;
-			
-			undoAction.setEnabled(false);
-			redoAction.setEnabled(false);
-			
+			updateDemoCanvas(currentSy);						
 			forceRepaint();
 		}
 
@@ -309,8 +291,6 @@ public class RequestDrawing_V2_Tab extends AbstractApplicationTab{
 				perGestureView.addGesture(Character.toString(symbols[currentSy]), new Gesture(points));
 			}
 			
-			undoAction.setEnabled(true);
-			
 			forceRepaint();
 		}
 
@@ -324,8 +304,6 @@ public class RequestDrawing_V2_Tab extends AbstractApplicationTab{
 			else if(type==MouseClickType.LEFT){
 				perGestureView.redo();
 			}
-						
-			undoAction.setEnabled(true);
 			
 			forceRepaint();
 		}
@@ -341,8 +319,6 @@ public class RequestDrawing_V2_Tab extends AbstractApplicationTab{
 			else{
 				perGestureView.undo();
 			}
-			
-			redoAction.setEnabled(true);
 			
 			forceRepaint();
 		}
@@ -409,34 +385,6 @@ public class RequestDrawing_V2_Tab extends AbstractApplicationTab{
 			}
 			
 			clearCanvasAction.actionPerformed(e);
-		}
-		
-	}
-	
-	private final class UndoAction extends AbstractAction {
-		
-		public UndoAction() {
-			super("Undo");
-		}
-
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			Log.addMessage("Undo action called", Log.Type.Plain);
-			setEnabled(drawingCanvas.undo());
-		}
-		
-	}
-	
-	private final class RedoAction extends AbstractAction {
-		
-		public RedoAction() {
-			super("Redo");
-		}
-
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			Log.addMessage("Redo action called", Log.Type.Plain);
-			setEnabled(drawingCanvas.redo());
 		}
 		
 	}

@@ -90,7 +90,12 @@ public class ExpressionFactory {
 			double shiftY = 0;
 
 			for (int i = 0; i < expressionSymbols.length; i++) {
-				List<RelativeSymbol> symbols = symbolsMap.get(expressionSymbols[i]);
+				String symbolAsString = expressionSymbols[i];
+				LexicalToken.Type tokenType = LexicalToken.Type.decodeType(symbolAsString);
+				if(tokenType==null)
+					continue;
+				
+				List<RelativeSymbol> symbols = symbolsMap.get(symbolAsString);
 				RelativeSymbol symbol = symbols.get(random.nextInt(symbols.size()));
 
 				Symbol artificialSymbol = new Symbol(symbol.getSymbol());
@@ -102,21 +107,26 @@ public class ExpressionFactory {
 
 				shiftX += (1 + shiftXRand) * width;
 				shiftY = (shiftYRand) * height;
-				double operatorModifier = 1;
-				LexicalToken.Type tokenType = LexicalToken.Type.decodeType(symbol.getSymbolAsString());
+				double operatorModifierX = 1;
+				double operatorModifierY = 1;
 				
 				if(tokenType==Type.OR || tokenType==Type.EQUALS) {
 					shiftX+=0.4*width;
 					shiftY+=height*0.5;
-					operatorModifier = 0.5;
+					operatorModifierX = 0.5;
+					operatorModifierY = 0.5;
 				}
 				
 				if(tokenType==Type.AND) {
 					shiftX+=0.2*width;
 					shiftY+=height*0.5;
-					operatorModifier = 0.5;
+					operatorModifierX = 0.5;
+					operatorModifierY = 0.5;
 				}
-
+				
+				if(tokenType==Type.NOT) {
+					shiftY -= height*0.6;
+				}
 				
 				for (RelativeGesture gesture : symbol.getGestures()) {
 
@@ -125,8 +135,8 @@ public class ExpressionFactory {
 
 					for (Relative2DPoint point : gesture.getPoints()) {
 
-						int x = (int) (shiftX + (point.x + 1) * width * operatorModifier);// shift to position + size
-						int y = (int) (shiftY + (point.y + 1) * height * operatorModifier);// shift to position + size
+						int x = (int) (shiftX + (point.x + 1) * width * operatorModifierX);// shift to position + size
+						int y = (int) (shiftY + (point.y + 1) * height * operatorModifierY);// shift to position + size
 
 						Point artificialPoint = new Point(x, y);
 						artificialGesture.addPoint(artificialPoint);
@@ -139,6 +149,11 @@ public class ExpressionFactory {
 				if(tokenType==Type.AND) {
 					shiftX-=0.4*width;
 				}
+
+				if(tokenType==Type.NOT) {
+					shiftX -= width;
+				}
+
 				
 			}
 
