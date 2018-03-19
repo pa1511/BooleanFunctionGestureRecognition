@@ -21,17 +21,17 @@ public class TestModel {
 	public static void main(String[] args) throws IOException, InterruptedException {
 		String folder = 
 				"./training/symbol-gesture-new/model/";
-//		String modelName = "CNN-78-2-model5";
-		String modelName = "FC-180-14-model1";
+		String modelName = "CNN-78-2-model7";
+//		String modelName = "FC-180-14-model1";
 		
         int batchSize = 32;
-		int numOutputs = 14;
+		int numOutputs = 2;
 		MultiLayerNetwork network = ModelSerializer.restoreMultiLayerNetwork(new File(folder + modelName));
 		
 		
-//        evaluate("./training/symbol-gesture-new/", "test_simple_data_exp-78-2.csv", batchSize, numOutputs, network);
+        evaluate("./training/symbol-gesture-new/", "test_simple_data_exp-78-2.csv", batchSize, numOutputs, network);
 //
-          evaluate("./training/symbol-gesture-new/", "test_simple_data_exp-180-14.csv", batchSize, numOutputs, network);
+//        evaluate("./training/symbol-gesture-new/", "test_simple_data_exp-180-14.csv", batchSize, numOutputs, network);
 //        evaluate("./training/symbol-gesture-new/", "test_complex_data-180-10.csv", batchSize, numOutputs, network);
         //
 	}
