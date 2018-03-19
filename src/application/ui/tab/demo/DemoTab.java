@@ -248,6 +248,11 @@ public class DemoTab extends AbstractApplicationTab{
 		public void actionPerformed(ActionEvent e) {
 
 			List<Gesture> inputData = canvas.getData().stream().map(pointsToGesture).collect(Collectors.toList());
+			if(inputData.isEmpty()) {
+				JOptionPane.showMessageDialog(null, "Please provide expression", "Warning", JOptionPane.WARNING_MESSAGE);
+				return;
+			}
+			
 			
 			lastGroupedSymbols = gestureGrouper.getOrThrow().group(inputData);
 			

@@ -118,7 +118,7 @@ public class RequestDrawing_V2_Tab extends AbstractApplicationTab{
 		}
 		
 		//==============================================================================================
-		requestedSymbols = new String[]{"A+B"};
+		requestedSymbols = new String[]{"A+B","0*(C+D)","F=A+B"};
 		requestedSymbolCounts = new int[requestedSymbols.length];
 		Arrays.fill(requestedSymbolCounts, 2);
 		remaining = Arrays.stream(requestedSymbolCounts).sum();
