@@ -13,7 +13,7 @@ public interface IBooleanTextParser {
 	 * Does initial expression preparation for further analysis. <br>
 	 */
 	public static @Nonnull String expressionPreprocessing(@Nonnull String expression) {
-		return expression.replaceAll("\\s", "").toUpperCase();
+		return expression.replaceAll("\\s", "").toUpperCase().replaceAll("[0|1|A-F|\\)](?=[A-F|0|1|\\(|!])", "$0\\*");
 	}
 
 }

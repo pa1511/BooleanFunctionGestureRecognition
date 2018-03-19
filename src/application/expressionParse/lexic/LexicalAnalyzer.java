@@ -25,20 +25,6 @@ public class LexicalAnalyzer implements ILexicalAnalyzer {
 	@Override
 	public @Nonnull LexicalToken[] analyze(@Nonnull String expression) throws BooleanExpressionLexicalException{
 		
-		
-//=================================================================		
-		//TODO: old version
-//		char[] expressionCharacters = expression.toCharArray();
-//		LexicalToken[] tokens = new LexicalToken[expressionCharacters.length];
-//		
-//		for(int i=0; i<expressionCharacters.length;i++){
-//			tokens[i] = decodeToken(expressionCharacters[i]);
-//			if(tokens[i]==null)
-//				throw new BooleanExpressionLexicalException("Unknown lexical token: " + expressionCharacters[i]);
-//		}
-//				
-//		return tokens;
-//=================================================================		
 		List<LexicalToken> tokens = new ArrayList<>();
 		
 		int start = 0;

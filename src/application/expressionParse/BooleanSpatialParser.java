@@ -36,7 +36,6 @@ class BooleanSpatialParser implements IBooleanSpatialParser {
 				
 		return Double.compare(rec1.getCenterX(), rec2.getCenterX());
 	};
-	private final @Nonnull Function<Symbol, Pair<IBooleanExpressionNode,Rectangle>> symbolToStructureMapper;
 
 
 	/**
@@ -44,13 +43,6 @@ class BooleanSpatialParser implements IBooleanSpatialParser {
 	 */
 	public BooleanSpatialParser(ILexicalAnalyzer lexicalAnalyzer) {
 		this.lexicalAnalizer = lexicalAnalyzer;
-		symbolToStructureMapper = symbol->{
-			
-			LexicalToken lexicalToken = lexicalAnalizer.decodeToken(symbol.getSymbol());
-			IBooleanExpressionNode expressionNode = BooleanNodeFactory.getNodeFor(lexicalToken);
-			
-			return Pair.of(expressionNode, SymbolTransformations.getRectangleRepresentation(symbol));
-		};
 	}
 	
 	@Override
