@@ -15,17 +15,21 @@ import dataModels.Pair;
 public class ExpressionTransformations {
 
 	public static @Nonnull ArrayDeque<Pair<MouseClickType, List<Point>>> getCanvasForm(@Nonnull Expression expression) {
-		
+		return getCanvasForm(expression, -1);
+	}
+
+	public static @Nonnull ArrayDeque<Pair<MouseClickType, List<Point>>> getCanvasForm(@Nonnull Expression expression, int rightClickSymbol) {
 		ArrayDeque<Pair<MouseClickType, List<Point>>> canvasForm = new ArrayDeque<>();
-		
+
+		int currentSymbol = 0;
 		for(Symbol symbol:expression.getSymbols()){
+			MouseClickType type = (rightClickSymbol==currentSymbol) ? MouseClickType.RIGHT : MouseClickType.LEFT; 
 			for(Gesture gesture:symbol.getGestures()){
-				canvasForm.add(Pair.of(MouseClickType.LEFT,gesture.getPoints()));
+				canvasForm.add(Pair.of(type,gesture.getPoints()));
 			}
-			//TODO: add separation points
+			currentSymbol++;
 		}
 		
 		return canvasForm;
 	}
-	
 }

@@ -1,42 +1,24 @@
 package expression.construction.data.preparation;
 
-import java.awt.BorderLayout;
-import java.awt.Point;
-import java.awt.ScrollPane;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Random;
-import java.util.Set;
 import java.util.stream.Collectors;
-
-import javax.annotation.CheckForNull;
-import javax.swing.JFrame;
-import javax.swing.JScrollPane;
-import javax.swing.SwingUtilities;
-import javax.swing.WindowConstants;
 
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Multiset;
 
 import application.data.model.Expression;
-import application.data.model.Gesture;
-import application.data.model.Relative2DPoint;
-import application.data.model.RelativeGesture;
 import application.data.model.RelativeSymbol;
-import application.data.model.Symbol;
-import application.data.model.handling.ExpressionTransformations;
+import application.data.model.handling.ExpressionFactory;
 import application.data.model.handling.SymbolTransformations;
 import application.data.source.H2Database;
 import application.data.source.IDataSource;
-import application.ui.draw.Canvas;
 import log.Log;
 
 public class CreateArtificialData {
@@ -207,16 +189,16 @@ public class CreateArtificialData {
 			// ======================================================================================
 
 			for (int r = 0; r < expressionCount * 10; r++) {
-				String[] expressionElements = generateRandomExpression(operators, operands, 5);
-				createdExpressions = createExpression(symbolsMap, 10, dimension, dimension, expressionElements);
+				String[] expressionElements = ExpressionFactory.generateRandomExpression(operators, operands, 5);
+				createdExpressions = ExpressionFactory.createExpression(symbolsMap, 10, dimension, dimension, expressionElements);
 				store(dataSource, createdExpressions);
 			}
 			
 			// ======================================================================================
 			Random random = new Random();
 			for (int r = 0; r < expressionCount * 10; r++) {
-				String[] expressionElements1 = generateRandomExpression(operators, operands, 1);
-				String[] expressionElements2 = generateRandomExpression(operators, operands, 1);
+				String[] expressionElements1 = ExpressionFactory.generateRandomExpression(operators, operands, 1);
+				String[] expressionElements2 = ExpressionFactory.generateRandomExpression(operators, operands, 1);
 
 				String[] expressionElements = new String[expressionElements1.length + expressionElements2.length + 1
 						+ 2];
@@ -251,31 +233,12 @@ public class CreateArtificialData {
 					i++;
 				}
 
-				createdExpressions = createExpression(symbolsMap, 10, dimension, dimension, expressionElements);
+				createdExpressions = ExpressionFactory.createExpression(symbolsMap, 10, dimension, dimension, expressionElements);
 				store(dataSource, createdExpressions);
 			}
 
 
 		}
-
-		// ===================================================================================================
-		// Plot expression
-		// Expression expression = artificialExpressions.get(0);
-		//
-		// SwingUtilities.invokeLater(()->{
-		// JFrame frame = new JFrame();
-		// frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-		//
-		//
-		// Canvas canvas = new Canvas(true);
-		// canvas.show(ExpressionTransformations.getCanvasForm(expression));
-		//
-		// frame.setLayout(new BorderLayout());
-		// frame.add(new JScrollPane(canvas), BorderLayout.CENTER);
-		//
-		// frame.setBounds(800, 300, 500, 500);
-		// frame.setVisible(true);
-		// });
 
 	}
 
@@ -286,81 +249,5 @@ public class CreateArtificialData {
 		}
 	}
 
-	private static String[] generateRandomExpression(String[] operators, String[] operands, int lengthFactor) {
-
-		Random random = new Random();
-
-		int length = 2 * (random.nextInt(lengthFactor) + 1) + 1;
-
-		String[] expressionSymbols = new String[length];
-
-		for (int i = 0; i < length; i++) {
-			if (i % 2 == 0) {
-				expressionSymbols[i] = operands[random.nextInt(operands.length)];
-			} else {
-				expressionSymbols[i] = operators[random.nextInt(operators.length)];
-			}
-		}
-
-		return expressionSymbols;
-	}
-
-	private static List<Expression> createExpression(Map<String, List<RelativeSymbol>> symbolsMap, int createCount,
-			int width, int height, String... expressionSymbols) {
-
-		Random random = new Random();
-		List<Expression> expressions = new ArrayList<>(createCount);
-
-		for (int r = 0; r < createCount; r++) {
-
-			Expression artificialExpression = new Expression(getExpressionStringForm(expressionSymbols));
-			expressions.add(artificialExpression);
-
-			//double shift = 0;
-			for (int i = 0; i < expressionSymbols.length; i++) {
-				List<RelativeSymbol> symbols = symbolsMap.get(expressionSymbols[i]);
-				RelativeSymbol symbol = symbols.get(random.nextInt(symbols.size()));
-
-				Symbol artificialSymbol = new Symbol(symbol.getSymbol());
-				artificialExpression.addSymbol(artificialSymbol);
-
-				double shiftX = (random.nextDouble() - 0.5) / 25.0;
-				double shiftY = (random.nextDouble() - 0.5) / 25.0;
-
-				//TODO
-				//double maxX = Double.NEGATIVE_INFINITY;
-
-				for (RelativeGesture gesture : symbol.getGestures()) {
-
-					Gesture artificialGesture = new Gesture();
-					artificialSymbol.addGesture(artificialGesture);
-
-					for (Relative2DPoint point : gesture.getPoints()) {
-
-						int x = (int) ((point.x + 1 + i + shiftX) * width);
-						//maxX = Math.max(maxX, Math.abs(point.x));
-
-						int y = (int) ((point.y + 1 + shiftY) * height);
-
-						Point artificialPoint = new Point(x, y);
-						artificialGesture.addPoint(artificialPoint);
-					}
-				}
-
-				//shift += i; //Math.min(1.0, 2 * maxX + 0.25);
-			}
-
-		}
-
-		return expressions;
-	}
-
-	private static String getExpressionStringForm(String[] expressionSymbols) {
-
-		StringBuilder stringBuilder = new StringBuilder();
-		for (String symbol : expressionSymbols)
-			stringBuilder.append(symbol);
-		return stringBuilder.toString();
-	}
 
 }
