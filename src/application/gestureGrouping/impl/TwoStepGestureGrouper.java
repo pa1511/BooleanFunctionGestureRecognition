@@ -52,7 +52,7 @@ public class TwoStepGestureGrouper implements IGestureGrouper{
 				String groupModelName_3 = "CNN-78-2-model5";
 				MultiLayerNetwork groupNetwork_3 = ModelSerializer.restoreMultiLayerNetwork(new File(folder + groupModelName_3));
 
-				String groupModelName_4 = "CNN-78-2-model4";
+				String groupModelName_4 = "FC-78-2-exp-model1";
 				MultiLayerNetwork groupNetwork_4 = ModelSerializer.restoreMultiLayerNetwork(new File(folder + groupModelName_4));
 				
 				return new MultiLayerNetwork[] {/*groupNetwork_1,*/ groupNetwork_2, groupNetwork_3, groupNetwork_4};
@@ -64,16 +64,19 @@ public class TwoStepGestureGrouper implements IGestureGrouper{
 		//Loading symbol classifiers
 		 symbolModels = new Lazy<>(()->{
 			 try {
-				String modelName_1 = "FC-180-14-model1";
-				MultiLayerNetwork network_1 = ModelSerializer.restoreMultiLayerNetwork(new File(folder + modelName_1));
-
-				String modelName_2 = "FC-180-14-model2";
-				MultiLayerNetwork network_2 = ModelSerializer.restoreMultiLayerNetwork(new File(folder + modelName_2));
+//				String modelName_1 = "FC-180-14-model1";
+//				MultiLayerNetwork network_1 = ModelSerializer.restoreMultiLayerNetwork(new File(folder + modelName_1));
+//
+//				String modelName_2 = "FC-180-14-model2";
+//				MultiLayerNetwork network_2 = ModelSerializer.restoreMultiLayerNetwork(new File(folder + modelName_2));
+//				
+//				String modelName_3 = "FC-180-14-model3";
+//				MultiLayerNetwork network_3 = ModelSerializer.restoreMultiLayerNetwork(new File(folder + modelName_3));
 				
-				String modelName_3 = "FC-180-14-model3";
-				MultiLayerNetwork network_3 = ModelSerializer.restoreMultiLayerNetwork(new File(folder + modelName_3));
+				String modelName_4 = "FC-180-14-model4";
+				MultiLayerNetwork network_4 = ModelSerializer.restoreMultiLayerNetwork(new File(folder + modelName_4));
 				
-				return new MultiLayerNetwork[] {network_1, network_2, network_3};
+				return new MultiLayerNetwork[] {/*network_1, network_2, network_3,*/ network_4};
 			 }catch(Exception e) {
 				 throw new RuntimeException(e);
 			 }

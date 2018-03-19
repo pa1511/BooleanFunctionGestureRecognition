@@ -37,12 +37,13 @@ public class CreateFCModel {
 	public static void main(String[] args) throws Exception {
 		Log.setDisabled(true);
 		
-		String fileNameTrainReal = "./training/symbol-gesture-new/training_data_exp-78-2.csv";
-		String fileNameSimpleTest = "./training/symbol-gesture-new/test_simple_data_exp-78-2.csv";
-//		String fileNameComplexTest = "./training/symbol-gesture-new/test_complex_data-180-10.csv";
-//		String fileNameTrainArtificial = "./training/symbol-gesture-new/artificial_training_data-180-10.csv";
+//		String fileNameTrainReal = "./training/symbol-gesture-new/training_data_exp-78-2.csv";
+//		String fileNameSimpleTest = "./training/symbol-gesture-new/test_simple_data_exp-78-2.csv";
+		
+		String fileNameTrainReal = "./training/symbol-gesture-new/training_data_exp-180-14.csv";
+		String fileNameSimpleTest = "./training/symbol-gesture-new/test_simple_data_exp-180-14.csv";
 		//
-		String modelName = "FC-78-2-exp-model8";
+		String modelName = "FC-180-14-model4";
 		
 		//File statOutputFolder = new File("./training/symbol-gesture-new/statistics/");
 		File inputFile = new File(fileNameTrainReal);
@@ -74,14 +75,6 @@ public class CreateFCModel {
 	                        .weightInit(WeightInit.XAVIER)
 	                        .activation(Activation.RELU)
 	                        .build())
-//	                .layer(2, new DenseLayer.Builder().nIn(width).nOut(width)
-//	                        .weightInit(WeightInit.XAVIER)
-//	                        .activation(Activation.RELU)
-//	                        .build())
-//	                .layer(3, new DenseLayer.Builder().nIn(width).nOut(width)
-//	                        .weightInit(WeightInit.XAVIER)
-//	                        .activation(Activation.RELU)
-//	                        .build())
 	                .layer(2, new OutputLayer.Builder(LossFunction.NEGATIVELOGLIKELIHOOD)
 	                        .weightInit(WeightInit.XAVIER)
 	                        .activation(Activation.SOFTMAX)

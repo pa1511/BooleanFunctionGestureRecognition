@@ -73,14 +73,14 @@ class BooleanSpatialParser implements IBooleanSpatialParser {
 				Pair<IBooleanExpressionNode,Rectangle> nodeAndRect = Pair.of(BooleanNodeFactory.getNodeFor(token), symbolAndRect.right());
 				symbolsAsToken.add(nodeAndRect);
 				
-				if((type==Type.VARIABLE || type==Type.TRUE || type==Type.FALSE) && !symbolsAndRect.isEmpty()) {
+				if((type==Type.VARIABLE || type==Type.TRUE || type==Type.FALSE || type==Type.RIGHT_BRACKET) && !symbolsAndRect.isEmpty()) {
 					
 					for(int i=0; i<symbolsAndRect.size();i++) {
 						Pair<String,Rectangle> nextSAR = symbolsAndRect.get(i);
 						LexicalToken.Type nextType = lexicalAnalizer.decodeTokenType(nextSAR.left());
 						if(nextType==Type.NOT)
 							continue;
-						if(nextType==Type.VARIABLE||nextType==Type.TRUE||nextType==Type.FALSE||nextType==Type.FUNCTION ||nextType==Type.LEFT_BRACKET) {
+						if(nextType==Type.VARIABLE||nextType==Type.TRUE||nextType==Type.FALSE||nextType==Type.FUNCTION ||(type!=Type.RIGHT_BRACKET && nextType==Type.LEFT_BRACKET)) {
 							LexicalToken andToken = new LexicalToken(LexicalToken.Type.AND.getSymbolAsString(), Type.AND);
 							Rectangle currentRect = nodeAndRect.right();
 							Rectangle nextRect = nextSAR.right();

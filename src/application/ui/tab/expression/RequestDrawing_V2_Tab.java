@@ -118,7 +118,10 @@ public class RequestDrawing_V2_Tab extends AbstractApplicationTab{
 		}
 		
 		//==============================================================================================
-		requestedSymbols = new String[]{"F=A","F=B","F=C","F=D","F=0","F=1","(A+B)","(B+C)","(C+D)","A(B+C)","B(C+D)","C(D+A)","D(A+B)","!A","!B","!C","!D","!F","!0","!1"};
+		requestedSymbols = new String[]{"F=A","F=B","F=C","F=D","F=0"
+				,"F=1","(A+B)","(B+C)","(C+D)","A(B+C)","B(C+D)","C(D+A)","D(A+B)"
+				,"!A","!B","!C","!D","!F","!0","!1","A","B","C","D","F"
+				};
 		requestedSymbolCounts = new int[requestedSymbols.length];
 		Arrays.fill(requestedSymbolCounts, 2);
 		remaining = Arrays.stream(requestedSymbolCounts).sum();
@@ -370,6 +373,7 @@ public class RequestDrawing_V2_Tab extends AbstractApplicationTab{
 					conceptDescriptionField.setText("");
 					remainingField.setText(remaining+"/"+totalCount);
 					remaining--;
+					//TODO:After this I should close the application
 				}
 				else if(remaining>0){
 					setupNewExpression();
