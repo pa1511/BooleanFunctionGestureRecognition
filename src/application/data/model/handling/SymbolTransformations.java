@@ -2,6 +2,7 @@ package application.data.model.handling;
 
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
@@ -11,6 +12,7 @@ import javax.annotation.Nonnull;
 
 import application.data.geometry.PointTransformations;
 import application.data.model.Gesture;
+import application.data.model.Relative2DPoint;
 import application.data.model.RelativeGesture;
 import application.data.model.RelativeSymbol;
 import application.data.model.Symbol;
@@ -153,10 +155,49 @@ public class SymbolTransformations {
 		
 		RelativeSymbol relativeSymbol = new RelativeSymbol(symbol.getSymbol());
 		
+		double averageX = 0;
+		double averageY = 0;
+		int pointCount = 0;
+		
+		double maxX = Double.MIN_VALUE, minX = Double.MAX_VALUE;
+		double maxY = Double.MIN_VALUE, minY = Double.MAX_VALUE;
+		
 		for(Gesture gesture:symbol.getGestures()) {
-			RelativeGesture relativeGesture = GestureTransformations.getRelativeGesture(gesture);
-			relativeSymbol.addGesture(relativeGesture);
+			List<Point> points = gesture.getPoints();
+			for(Point point:points) {
+				averageX+=point.getX();
+				averageY+=point.getY();
+				
+				maxX = Math.max(maxX, point.x);
+				minX = Math.min(minX, point.x);
+				
+				maxY = Math.max(maxY, point.y);
+				minY = Math.min(minY, point.y);
+				
+				pointCount++;
+			}
 		}
+		
+		averageX/=pointCount;
+		averageY/=pointCount;
+		double scale = Math.max(maxX-minX, maxY-minY);
+
+		for(Gesture gesture:symbol.getGestures()) {
+			List<Point> points = gesture.getPoints();
+			List<Relative2DPoint> relativePoints = new ArrayList<>(points.size());
+
+			
+			for(Point point:points) {
+				double relativeX = (point.getX()-averageX)/scale;
+				double relativeY = (point.getY()-averageY)/scale;
+				
+				Relative2DPoint relativePoint = new Relative2DPoint(relativeX, relativeY);
+				relativePoints.add(relativePoint);
+			}
+			
+			relativeSymbol.addGesture(new RelativeGesture(relativePoints));
+		}
+		
 		
 		return relativeSymbol;
 	}
