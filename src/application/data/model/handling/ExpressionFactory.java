@@ -16,40 +16,42 @@ import application.data.model.RelativeGesture;
 import application.data.model.RelativeSymbol;
 import application.data.model.Symbol;
 import application.expressionParse.lexic.token.LexicalToken;
+import application.expressionParse.lexic.token.LexicalToken.Type;
 import dataModels.Pair;
 
 public class ExpressionFactory {
 
-	public static @Nonnull Expression getExpressionFor(@Nonnull String symbolicForm,@Nonnull List<Pair<MouseClickType, List<Point>>> data) {
-		
+	public static @Nonnull Expression getExpressionFor(@Nonnull String symbolicForm,
+			@Nonnull List<Pair<MouseClickType, List<Point>>> data) {
+
 		Expression expression = new Expression(symbolicForm);
 
 		char[] symbols = symbolicForm.toCharArray();
-		
+
 		int dataCount = data.size();
-		for(int i=0, dataPosition=0; i<symbols.length && dataPosition<dataCount; i++){
+		for (int i = 0, dataPosition = 0; i < symbols.length && dataPosition < dataCount; i++) {
 			char symbolChar = symbols[i];
 			Symbol symbol = new Symbol(symbolChar);
-			
-			do{
+
+			do {
 				Gesture gesture = new Gesture(data.get(dataPosition).right());
 				symbol.addGesture(gesture);
 				dataPosition++;
-			}while(dataPosition<dataCount && data.get(dataPosition).left()!=MouseClickType.RIGHT);
+			} while (dataPosition < dataCount && data.get(dataPosition).left() != MouseClickType.RIGHT);
 			dataPosition++;
-			
+
 			expression.addSymbol(symbol);
 		}
-		
-		if(expression.getSymbols().isEmpty())
+
+		if (expression.getSymbols().isEmpty())
 			throw new IllegalArgumentException("No symbols provided for expression");
-				
+
 		return expression;
 	}
 
-	//=============================================================================================================
-	//Artificial data creation
-	
+	// =============================================================================================================
+	// Artificial data creation
+
 	public static String[] generateRandomExpression(String[] operators, String[] operands, int lengthFactor) {
 
 		Random random = new Random();
@@ -69,16 +71,13 @@ public class ExpressionFactory {
 		return expressionSymbols;
 	}
 
-	
 	/**
-	 * TODO:
-	 * needs to be able to handle negation and special brackets
+	 * TODO: needs to be able to handle negation and special brackets
 	 */
 	public static List<Expression> createExpression(Map<String, List<RelativeSymbol>> symbolsMap, int createCount,
 			int width, int height, String... expressionSymbols) {
 
-		double operatorModifier = 0.5;
-		
+
 		Random random = new Random();
 		List<Expression> expressions = new ArrayList<>(createCount);
 
@@ -87,6 +86,9 @@ public class ExpressionFactory {
 			Expression artificialExpression = new Expression(getExpressionStringForm(expressionSymbols));
 			expressions.add(artificialExpression);
 
+			double shiftX = 0;
+			double shiftY = 0;
+
 			for (int i = 0; i < expressionSymbols.length; i++) {
 				List<RelativeSymbol> symbols = symbolsMap.get(expressionSymbols[i]);
 				RelativeSymbol symbol = symbols.get(random.nextInt(symbols.size()));
@@ -94,9 +96,28 @@ public class ExpressionFactory {
 				Symbol artificialSymbol = new Symbol(symbol.getSymbol());
 				artificialExpression.addSymbol(artificialSymbol);
 
-				double shiftX = (random.nextDouble() - 0.5) / 25.0;
-				double shiftY = (random.nextDouble() - 0.5) / 25.0;
+				// introducing random element in symbol position
+				double shiftXRand = (random.nextDouble() - 0.5) / 25.0;
+				double shiftYRand = (random.nextDouble() - 0.5) / 25.0;
 
+				shiftX += (1 + shiftXRand) * width;
+				shiftY = (shiftYRand) * height;
+				double operatorModifier = 1;
+				LexicalToken.Type tokenType = LexicalToken.Type.decodeType(symbol.getSymbolAsString());
+				
+				if(tokenType==Type.OR || tokenType==Type.EQUALS) {
+					shiftX+=0.4*width;
+					shiftY+=height*0.5;
+					operatorModifier = 0.5;
+				}
+				
+				if(tokenType==Type.AND) {
+					shiftX+=0.2*width;
+					shiftY+=height*0.5;
+					operatorModifier = 0.5;
+				}
+
+				
 				for (RelativeGesture gesture : symbol.getGestures()) {
 
 					Gesture artificialGesture = new Gesture();
@@ -104,13 +125,21 @@ public class ExpressionFactory {
 
 					for (Relative2DPoint point : gesture.getPoints()) {
 
-						int x = (int) ((point.x + 1 + i + shiftX) * width);
-						int y = (int) ((point.y + 1 + shiftY) * height);
+						int x = (int) (shiftX + (point.x + 1) * width * operatorModifier);// shift to position + size
+						int y = (int) (shiftY + (point.y + 1) * height * operatorModifier);// shift to position + size
 
 						Point artificialPoint = new Point(x, y);
 						artificialGesture.addPoint(artificialPoint);
 					}
 				}
+				
+				if(tokenType==Type.AND || tokenType==Type.OR || tokenType==Type.EQUALS) {
+					shiftX-=0.2*width;
+				}
+				if(tokenType==Type.AND) {
+					shiftX-=0.4*width;
+				}
+				
 			}
 
 		}
