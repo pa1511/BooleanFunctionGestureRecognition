@@ -23,27 +23,27 @@ public class TestMultipleModel {
 	public static void main(String[] args) throws IOException, InterruptedException {
 		String folder = "./training/symbol-gesture-new/model/";
 		
-//		String modelName_1 = "CNN-78-2-model4";
-//		MultiLayerNetwork network_1 = ModelSerializer.restoreMultiLayerNetwork(new File(folder + modelName_1));
-//		String modelName_2 = "CNN-78-2-model5";
-//		MultiLayerNetwork network_2 = ModelSerializer.restoreMultiLayerNetwork(new File(folder + modelName_2));
+		String modelName_1 = "CNN-78-2-model5";
+		MultiLayerNetwork network_1 = ModelSerializer.restoreMultiLayerNetwork(new File(folder + modelName_1));
+		String modelName_2 = "FC-78-2-exp-model1";
+		MultiLayerNetwork network_2 = ModelSerializer.restoreMultiLayerNetwork(new File(folder + modelName_2));
 //		String modelName_3 = "CNN-78-2-model3";
 //		MultiLayerNetwork network_3 = ModelSerializer.restoreMultiLayerNetwork(new File(folder + modelName_3));
 		
-		String modelName_1 = "FC-180-14-model1";
-		MultiLayerNetwork network_1 = ModelSerializer.restoreMultiLayerNetwork(new File(folder + modelName_1));
-		String modelName_2 = "FC-180-14-model2";
-		MultiLayerNetwork network_2 = ModelSerializer.restoreMultiLayerNetwork(new File(folder + modelName_2));
-		String modelName_3 = "FC-180-14-model3";
-		MultiLayerNetwork network_3 = ModelSerializer.restoreMultiLayerNetwork(new File(folder + modelName_3));
+//		String modelName_1 = "FC-180-14-model1";
+//		MultiLayerNetwork network_1 = ModelSerializer.restoreMultiLayerNetwork(new File(folder + modelName_1));
+//		String modelName_2 = "FC-180-14-model2";
+//		MultiLayerNetwork network_2 = ModelSerializer.restoreMultiLayerNetwork(new File(folder + modelName_2));
+//		String modelName_3 = "FC-180-14-model3";
+//		MultiLayerNetwork network_3 = ModelSerializer.restoreMultiLayerNetwork(new File(folder + modelName_3));
 
 
 		int batchSize = 512;
-		int numOutputs = 14;
+		int numOutputs = 2;
 		long start = System.nanoTime();
-        //evaluate("test_simple_data_exp-78-2.csv", batchSize, numOutputs, network_1, network_2, network_3);
+        evaluate("test_simple_data_exp-78-2.csv", batchSize, numOutputs, network_1, network_2/*, network_3*/);
 		//
-        evaluate("test_simple_data_exp-180-14.csv", batchSize, numOutputs, network_1, network_2, network_3);
+        //evaluate("test_simple_data_exp-180-14.csv", batchSize, numOutputs, network_1, network_2, network_3);
         //evaluate("test_complex_data_exp-180-14.csv", batchSize, numOutputs, network_1, network_2, network_3);
         
         long end = System.nanoTime();
