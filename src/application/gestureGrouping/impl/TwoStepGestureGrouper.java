@@ -38,7 +38,7 @@ public class TwoStepGestureGrouper implements IGestureGrouper{
 	
 	public TwoStepGestureGrouper() throws Exception {
 		
-		String folder = "./training/symbol-gesture-new/model/";
+		String folder = "./training/model/";
 
 		//Loading grouping models
 		groupingModels = new Lazy<>(()->{

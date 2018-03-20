@@ -21,7 +21,7 @@ public class TestMultipleModel {
 
 	
 	public static void main(String[] args) throws IOException, InterruptedException {
-		String folder = "./training/symbol-gesture-new/model/";
+		String folder = "./training/model/";
 		
 		String modelName_1 = "CNN-78-2-model5";
 		MultiLayerNetwork network_1 = ModelSerializer.restoreMultiLayerNetwork(new File(folder + modelName_1));

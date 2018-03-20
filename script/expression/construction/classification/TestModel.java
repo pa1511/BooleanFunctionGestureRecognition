@@ -20,7 +20,7 @@ public class TestModel {
 	
 	public static void main(String[] args) throws IOException, InterruptedException {
 		String folder = 
-				"./training/symbol-gesture-new/model/";
+				"./training/model/";
 		String modelName = "CNN-78-2-model5";
 //		String modelName = "FC-180-14-model1";
 		
