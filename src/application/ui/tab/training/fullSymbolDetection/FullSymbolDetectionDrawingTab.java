@@ -3,7 +3,6 @@ package application.ui.tab.training.fullSymbolDetection;
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
-import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
@@ -41,6 +40,7 @@ import application.ui.draw.ACanvasObserver;
 import application.ui.draw.RectangleRepresentationView;
 import application.ui.tab.AbstractApplicationTab;
 import dataModels.Pair;
+import dataModels.Point;
 import log.Log;
 import utilities.lazy.Lazy;
 

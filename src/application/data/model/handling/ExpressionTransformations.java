@@ -1,6 +1,5 @@
 package application.data.model.handling;
 
-import java.awt.Point;
 import java.util.ArrayDeque;
 import java.util.List;
 
@@ -11,6 +10,7 @@ import application.data.model.Expression;
 import application.data.model.Gesture;
 import application.data.model.Symbol;
 import dataModels.Pair;
+import dataModels.Point;
 
 public class ExpressionTransformations {
 

@@ -1,10 +1,11 @@
 package application.data.geometry;
 
-import java.awt.Point;
 import java.awt.Rectangle;
 import java.util.List;
 
 import javax.annotation.Nonnull;
+
+import dataModels.Point;
 
 public class PointTransformations {
 	

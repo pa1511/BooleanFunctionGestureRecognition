@@ -4,7 +4,6 @@ import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GridLayout;
-import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.util.Arrays;
@@ -47,6 +46,7 @@ import application.ui.draw.PerGestureView;
 import application.ui.tab.AbstractApplicationTab;
 import application.ui.draw.ACanvasObserver;
 import dataModels.Pair;
+import dataModels.Point;
 import log.Log;
 
 public class RequestDrawing_V2_Tab extends AbstractApplicationTab{

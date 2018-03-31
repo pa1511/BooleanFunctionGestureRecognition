@@ -1,12 +1,12 @@
 package application.data.model.handling;
 
-import java.awt.Point;
 import java.util.ArrayList;
 import java.util.List;
 
 import application.data.geometry.MouseClickType;
 import application.data.model.Gesture;
 import dataModels.Pair;
+import dataModels.Point;
 
 public class GestureFactory {
 

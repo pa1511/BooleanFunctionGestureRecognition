@@ -3,7 +3,6 @@ package application.ui.tab.training.gestureGrouping;
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
-import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
@@ -42,6 +41,7 @@ import application.ui.draw.ACanvasObserver;
 import application.ui.draw.RectangleRepresentationView;
 import application.ui.tab.AbstractApplicationTab;
 import dataModels.Pair;
+import dataModels.Point;
 import log.Log;
 
 public class GestureDrawingTab extends AbstractApplicationTab{
@@ -80,9 +80,6 @@ public class GestureDrawingTab extends AbstractApplicationTab{
 	
 	//
 	private static final @Nonnull Function<? super Pair<MouseClickType, List<Point>>, ? extends Gesture> pointsToGesture = dataUnit -> new Gesture(dataUnit.right());
-
-
-
 	
 	public GestureDrawingTab() throws Exception {
 		super("Drawing");

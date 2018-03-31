@@ -2,7 +2,6 @@ package application.ui.draw;
 
 import java.awt.Color;
 import java.awt.Graphics;
-import java.awt.Point;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayDeque;
@@ -19,6 +18,7 @@ import javax.swing.SwingUtilities;
 
 import application.data.geometry.MouseClickType;
 import dataModels.Pair;
+import dataModels.Point;
 import observer.StrictObservationManager;
 
 public class Canvas extends JPanel implements AutoCloseable {
@@ -57,7 +57,8 @@ public class Canvas extends JPanel implements AutoCloseable {
 				undoneInput.clear();
 
 				List<Point> pointsList = new ArrayList<>();
-				pointsList.add(e.getPoint());
+				java.awt.Point point = e.getPoint();
+				pointsList.add(new Point(point.x, point.y));
 
 				if (SwingUtilities.isLeftMouseButton(e)) {
 					pointGroups.push(Pair.of(MouseClickType.LEFT, pointsList));
@@ -73,8 +74,8 @@ public class Canvas extends JPanel implements AutoCloseable {
 				if (Canvas.this.lock)
 					return;
 
-				Point point = e.getPoint();
-				pointGroups.peek().right().add(point);
+				java.awt.Point point = e.getPoint();
+				pointGroups.peek().right().add(new Point(point.x, point.y));
 				repaint();
 			}
 
@@ -83,11 +84,11 @@ public class Canvas extends JPanel implements AutoCloseable {
 				if (Canvas.this.lock)
 					return;
 
-				Point point = e.getPoint();
+				java.awt.Point point = e.getPoint();
 				Pair<MouseClickType, List<Point>> input = pointGroups.peek();
 				
 				//TODO: seem to have exception being thrown here
-				input.right().add(point);
+				input.right().add(new Point(point.x, point.y));
 				((CanvasObservationManager) observationManager).newInputUpdate(input);
 				repaint();
 			}

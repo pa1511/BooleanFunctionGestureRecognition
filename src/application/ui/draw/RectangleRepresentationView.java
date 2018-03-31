@@ -2,7 +2,6 @@ package application.ui.draw;
 
 import java.awt.Color;
 import java.awt.Graphics;
-import java.awt.Point;
 import java.awt.Rectangle;
 import java.util.ArrayDeque;
 import java.util.List;
@@ -12,6 +11,7 @@ import javax.swing.JPanel;
 
 import application.data.geometry.PointTransformations;
 import dataModels.Pair;
+import dataModels.Point;
 
 public class RectangleRepresentationView extends JPanel {
 	

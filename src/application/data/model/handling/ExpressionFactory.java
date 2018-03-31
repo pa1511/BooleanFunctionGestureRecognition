@@ -1,6 +1,5 @@
 package application.data.model.handling;
 
-import java.awt.Point;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -18,6 +17,7 @@ import application.data.model.Symbol;
 import application.expressionParse.lexic.token.LexicalToken;
 import application.expressionParse.lexic.token.LexicalToken.Type;
 import dataModels.Pair;
+import dataModels.Point;
 
 public class ExpressionFactory {
 

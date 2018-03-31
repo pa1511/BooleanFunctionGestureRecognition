@@ -1,10 +1,11 @@
 package application.data.model;
 
-import java.awt.Point;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.Nonnull;
+
+import dataModels.Point;
 
 public class Gesture extends AIdentifiable{
 

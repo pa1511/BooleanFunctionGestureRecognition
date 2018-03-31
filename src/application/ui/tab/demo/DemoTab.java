@@ -2,7 +2,6 @@ package application.ui.tab.demo;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
-import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
@@ -45,6 +44,7 @@ import application.ui.tab.AbstractApplicationTab;
 import application.ui.table.ExpressionEvaluationTableModel;
 import application.ui.table.FunctionTableModel;
 import dataModels.Pair;
+import dataModels.Point;
 import log.Log;
 import utilities.lazy.Lazy;
 

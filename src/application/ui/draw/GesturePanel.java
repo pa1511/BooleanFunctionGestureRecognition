@@ -4,7 +4,6 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
-import java.awt.Point;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,6 +17,7 @@ import javax.swing.WindowConstants;
 
 import application.data.geometry.RelativePoint;
 import application.data.model.Gesture;
+import dataModels.Point;
 
 public class GesturePanel extends JPanel{
 

@@ -1,12 +1,12 @@
 package application.ui.draw;
 
-import java.awt.Point;
 import java.util.List;
 
 import javax.annotation.Nonnull;
 
 import application.data.geometry.MouseClickType;
 import dataModels.Pair;
+import dataModels.Point;
 import observer.AbstractObserver;
 
 public abstract class ACanvasObserver  extends AbstractObserver<Canvas>{
