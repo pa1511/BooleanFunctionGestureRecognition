@@ -4,7 +4,6 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
-import java.awt.Rectangle;
 import java.util.List;
 import java.util.Properties;
 
@@ -39,6 +38,7 @@ import application.ui.tab.AbstractApplicationTab;
 import application.ui.table.AExpressionManagementObserver;
 import application.ui.table.ExpressionEvaluationTableModel;
 import application.ui.table.ExpressionManagementTable;
+import dataModels.Rectangle;
 import log.Log;
 
 public class ExpressionConstructionPanel extends AbstractApplicationTab{

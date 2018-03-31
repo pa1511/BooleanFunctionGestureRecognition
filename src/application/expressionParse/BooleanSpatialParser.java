@@ -1,6 +1,5 @@
 package application.expressionParse;
 
-import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -26,6 +25,7 @@ import application.expressionParse.syntactic.node.leaf.EqualsNode;
 import application.expressionParse.syntactic.node.leaf.NotNode;
 import application.expressionParse.syntactic.node.leaf.OrNode;
 import dataModels.Pair;
+import dataModels.Rectangle;
 import log.Log;
 
 class BooleanSpatialParser implements IBooleanSpatialParser {

@@ -1,6 +1,5 @@
 package application.data.model.handling;
 
-import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,6 +10,7 @@ import application.data.model.Gesture;
 import application.data.model.Relative2DPoint;
 import application.data.model.RelativeGesture;
 import dataModels.Point;
+import dataModels.Rectangle;
 
 public class GestureTransformations {
 

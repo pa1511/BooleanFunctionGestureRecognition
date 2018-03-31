@@ -1,6 +1,5 @@
 package application.data.model.handling;
 
-import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -16,6 +15,7 @@ import application.data.model.RelativeGesture;
 import application.data.model.RelativeSymbol;
 import application.data.model.Symbol;
 import dataModels.Point;
+import dataModels.Rectangle;
 import utilities.random.RNGProvider;
 
 public class SymbolTransformations {
