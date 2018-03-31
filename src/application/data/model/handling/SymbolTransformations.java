@@ -155,32 +155,16 @@ public class SymbolTransformations {
 		
 		RelativeSymbol relativeSymbol = new RelativeSymbol(symbol.getSymbol());
 		
-		double averageX = 0;
-		double averageY = 0;
-		int pointCount = 0;
-		
-		double maxX = Double.MIN_VALUE, minX = Double.MAX_VALUE;
-		double maxY = Double.MIN_VALUE, minY = Double.MAX_VALUE;
+		Point.PointCollectionDP dp = new Point.PointCollectionDP();
 		
 		for(Gesture gesture:symbol.getGestures()) {
-			List<Point> points = gesture.getPoints();
-			for(Point point:points) {
-				averageX+=point.getX();
-				averageY+=point.getY();
-				
-				maxX = Math.max(maxX, point.x);
-				minX = Math.min(minX, point.x);
-				
-				maxY = Math.max(maxY, point.y);
-				minY = Math.min(minY, point.y);
-				
-				pointCount++;
-			}
+			dp = Point.analyzePointCollection(gesture.getPoints(), dp);
 		}
 		
-		averageX/=pointCount;
-		averageY/=pointCount;
-		double scale = Math.max(maxX-minX, maxY-minY);
+		double scale = Math.max(dp.maxX-dp.minX, dp.maxY-dp.minY);
+		double averageX = dp.getAverageX();
+		double averageY = dp.getAverageY();
+
 
 		for(Gesture gesture:symbol.getGestures()) {
 			List<Point> points = gesture.getPoints();
