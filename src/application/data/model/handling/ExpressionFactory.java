@@ -202,6 +202,7 @@ public class ExpressionFactory {
 		private final @Nonnull StringBuilder expressionOrder;
 		
 		//Top-left symbol point and symbol width and height 
+		private static final @Nonnegative int space = 5;
 		private final @Nonnegative int width;
 		private final @Nonnegative int height;
 		private @Nonnegative int leftX;
@@ -243,16 +244,17 @@ public class ExpressionFactory {
 				String symbolAsString = ((BracketsNode)node).getSymbol1();
 				expressionOrder.append(symbolAsString);
 				createArtificialSymbol(symbolAsString,width,height,leftX,topY);
-				leftX+=width;
+				moveX();
 			}
 			
 		}
+		
 		@Override
 		public void betweenChildren(IBooleanExpressionNode node, IBooleanExpressionNode child1, IBooleanExpressionNode child2) {
 			String symbolAsString = node.getSymbol();
 			expressionOrder.append(symbolAsString);
 			createArtificialSymbol(symbolAsString,width,height,leftX,topY);
-			leftX+=width;
+			moveX();
 		}
 		
 		@Override
@@ -268,10 +270,10 @@ public class ExpressionFactory {
 				node.getChildren()[0].walkNodeTree(innerWorker);
 				int childCount = innerWorker.count;
 				//
-				leftX -= width*childCount/2-width;
-				topY -= 3*height/4;
+				leftX -= (width+space)*childCount;
+				topY -= (int)(height/2.0);
 				//
-				createArtificialSymbol(symbolAsString,width*childCount,height/4,leftX,topY);
+				createArtificialSymbol(symbolAsString,(int)((width+space)*(childCount-0.2)),(int)(height/4.0),leftX,topY);
 				//
 				leftX = oldLX;
 				topY = oldTY;
@@ -283,17 +285,18 @@ public class ExpressionFactory {
 				String symbolAsString = ((BracketsNode)node).getSymbol2();
 				expressionOrder.append(symbolAsString);
 				createArtificialSymbol(symbolAsString,width,height,leftX,topY);
+				moveX();
 			}
 			else if(node instanceof TrueNode || node instanceof FalseNode || 
 					node instanceof VariableNode || node instanceof FunctionNode) {
-				leftX+=width;
+				moveX();
 			}
 		}
 
 		@SuppressWarnings("hiding")
 		private void createArtificialSymbol(String symbolAsString, int width, int height, int lX, int tY) {
 			//TODO: remove
-			System.out.println("X: " + lX + " Y: " + tY + " Width: " + width + " Height: " + height);
+			System.out.println("Symbol:" + symbolAsString + " X: " + lX + " Y: " + tY + " Width: " + width + " Height: " + height);
 			//
 			
 			List<RelativeSymbol> relativeSymbols = symbolsMap.get(symbolAsString);
@@ -316,7 +319,10 @@ public class ExpressionFactory {
 			expression.addSymbol(artificialSymbol);
 		}
 		
-		
+		private void moveX() {
+			leftX+=width+space;
+		}
+
 	}
 
 	public static ExpressionNodeWorker createExpression(Map<String, List<RelativeSymbol>> symbolsMap, int width, int height, String expression) throws Exception{

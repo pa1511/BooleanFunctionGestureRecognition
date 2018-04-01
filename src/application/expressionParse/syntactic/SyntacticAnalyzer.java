@@ -42,7 +42,7 @@ public class SyntacticAnalyzer implements ISyntacticAnalyzer {
 			LexicalToken token = tokens[i];
 			IBooleanExpressionNode node;
 			
-			if(token.getType()==Type.RIGHT_BRACKET){
+			if(token.getType()==Type.RIGHT_BRACKET || token.getType()==Type.RIGHT_BRACKET_NOT_VISIBLE){
 				
 				while(!(operationStack.peek() instanceof BracketsNode)){
 					reduceSyntacticTree();
@@ -108,15 +108,16 @@ public class SyntacticAnalyzer implements ISyntacticAnalyzer {
 			else if(tokenType == LexicalToken.Type.EQUALS ||
 					tokenType == LexicalToken.Type.AND || 
 					tokenType == LexicalToken.Type.OR ||
-					tokenType == LexicalToken.Type.RIGHT_BRACKET){
+					tokenType == LexicalToken.Type.RIGHT_BRACKET || 
+					tokenType==Type.RIGHT_BRACKET_NOT_VISIBLE){
 				throw new BooleanExpressionSyntacticExceptiona("Expression can not start with: " + lexicalToken);
 			}
 			
 			currentTokenType = tokenType;
 			
-			if(currentTokenType==Type.LEFT_BRACKET)
+			if(currentTokenType==Type.LEFT_BRACKET || currentTokenType==Type.LEFT_BRACKET_NOT_VISIBLE)
 				bracketCounter++;
-			else if(currentTokenType==Type.RIGHT_BRACKET){
+			else if(currentTokenType==Type.RIGHT_BRACKET || currentTokenType==Type.RIGHT_BRACKET_NOT_VISIBLE){
 				bracketCounter--;
 				if(bracketCounter<0){
 					throw new BooleanExpressionSyntacticExceptiona("Too many right brackets");

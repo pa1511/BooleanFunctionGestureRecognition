@@ -61,12 +61,12 @@ public class BooleanNodeFactory {
 		case RIGHT_BRACKET:
 			node = new BracketsNode(LexicalToken.Type.LEFT_BRACKET.getSymbolAsString(), LexicalToken.Type.RIGHT_BRACKET.getSymbolAsString(),Type.RIGHT);
 			break;
-//		case LEFT_BRACKET_NOT_VISIBLE:
-//			node = new BracketsNotVisibleNode(LexicalToken.Type.LEFT_BRACKET.getSymbolAsString(), LexicalToken.Type.RIGHT_BRACKET.getSymbolAsString(),Type.LEFT);
-//			break;
-//		case RIGHT_BRACKET_NOT_VISIBLE:
-//			node = new BracketsNotVisibleNode(LexicalToken.Type.LEFT_BRACKET.getSymbolAsString(), LexicalToken.Type.RIGHT_BRACKET.getSymbolAsString(),Type.RIGHT);
-//			break;
+		case LEFT_BRACKET_NOT_VISIBLE:
+			node = new BracketsNotVisibleNode(LexicalToken.Type.LEFT_BRACKET.getSymbolAsString(), LexicalToken.Type.RIGHT_BRACKET.getSymbolAsString(),Type.LEFT);
+			break;
+		case RIGHT_BRACKET_NOT_VISIBLE:
+			node = new BracketsNotVisibleNode(LexicalToken.Type.LEFT_BRACKET.getSymbolAsString(), LexicalToken.Type.RIGHT_BRACKET.getSymbolAsString(),Type.RIGHT);
+			break;
 		case EQUALS:
 			node = new EqualsNode(symbolAsString);
 			break;

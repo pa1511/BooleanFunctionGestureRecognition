@@ -162,8 +162,8 @@ public class SymbolTransformations {
 		}
 		
 		double scale = Math.max(dp.maxX-dp.minX, dp.maxY-dp.minY);
-		double averageX = dp.getAverageX();
-		double averageY = dp.getAverageY();
+//		double averageX = dp.getAverageX();
+//		double averageY = dp.getAverageY();
 
 
 		for(Gesture gesture:symbol.getGestures()) {
@@ -172,8 +172,8 @@ public class SymbolTransformations {
 
 			
 			for(Point point:points) {
-				double relativeX = (point.getX()-averageX)/scale;
-				double relativeY = (point.getY()-averageY)/scale;
+				double relativeX = (point.getX()-dp.minX/*averageX*/)/scale;
+				double relativeY = (point.getY()-dp.minY/*averageY*/)/scale;
 				
 				Relative2DPoint relativePoint = new Relative2DPoint(relativeX, relativeY);
 				relativePoints.add(relativePoint);
