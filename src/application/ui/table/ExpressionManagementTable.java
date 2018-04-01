@@ -150,6 +150,12 @@ public class ExpressionManagementTable extends JTable implements AutoCloseable{
 		}
 		throw new IllegalArgumentException("Unknown action requested: " + actionName);
 	}
+	
+	public Expression getCurrentExpression() {
+		int row = getSelectedRow();
+		List<Expression> expressions = model.expressions.getOrThrow();
+		return expressions.get(row);
+	}
 
 	@Override
 	public void close() throws Exception {

@@ -7,9 +7,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Properties;
 import java.util.function.Supplier;
 
@@ -222,7 +221,6 @@ public final class H2Database implements IDataSource {
 					List<Gesture> gestures = symbol.getGestures();
 					for (int i = 0, limit = gestures.size(); i < limit; i++) {
 						Gesture gesture = gestures.get(i);
-
 						statement.setInt(1, expressionId);
 						statement.setString(2, symbol.getSymbolAsString());
 						statement.setInt(3, i);
@@ -286,10 +284,10 @@ public final class H2Database implements IDataSource {
 						Expression expression = new Expression(resultSet.getString(2), id);
 						expressions.add(expression);
 
-						Map<Pair<String,Integer>, Symbol> symbols = new HashMap<>();
+						LinkedHashMap<Pair<String,Integer>, Symbol> symbols = new LinkedHashMap<>();//linked to perserv symbol order
 						try (Statement innerStatement = connection.createStatement()) {
 							try (ResultSet innerResultSet = innerStatement.executeQuery(
-									"SELECT * FROM " + gestureTable + " WHERE " + geFIdExColumn + " = " + id)) {
+									"SELECT * FROM " + gestureTable + " WHERE " + geFIdExColumn + " = " + id + " ORDER BY " + geSymbolIDColumn)) {
 								while (innerResultSet.next()) {
 
 									int geId = innerResultSet.getInt(1);

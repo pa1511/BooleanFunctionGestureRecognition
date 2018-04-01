@@ -1,9 +1,7 @@
 package application.data.model.handling;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 
 import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
@@ -18,11 +16,9 @@ import application.data.model.RelativeSymbol;
 import application.data.model.Symbol;
 import application.expressionParse.IBooleanTextParser;
 import application.expressionParse.ParserSystem;
-import application.expressionParse.lexic.token.LexicalToken;
-import application.expressionParse.lexic.token.LexicalToken.Type;
 import application.expressionParse.syntactic.node.AbstractNodeWorker;
-import application.expressionParse.syntactic.node.BinaryOperationNode;
 import application.expressionParse.syntactic.node.IBooleanExpressionNode;
+import application.expressionParse.syntactic.node.leaf.AndNode;
 import application.expressionParse.syntactic.node.leaf.BracketsNode;
 import application.expressionParse.syntactic.node.leaf.BracketsNotVisibleNode;
 import application.expressionParse.syntactic.node.leaf.FalseNode;
@@ -36,12 +32,12 @@ import utilities.random.RNGProvider;
 
 public class ExpressionFactory {
 
-	public static @Nonnull Expression getExpressionFor(@Nonnull String symbolicForm,
+	public static @Nonnull Expression getExpressionFor(@Nonnull String symbolicForm,@Nonnull String symbolicOrder,
 			@Nonnull List<Pair<MouseClickType, List<Point>>> data) {
 
 		Expression expression = new Expression(symbolicForm);
 
-		char[] symbols = symbolicForm.toCharArray();
+		char[] symbols = symbolicOrder.toCharArray();
 
 		int dataCount = data.size();
 		for (int i = 0, dataPosition = 0; i < symbols.length && dataPosition < dataCount; i++) {
@@ -67,118 +63,6 @@ public class ExpressionFactory {
 	// =============================================================================================================
 	// Artificial data creation
 
-	public static String[] generateRandomExpression(String[] operators, String[] operands, int lengthFactor) {
-
-		Random random = new Random();
-
-		int length = 2 * (random.nextInt(lengthFactor) + 1) + 1;
-
-		String[] expressionSymbols = new String[length];
-
-		for (int i = 0; i < length; i++) {
-			if (i % 2 == 0) {
-				expressionSymbols[i] = operands[random.nextInt(operands.length)];
-			} else {
-				expressionSymbols[i] = operators[random.nextInt(operators.length)];
-			}
-		}
-
-		return expressionSymbols;
-	}
-
-	/**
-	 * TODO: needs to be able to handle negation and special brackets
-	 */
-	public static List<Expression> createExpression(Map<String, List<RelativeSymbol>> symbolsMap, int createCount,
-			int width, int height, String... expressionSymbols) {
-
-
-		Random random = new Random();
-		List<Expression> expressions = new ArrayList<>(createCount);
-
-		for (int r = 0; r < createCount; r++) {
-
-			Expression artificialExpression = new Expression(getExpressionStringForm(expressionSymbols));
-			expressions.add(artificialExpression);
-
-			double shiftX = 0;
-			double shiftY = 0;
-
-			for (int i = 0; i < expressionSymbols.length; i++) {
-				String symbolAsString = expressionSymbols[i];
-				LexicalToken.Type tokenType = LexicalToken.Type.decodeType(symbolAsString);
-				if(tokenType==null)
-					continue;
-				
-				List<RelativeSymbol> symbols = symbolsMap.get(symbolAsString);
-				RelativeSymbol symbol = symbols.get(random.nextInt(symbols.size()));
-
-				Symbol artificialSymbol = new Symbol(symbol.getSymbol());
-				artificialExpression.addSymbol(artificialSymbol);
-
-				// introducing random element in symbol position
-				double shiftXRand = (random.nextDouble() - 0.5) / 25.0;
-				double shiftYRand = (random.nextDouble() - 0.5) / 25.0;
-
-				shiftX += (1 + shiftXRand) * width;
-				shiftY = (shiftYRand) * height;
-				double operatorModifierX = 1;
-				double operatorModifierY = 1;
-				
-				if(tokenType==Type.OR || tokenType==Type.EQUALS) {
-					shiftX+=0.4*width;
-					shiftY+=height*0.5;
-					operatorModifierX = 0.5;
-					operatorModifierY = 0.5;
-				}
-				
-				if(tokenType==Type.AND) {
-					shiftX+=0.2*width;
-					shiftY+=height*0.5;
-					operatorModifierX = 0.5;
-					operatorModifierY = 0.5;
-				}
-				
-				if(tokenType==Type.NOT) {
-					shiftY -= height*0.6;
-				}
-				
-				for (RelativeGesture gesture : symbol.getGestures()) {
-
-					Gesture artificialGesture = new Gesture();
-					artificialSymbol.addGesture(artificialGesture);
-
-					for (Relative2DPoint point : gesture.getPoints()) {
-
-						int x = (int) (shiftX + (point.x + 1) * width * operatorModifierX);// shift to position + size
-						int y = (int) (shiftY + (point.y + 1) * height * operatorModifierY);// shift to position + size
-
-						Point artificialPoint = new Point(x, y);
-						artificialGesture.addPoint(artificialPoint);
-					}
-				}
-				
-				if(tokenType==Type.AND || tokenType==Type.OR || tokenType==Type.EQUALS) {
-					shiftX-=0.2*width;
-				}
-				if(tokenType==Type.AND) {
-					shiftX-=0.4*width;
-				}
-
-				if(tokenType==Type.NOT) {
-					shiftX -= width;
-				}
-
-				
-			}
-
-		}
-
-		return expressions;
-	}
-
-	//======================================================================================================================
-	
 	public static class NodeCountWorker extends AbstractNodeWorker{
 		
 		private int count = 0;
@@ -253,7 +137,12 @@ public class ExpressionFactory {
 		public void betweenChildren(IBooleanExpressionNode node, IBooleanExpressionNode child1, IBooleanExpressionNode child2) {
 			String symbolAsString = node.getSymbol();
 			expressionOrder.append(symbolAsString);
-			createArtificialSymbol(symbolAsString,width,height,leftX,topY);
+			if(node instanceof AndNode) {
+				createArtificialSymbol(symbolAsString,width,height,leftX+width/2,topY+height/2);
+			}
+			else {
+				createArtificialSymbol(symbolAsString,width,height,leftX,topY);
+			}
 			moveX();
 		}
 		
@@ -262,7 +151,7 @@ public class ExpressionFactory {
 			if(node instanceof NotNode) {
 				String symbolAsString = node.getSymbol();
 				expressionOrder.append(symbolAsString);
-//				//TODO:
+				//
 				int oldLX = leftX;
 				int oldTY = topY;
 				//

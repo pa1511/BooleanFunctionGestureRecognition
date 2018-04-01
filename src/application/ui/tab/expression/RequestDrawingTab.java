@@ -3,33 +3,38 @@ package application.ui.tab.expression;
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.Font;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
-
+import java.util.Map;
 import java.util.Random;
+import java.util.stream.Collectors;
 
 import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
 import javax.swing.AbstractAction;
 import javax.swing.JButton;
-import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
-import javax.swing.KeyStroke;
-import javax.swing.SwingUtilities;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
+
+import com.google.common.collect.HashMultiset;
+import com.google.common.collect.Multiset;
 
 import application.Application;
 import application.data.geometry.MouseClickType;
 import application.data.model.Expression;
 import application.data.model.Gesture;
+import application.data.model.RelativeSymbol;
 import application.data.model.handling.ExpressionFactory;
-import application.expressionParse.IBooleanTextParser;
+import application.data.model.handling.ExpressionFactory.ExpressionNodeWorker;
+import application.data.model.handling.ExpressionTransformations;
+import application.data.model.handling.SymbolTransformations;
+import application.data.source.H2Database;
+import application.data.source.IDataSource;
 import application.ui.draw.Canvas;
 import application.ui.draw.PerGestureView;
 import application.ui.tab.AbstractApplicationTab;
@@ -41,92 +46,117 @@ import log.Log;
 public class RequestDrawingTab extends AbstractApplicationTab{
 	
 	private static final @Nonnull Random random = new Random();
-
-	private final @Nonnull JTextField conceptDescriptionField;
+	private static final @Nonnegative int dimension = 80;
+	
 	private final @Nonnull JTextField remainingField;
 
-	private final @Nonnull Canvas canvas;
+	//
+	private final @Nonnull Canvas demoCanvas;
+	private final @Nonnull Canvas drawingCanvas;
 	private final @Nonnull PerGestureView perGestureView;
 
 	//Actions
-	private final @Nonnull UndoAction undoAction;
-	private final @Nonnull RedoAction redoAction;
 	private final @Nonnull StoreExpressionAction storeExpressionAction;
 	private final @Nonnull ClearCanvasAction clearCanvasAction;
 	
 	//Listeners
-	private final @Nonnull ConceptFieldListener conceptFieldListener;
 	private final @Nonnull CanvasObserver canvasObserver;
-
 		
 	//Request map
 	private final @Nonnull String[] requestedSymbols;
 	private final @Nonnull int[] requestedSymbolCounts;
 	private int totalCount;
 	private int remaining;
-	
+	//
 	private int selected = 0;
+	//
+	//Used in generating artificial data
+	private Map<String, List<RelativeSymbol>> symbolsMap;
+	private Expression artificialExpressions;
+	private String expressionOrder;
 	
 	public RequestDrawingTab() {
 		super("Drawing");
 		
-		requestedSymbols = new String[]{"FA=A*B","FB=B*C","FC=C*D","F0=0*1","F1=1*0"};
+		symbolsMap = new HashMap<>();
+
+		// Loading symbols from database
+		try (final IDataSource dataSource = new H2Database("main", Application.getInstance().getProperties())) {
+			Multiset<String> multiset = HashMultiset.create();
+			multiset.add("F", 10);
+			multiset.add("=", 10);			
+			multiset.add("A", 10);
+			multiset.add("B", 10);
+			multiset.add("C", 10);
+			multiset.add("D", 10);
+			multiset.add("!", 10);
+			multiset.add("+", 10);
+			multiset.add("*", 10);
+			multiset.add("0", 10);
+			multiset.add("1", 10);
+			multiset.add("(", 10);
+			multiset.add(")", 10);
+
+			for (String symbolSign : multiset.elementSet()) {
+				List<RelativeSymbol> symbols = dataSource.getSymbols(symbolSign, multiset.count(symbolSign)).stream()
+						.map(SymbolTransformations::getRelativeSymbol).collect(Collectors.toList());
+				symbolsMap.put(symbolSign, symbols);
+			}
+
+		}
+		catch (Exception e) {
+			JOptionPane.showMessageDialog(null, "Can not load symbols", "Not properly loaded", JOptionPane.WARNING_MESSAGE);
+			Log.addError(e);
+		}
+		
+		//==============================================================================================
+//		requestedSymbols = new String[]{"F=A","F=B","F=C","F=D","F=0"
+//				,"F=1","(A+B)","(B+C)","(C+D)","A(B+C)","B(C+D)","C(D+A)","D(A+B)"
+//				,"!A","!B","!C","!D","!F","!0","!1","A","B","C","D","F"
+//				};
+		requestedSymbols = new String[]{"A*B"};
 		requestedSymbolCounts = new int[requestedSymbols.length];
 		Arrays.fill(requestedSymbolCounts, 2);
 		remaining = Arrays.stream(requestedSymbolCounts).sum();
 		totalCount = remaining;
-		selected = selectRequest();
 		
 		//set tab  layout
 		setLayout(new BorderLayout());
 		
 		//Concept description field
-		conceptDescriptionField = new JTextField(requestedSymbols[selected]);
-		conceptDescriptionField.setEditable(false);
-		
 		remainingField = new JTextField(remaining+"/"+totalCount);
 		remainingField.setEditable(false);
 		
 		JPanel conceptDescriptionHolderPanel = new JPanel(new BorderLayout());
-		conceptDescriptionHolderPanel.add(new JLabel("Concept description: "), BorderLayout.WEST);
-		conceptDescriptionHolderPanel.add(conceptDescriptionField,BorderLayout.CENTER);
 		conceptDescriptionHolderPanel.add(remainingField,BorderLayout.EAST);
 		add(conceptDescriptionHolderPanel,BorderLayout.NORTH);
 		
 		//Drawing canvas
-		canvas = new Canvas();
-		conceptFieldListener = new ConceptFieldListener();
-		conceptDescriptionField.getDocument().addDocumentListener(conceptFieldListener);
+		demoCanvas = new Canvas(true);
+		drawingCanvas = new Canvas();
 		perGestureView = new PerGestureView();
 		
 		JLabel canvasInstruction = new JLabel("<html>Left click and drag for gesture input. <br>"
 				+ "Right click once to signal symbol end. <br>"
-				+ "Simbols are read from left to right in order. <br> "
-				+ "! means negation and please write it as a line above a symbol or just a horizontal line if it is the only symbol requested. <br>"
+				// TODO: this needs to be re-added 
 				+ "CTRL+S save to database <br>"
-				+ "CTRL+Z undo <br>"
-				+ "CTRL+Y redo <br>"
 				+ "CTRL+SHIFT+C clear</html>");
 		Font tipFont = canvasInstruction.getFont().deriveFont(Font.ITALIC).deriveFont(Font.BOLD);
 		canvasInstruction.setFont(tipFont);
 		JPanel canvasHolderPanel = new JPanel(new BorderLayout());
-		canvasHolderPanel.add(canvas,BorderLayout.CENTER);
+		JPanel innerCanvasHolderPanel = new JPanel(new GridLayout(2, 1,0,10));
+		innerCanvasHolderPanel.add(demoCanvas);
+		innerCanvasHolderPanel.add(drawingCanvas);
+		canvasHolderPanel.add(innerCanvasHolderPanel,BorderLayout.CENTER);
 		canvasHolderPanel.add(canvasInstruction, BorderLayout.SOUTH);
 				
 		add(canvasHolderPanel,BorderLayout.CENTER);
 		
 		//Control panel
-		undoAction = new UndoAction();
-		redoAction = new RedoAction();
 		clearCanvasAction = new ClearCanvasAction();
 		storeExpressionAction = new StoreExpressionAction();
-		
-		undoAction.setEnabled(false);
-		redoAction.setEnabled(false);
-				
+						
 		JPanel controlPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-		controlPanel.add(new JButton(undoAction));
-		controlPanel.add(new JButton(redoAction));
 		controlPanel.add(new JButton(storeExpressionAction));
 		controlPanel.add(new JButton(clearCanvasAction));
 		
@@ -135,12 +165,11 @@ public class RequestDrawingTab extends AbstractApplicationTab{
 		lowerPanel.add(controlPanel);
 		
 		add(lowerPanel,BorderLayout.SOUTH);
-		registerKeyboardActions();
 		
 		canvasObserver = new CanvasObserver();
-		canvas.observationManager.addObserver(canvasObserver);
+		drawingCanvas.observationManager.addObserver(canvasObserver);
 		
-		SwingUtilities.invokeLater(()->conceptDescriptionField.requestFocus());
+		setupNewExpression();
 	}
 	
 
@@ -156,16 +185,28 @@ public class RequestDrawingTab extends AbstractApplicationTab{
 		}
 		return selected;
 	}
+	
+	private void setupNewExpression() {
+		selected = selectRequest();
+		String requestedExpression = requestedSymbols[selected];
+		remainingField.setText(remaining+"/"+totalCount);
+		
+		
+		try {
+			ExpressionNodeWorker worker = ExpressionFactory.createExpression(symbolsMap, dimension, dimension, requestedExpression);
+			artificialExpressions = worker.getExpression();
+			expressionOrder = worker.getExpressionOrder();
+		} catch (Exception e) {
+			JOptionPane.showMessageDialog(null, "An error has occured while generating artificial expression.");
+			Log.addError(e);
+		}
+		updateDemoCanvas(0);		
+	}
 
-	private void registerKeyboardActions() {
-		conceptDescriptionField.registerKeyboardAction(undoAction, 
-				KeyStroke.getKeyStroke(KeyEvent.VK_Z, KeyEvent.CTRL_DOWN_MASK), JComponent.WHEN_FOCUSED);
-		conceptDescriptionField.registerKeyboardAction(redoAction, 
-				KeyStroke.getKeyStroke(KeyEvent.VK_Y, KeyEvent.CTRL_DOWN_MASK), JComponent.WHEN_FOCUSED);
-		conceptDescriptionField.registerKeyboardAction(storeExpressionAction, 
-				KeyStroke.getKeyStroke(KeyEvent.VK_S, KeyEvent.CTRL_DOWN_MASK), JComponent.WHEN_FOCUSED);
-		conceptDescriptionField.registerKeyboardAction(clearCanvasAction, 
-				KeyStroke.getKeyStroke(KeyEvent.VK_C, KeyEvent.CTRL_DOWN_MASK + KeyEvent.SHIFT_DOWN_MASK), JComponent.WHEN_FOCUSED);
+
+	private void updateDemoCanvas(int currSy) {
+		demoCanvas.clear();
+		demoCanvas.show(ExpressionTransformations.getCanvasForm(artificialExpressions,currSy));
 	}
 
 	private void forceRepaint() {
@@ -175,37 +216,12 @@ public class RequestDrawingTab extends AbstractApplicationTab{
 	
 	@Override
 	public void close() throws Exception {
-		conceptDescriptionField.getDocument().removeDocumentListener(conceptFieldListener);
-		canvas.observationManager.removeObserver(canvasObserver);
-		canvas.close();
+		drawingCanvas.observationManager.removeObserver(canvasObserver);
+		drawingCanvas.close();
 	}
 
 	
 	//========================================================================================================================
-
-	
-	
-	private final class ConceptFieldListener implements DocumentListener {
-		@Override
-		public void removeUpdate(DocumentEvent e) {
-			updateCanvas();
-		}
-
-		@Override
-		public void insertUpdate(DocumentEvent e) {
-			updateCanvas();
-		}
-
-		@Override
-		public void changedUpdate(DocumentEvent e) {
-			updateCanvas();
-		}
-
-		private void updateCanvas(){
-			String concept = conceptDescriptionField.getText();
-			canvas.setLock(concept==null || concept.isEmpty());
-		}
-	}
 
 	private final class CanvasObserver extends ACanvasObserver {
 		
@@ -215,10 +231,7 @@ public class RequestDrawingTab extends AbstractApplicationTab{
 		public void clearUpdate() {
 			perGestureView.clear();
 			currentSy = 0;
-			
-			undoAction.setEnabled(false);
-			redoAction.setEnabled(false);
-			
+			updateDemoCanvas(currentSy);						
 			forceRepaint();
 		}
 
@@ -226,16 +239,15 @@ public class RequestDrawingTab extends AbstractApplicationTab{
 		public void newInputUpdate(@Nonnull Pair<MouseClickType, List<Point>> relativePoints) {
 			if((relativePoints.left()==MouseClickType.RIGHT)){
 				currentSy++;
+				updateDemoCanvas(currentSy);						
 			}
 			else{
 				List<Point> points = relativePoints.right();
 				
-				char[] symbols = conceptDescriptionField.getText().toCharArray();
+				char[] symbols = expressionOrder.toCharArray();
 				
 				perGestureView.addGesture(Character.toString(symbols[currentSy]), new Gesture(points));
 			}
-			
-			undoAction.setEnabled(true);
 			
 			forceRepaint();
 		}
@@ -250,8 +262,6 @@ public class RequestDrawingTab extends AbstractApplicationTab{
 			else if(type==MouseClickType.LEFT){
 				perGestureView.redo();
 			}
-						
-			undoAction.setEnabled(true);
 			
 			forceRepaint();
 		}
@@ -268,8 +278,6 @@ public class RequestDrawingTab extends AbstractApplicationTab{
 				perGestureView.undo();
 			}
 			
-			redoAction.setEnabled(true);
-			
 			forceRepaint();
 		}
 		
@@ -285,7 +293,7 @@ public class RequestDrawingTab extends AbstractApplicationTab{
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			Log.addMessage("Clear action called", Log.Type.Plain);
-			canvas.clear();
+			drawingCanvas.clear();
 		}
 	}
 
@@ -297,16 +305,17 @@ public class RequestDrawingTab extends AbstractApplicationTab{
 		
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			String text = conceptDescriptionField.getText();
 			
-			Log.addMessage("Storing expression: " + text, Log.Type.Plain);
+			String expressionSymbolicForm = artificialExpressions.getSymbolicForm();
+			Log.addMessage("Storing expression: " + expressionSymbolicForm, Log.Type.Plain);
 			
 			try {
-				if(text==null || text.isEmpty())
+				if(expressionSymbolicForm==null || expressionSymbolicForm.isEmpty())
 					throw new IllegalArgumentException("No expression provided");
 
-				String expressionSymbolicForm = IBooleanTextParser.expressionPreprocessing(text);
-				Expression expression = ExpressionFactory.getExpressionFor(expressionSymbolicForm,canvas.getData());
+				//TODO: this produces a wrong symbolic form for expression and 
+				// it is questionable if the right symbol is associated with the right data
+				Expression expression = ExpressionFactory.getExpressionFor(artificialExpressions.getSymbolicForm(),expressionOrder,drawingCanvas.getData());
 				Application.getInstance().getDataSource().store(expression);
 				
 				if(remaining>0){
@@ -316,15 +325,12 @@ public class RequestDrawingTab extends AbstractApplicationTab{
 				
 				if(remaining==0){
 					JOptionPane.showMessageDialog(null, "Thank you very much!!! :D", "", JOptionPane.INFORMATION_MESSAGE);
-					conceptDescriptionField.setEditable(true);
-					conceptDescriptionField.setText("");
 					remainingField.setText(remaining+"/"+totalCount);
 					remaining--;
+					Application.getInstance().quit();
 				}
 				else if(remaining>0){
-					selected = selectRequest();
-					conceptDescriptionField.setText(requestedSymbols[selected]);
-					remainingField.setText(remaining+"/"+totalCount);
+					setupNewExpression();
 				}
 				
 				Log.addMessage("Expression stored", Log.Type.Plain);
@@ -336,36 +342,7 @@ public class RequestDrawingTab extends AbstractApplicationTab{
 				JOptionPane.showMessageDialog(null, "A critical error has occured during storage attempt." + e1.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
 			}
 			
-			//TODO: remove
 			clearCanvasAction.actionPerformed(e);
-		}
-		
-	}
-	
-	private final class UndoAction extends AbstractAction {
-		
-		public UndoAction() {
-			super("Undo");
-		}
-
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			Log.addMessage("Undo action called", Log.Type.Plain);
-			setEnabled(canvas.undo());
-		}
-		
-	}
-	
-	private final class RedoAction extends AbstractAction {
-		
-		public RedoAction() {
-			super("Redo");
-		}
-
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			Log.addMessage("Redo action called", Log.Type.Plain);
-			setEnabled(canvas.redo());
 		}
 		
 	}
