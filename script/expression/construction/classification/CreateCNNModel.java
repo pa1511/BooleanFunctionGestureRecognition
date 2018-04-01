@@ -41,10 +41,10 @@ public class CreateCNNModel {
 	public static void main(String[] args) throws Exception {
 		Log.setDisabled(true);
 		
-		String fileNameTrain = "./training/symbol-gesture-new/training_data_exp-78-2.csv";
-		String fileNameSimpleTest = "./training/symbol-gesture-new/test_simple_data_exp-78-2.csv";
-		//String fileNameComplexTest = "./training/symbol-gesture-new/test_complex_data-181-10.csv";
-		String modelName = "CNN-78-2-model6";
+		String fileNameTrain = "./training/training_data-78-2.csv";
+		String fileNameSimpleTest = "./training/test_simple_data-78-2.csv";
+		//String fileNameComplexTest = "./training/test_complex_data-181-10.csv";
+		String modelName = "CNN-78-2-model1";
 		
 		File inputFile = new File(fileNameTrain);
 		
@@ -104,7 +104,7 @@ public class CreateCNNModel {
 			TDoubleArrayList trainAccuracyList = new TDoubleArrayList();
 			
 	        //Store model
-			File outputFolder = new File("./training/symbol-gesture-new/model/");
+			File outputFolder = new File("./training/model/");
 			Evaluation bestEvaluation = null;
 			MultiLayerNetwork bestNetwork = null;
 			int nEpochs = 250;
