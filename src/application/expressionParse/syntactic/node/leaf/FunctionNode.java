@@ -4,6 +4,7 @@ import application.expressionParse.MemoryTable;
 import application.expressionParse.VariableValueProvider;
 import application.expressionParse.syntactic.node.ABooleanExpressionNode;
 import application.expressionParse.syntactic.node.IBooleanExpressionNode;
+import application.expressionParse.syntactic.node.INodeWorker;
 
 public class FunctionNode extends ABooleanExpressionNode{
 
@@ -27,6 +28,12 @@ public class FunctionNode extends ABooleanExpressionNode{
 		MemoryTable.getMemoryTable().removeFunction(this.symbol);
 		super.setSymbol(symbol);
 		MemoryTable.getMemoryTable().storeFunction(symbol, this);
+	}
+	
+	@Override
+	public void walkNodeTree(INodeWorker worker) {
+		worker.enterNode(this);
+		worker.exitNode(this);
 	}
 	
 	@Override

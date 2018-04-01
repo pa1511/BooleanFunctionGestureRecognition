@@ -9,6 +9,13 @@ public abstract class UnaryOperationNode extends AOperationNode{
 	}
 	
 	@Override
+	public void walkNodeTree(INodeWorker worker) {
+		worker.enterNode(this);
+		children[0].walkNodeTree(worker);
+		worker.exitNode(this);
+	}
+	
+	@Override
 	public String toString() {
 		return symbol + children[0];
 	}

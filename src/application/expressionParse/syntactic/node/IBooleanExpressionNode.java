@@ -21,6 +21,8 @@ public interface IBooleanExpressionNode {
 	
 	public String getSymbol();
 	
+	public void walkNodeTree(INodeWorker worker);
+	
 	@Override
 	public @Nonnull String toString();
 	

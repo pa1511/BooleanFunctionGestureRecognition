@@ -24,6 +24,14 @@ public class BracketsNode extends UnaryOperationNode{
 		return children[0].evaluate(variableValueProvider);
 	}
 	
+	public String getSymbol1() {
+		return symbol1;
+	}
+	
+	public String getSymbol2() {
+		return symbol2;
+	}
+	
 	@Override
 	public String toString() {
 		return symbol1 + children[0] + symbol2;

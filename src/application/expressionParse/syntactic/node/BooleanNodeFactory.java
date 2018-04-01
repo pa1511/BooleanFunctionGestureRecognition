@@ -15,6 +15,7 @@ import application.expressionParse.syntactic.node.leaf.OrNode;
 import application.expressionParse.syntactic.node.leaf.TrueNode;
 import application.expressionParse.syntactic.node.leaf.VariableNode;
 import application.expressionParse.syntactic.node.leaf.BracketsNode.Type;
+import application.expressionParse.syntactic.node.leaf.BracketsNotVisibleNode;
 
 public class BooleanNodeFactory {
 
@@ -60,6 +61,12 @@ public class BooleanNodeFactory {
 		case RIGHT_BRACKET:
 			node = new BracketsNode(LexicalToken.Type.LEFT_BRACKET.getSymbolAsString(), LexicalToken.Type.RIGHT_BRACKET.getSymbolAsString(),Type.RIGHT);
 			break;
+//		case LEFT_BRACKET_NOT_VISIBLE:
+//			node = new BracketsNotVisibleNode(LexicalToken.Type.LEFT_BRACKET.getSymbolAsString(), LexicalToken.Type.RIGHT_BRACKET.getSymbolAsString(),Type.LEFT);
+//			break;
+//		case RIGHT_BRACKET_NOT_VISIBLE:
+//			node = new BracketsNotVisibleNode(LexicalToken.Type.LEFT_BRACKET.getSymbolAsString(), LexicalToken.Type.RIGHT_BRACKET.getSymbolAsString(),Type.RIGHT);
+//			break;
 		case EQUALS:
 			node = new EqualsNode(symbolAsString);
 			break;

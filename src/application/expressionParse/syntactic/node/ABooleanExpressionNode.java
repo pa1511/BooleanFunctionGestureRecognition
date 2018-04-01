@@ -40,7 +40,7 @@ public abstract class ABooleanExpressionNode implements IBooleanExpressionNode{
 		}		
 		return connected;
 	}
-	
+		
 	@Override
 	public String getSymbol() {
 		return symbol;

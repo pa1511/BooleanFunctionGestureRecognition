@@ -36,6 +36,7 @@ import application.data.model.Expression;
 import application.data.model.Gesture;
 import application.data.model.RelativeSymbol;
 import application.data.model.handling.ExpressionFactory;
+import application.data.model.handling.ExpressionFactory.ExpressionNodeWorker;
 import application.data.model.handling.ExpressionTransformations;
 import application.data.model.handling.SymbolTransformations;
 import application.data.source.H2Database;
@@ -82,6 +83,7 @@ public class RequestDrawing_V2_Tab extends AbstractApplicationTab{
 	//Used in generating artificial data
 	private Map<String, List<RelativeSymbol>> symbolsMap;
 	private Expression artificialExpressions;
+	private String expressionOrder;
 	
 	public RequestDrawing_V2_Tab() {
 		super("Drawing");
@@ -118,10 +120,11 @@ public class RequestDrawing_V2_Tab extends AbstractApplicationTab{
 		}
 		
 		//==============================================================================================
-		requestedSymbols = new String[]{"F=A","F=B","F=C","F=D","F=0"
-				,"F=1","(A+B)","(B+C)","(C+D)","A(B+C)","B(C+D)","C(D+A)","D(A+B)"
-				,"!A","!B","!C","!D","!F","!0","!1","A","B","C","D","F"
-				};
+//		requestedSymbols = new String[]{"F=A","F=B","F=C","F=D","F=0"
+//				,"F=1","(A+B)","(B+C)","(C+D)","A(B+C)","B(C+D)","C(D+A)","D(A+B)"
+//				,"!A","!B","!C","!D","!F","!0","!1","A","B","C","D","F"
+//				};
+		requestedSymbols = new String[]{"![A+B]","!(A+B)"};
 		requestedSymbolCounts = new int[requestedSymbols.length];
 		Arrays.fill(requestedSymbolCounts, 2);
 		remaining = Arrays.stream(requestedSymbolCounts).sum();
@@ -210,9 +213,15 @@ public class RequestDrawing_V2_Tab extends AbstractApplicationTab{
 		conceptDescriptionField.setText(requestedExpression);
 		remainingField.setText(remaining+"/"+totalCount);
 		
-		String[] symbols = requestedExpression.chars().mapToObj(c->Character.toString((char)c)).toArray(String[]::new);
 		
-		artificialExpressions = ExpressionFactory.createExpression(symbolsMap, 1, dimension, dimension, symbols).get(0);
+		try {
+			ExpressionNodeWorker worker = ExpressionFactory.createExpression(symbolsMap, dimension, dimension, requestedExpression);
+			artificialExpressions = worker.getExpression();
+			expressionOrder = worker.getExpressionOrder();
+		} catch (Exception e) {
+			JOptionPane.showMessageDialog(null, "An error has occured while generating artificial expression.");
+			Log.addError(e);
+		}
 		updateDemoCanvas(0);		
 	}
 
@@ -289,7 +298,7 @@ public class RequestDrawing_V2_Tab extends AbstractApplicationTab{
 			else{
 				List<Point> points = relativePoints.right();
 				
-				char[] symbols = conceptDescriptionField.getText().toCharArray();
+				char[] symbols = expressionOrder.toCharArray();
 				
 				perGestureView.addGesture(Character.toString(symbols[currentSy]), new Gesture(points));
 			}
