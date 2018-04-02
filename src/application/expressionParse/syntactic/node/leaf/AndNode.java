@@ -6,7 +6,7 @@ import application.expressionParse.VariableValueProvider;
 import application.expressionParse.syntactic.node.BinaryOperationNode;
 import application.expressionParse.syntactic.node.OperationPriority;
 
-public final class AndNode extends BinaryOperationNode{
+public class AndNode extends BinaryOperationNode{
 
 	public AndNode(@Nonnull String symbol) {
 		super(symbol,OperationPriority.LVL1);

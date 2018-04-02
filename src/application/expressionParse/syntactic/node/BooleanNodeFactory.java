@@ -6,6 +6,7 @@ import application.expressionParse.MemoryTable;
 import application.expressionParse.exception.BooleanExpressionSyntacticExceptiona;
 import application.expressionParse.lexic.token.LexicalToken;
 import application.expressionParse.syntactic.node.leaf.AndNode;
+import application.expressionParse.syntactic.node.leaf.AndNotVisibleNode;
 import application.expressionParse.syntactic.node.leaf.BracketsNode;
 import application.expressionParse.syntactic.node.leaf.EqualsNode;
 import application.expressionParse.syntactic.node.leaf.FalseNode;
@@ -66,6 +67,9 @@ public class BooleanNodeFactory {
 			break;
 		case RIGHT_BRACKET_NOT_VISIBLE:
 			node = new BracketsNotVisibleNode(LexicalToken.Type.LEFT_BRACKET.getSymbolAsString(), LexicalToken.Type.RIGHT_BRACKET.getSymbolAsString(),Type.RIGHT);
+			break;
+		case AND_NOT_VISIBLE:
+			node = new AndNotVisibleNode(LexicalToken.Type.AND.getSymbolAsString());
 			break;
 		case EQUALS:
 			node = new EqualsNode(symbolAsString);

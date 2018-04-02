@@ -19,6 +19,7 @@ import application.expressionParse.ParserSystem;
 import application.expressionParse.syntactic.node.AbstractNodeWorker;
 import application.expressionParse.syntactic.node.IBooleanExpressionNode;
 import application.expressionParse.syntactic.node.leaf.AndNode;
+import application.expressionParse.syntactic.node.leaf.AndNotVisibleNode;
 import application.expressionParse.syntactic.node.leaf.BracketsNode;
 import application.expressionParse.syntactic.node.leaf.BracketsNotVisibleNode;
 import application.expressionParse.syntactic.node.leaf.FalseNode;
@@ -84,6 +85,7 @@ public class ExpressionFactory {
 		private final @Nonnull Map<String, List<RelativeSymbol>> symbolsMap;
 		private final @Nonnull Expression expression;
 		private final @Nonnull StringBuilder expressionOrder;
+		private @Nonnull String expressionSymbolicForm = "";
 		
 		//Top-left symbol point and symbol width and height 
 		private static final @Nonnegative int space = 5;
@@ -111,6 +113,16 @@ public class ExpressionFactory {
 			return expressionOrder.toString();
 		}
 		
+		public String getExpressionSymbolicForm() {
+			return expressionSymbolicForm;
+		}
+		
+		@Override
+		public void analyze(IBooleanExpressionNode node) {
+			super.analyze(node);
+			expressionSymbolicForm = node.toString();
+		}
+		
 		@Override
 		public void enterNode(IBooleanExpressionNode node) {
 			
@@ -121,7 +133,7 @@ public class ExpressionFactory {
 				expressionOrder.append(symbolAsString);
 				createArtificialSymbol(symbolAsString,width,height,leftX,topY);
 			}
-			else if(node instanceof BracketsNotVisibleNode) {
+			else if(node instanceof BracketsNotVisibleNode || node instanceof AndNotVisibleNode) {
 				//do nothing
 			}
 			else if(node instanceof BracketsNode) {
@@ -135,6 +147,9 @@ public class ExpressionFactory {
 		
 		@Override
 		public void betweenChildren(IBooleanExpressionNode node, IBooleanExpressionNode child1, IBooleanExpressionNode child2) {
+			if( node instanceof AndNotVisibleNode)
+				return;
+			
 			String symbolAsString = node.getSymbol();
 			expressionOrder.append(symbolAsString);
 			if(node instanceof AndNode) {
@@ -167,7 +182,7 @@ public class ExpressionFactory {
 				leftX = oldLX;
 				topY = oldTY;
 			} 
-			else if(node instanceof BracketsNotVisibleNode) {
+			else if(node instanceof BracketsNotVisibleNode || node instanceof AndNotVisibleNode) {
 				//do nothing
 			}
 			else if(node instanceof BracketsNode) {
@@ -214,14 +229,17 @@ public class ExpressionFactory {
 
 	}
 
+	/**
+	 * TODO: this is bad design. The expression worker was used to build the artificial expression and contains the order and symbolic form. 
+	 * I should return some sort of data pack insteaed of the worker itself. 
+	 */
 	public static ExpressionNodeWorker createExpression(Map<String, List<RelativeSymbol>> symbolsMap, int width, int height, String expression) throws Exception{
 	
 		IBooleanTextParser parser = ParserSystem.getBooleanTextParser(Application.getInstance().getProperties());
 		IBooleanExpressionNode node = parser.parse(expression);
 		
 		ExpressionNodeWorker worker = new ExpressionNodeWorker(symbolsMap, expression, width, height);
-		
-		node.walkNodeTree(worker);
+		worker.analyze(node);
 		
 		//TODO: remove
 		System.out.println("Order: " + worker.getExpressionOrder());

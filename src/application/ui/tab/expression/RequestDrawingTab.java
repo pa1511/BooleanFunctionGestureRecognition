@@ -74,6 +74,7 @@ public class RequestDrawingTab extends AbstractApplicationTab{
 	private Map<String, List<RelativeSymbol>> symbolsMap;
 	private Expression artificialExpressions;
 	private String expressionOrder;
+	private String expressionSymbolicForm;
 	
 	public RequestDrawingTab() {
 		super("Drawing");
@@ -114,7 +115,7 @@ public class RequestDrawingTab extends AbstractApplicationTab{
 //				,"F=1","(A+B)","(B+C)","(C+D)","A(B+C)","B(C+D)","C(D+A)","D(A+B)"
 //				,"!A","!B","!C","!D","!F","!0","!1","A","B","C","D","F"
 //				};
-		requestedSymbols = new String[]{"A*B"};
+		requestedSymbols = new String[]{"![C+D]+A_B"};
 		requestedSymbolCounts = new int[requestedSymbols.length];
 		Arrays.fill(requestedSymbolCounts, 2);
 		remaining = Arrays.stream(requestedSymbolCounts).sum();
@@ -196,6 +197,7 @@ public class RequestDrawingTab extends AbstractApplicationTab{
 			ExpressionNodeWorker worker = ExpressionFactory.createExpression(symbolsMap, dimension, dimension, requestedExpression);
 			artificialExpressions = worker.getExpression();
 			expressionOrder = worker.getExpressionOrder();
+			expressionSymbolicForm = worker.getExpressionSymbolicForm();
 		} catch (Exception e) {
 			JOptionPane.showMessageDialog(null, "An error has occured while generating artificial expression.");
 			Log.addError(e);
@@ -306,16 +308,13 @@ public class RequestDrawingTab extends AbstractApplicationTab{
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			
-			String expressionSymbolicForm = artificialExpressions.getSymbolicForm();
 			Log.addMessage("Storing expression: " + expressionSymbolicForm, Log.Type.Plain);
 			
 			try {
 				if(expressionSymbolicForm==null || expressionSymbolicForm.isEmpty())
 					throw new IllegalArgumentException("No expression provided");
 
-				//TODO: this produces a wrong symbolic form for expression and 
-				// it is questionable if the right symbol is associated with the right data
-				Expression expression = ExpressionFactory.getExpressionFor(artificialExpressions.getSymbolicForm(),expressionOrder,drawingCanvas.getData());
+				Expression expression = ExpressionFactory.getExpressionFor(expressionSymbolicForm, expressionOrder, drawingCanvas.getData());
 				Application.getInstance().getDataSource().store(expression);
 				
 				if(remaining>0){
