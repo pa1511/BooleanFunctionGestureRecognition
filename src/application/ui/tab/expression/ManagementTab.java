@@ -59,17 +59,19 @@ public class ManagementTab extends AbstractApplicationTab{
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				Expression expression = expressionTable.getCurrentExpression();
-				List<Symbol> symbols = expression.getSymbols();
-				int symbolCount = symbols.size();
-				currentSymbol--;
-				if(currentSymbol!=-1) {
-					currentSymbol = (currentSymbol+symbolCount)%symbolCount;
-					symbolField.setText((currentSymbol+1) + "/" + symbolCount + ":" +symbols.get(currentSymbol).getSymbolAsString());
+				if(expression!=null) {
+					List<Symbol> symbols = expression.getSymbols();
+					int symbolCount = symbols.size();
+					currentSymbol=Math.max(currentSymbol-1, -1);
+					if(currentSymbol!=-1) {
+						currentSymbol = (currentSymbol+symbolCount)%symbolCount;
+						symbolField.setText((currentSymbol+1) + "/" + symbolCount + ":" +symbols.get(currentSymbol).getSymbolAsString());
+					}
+					else {
+						symbolField.setText("");
+					}
+					observer.innerUpdate(expression);
 				}
-				else {
-					symbolField.setText("");
-				}
-				observer.innerUpdate(expression);
 			}
 		});
 		JButton right = new JButton(new AbstractAction(">") {
@@ -77,13 +79,15 @@ public class ManagementTab extends AbstractApplicationTab{
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				Expression expression = expressionTable.getCurrentExpression();
-				List<Symbol> symbols = expression.getSymbols();
-				int symbolCount = symbols.size();
-				currentSymbol = (currentSymbol+1+symbolCount)%symbolCount;
-				Symbol symbol = symbols.get(currentSymbol);
-				
-				symbolField.setText((currentSymbol+1) + "/" + symbolCount + ":" +symbol.getSymbolAsString());
-				observer.innerUpdate(expression);
+				if(expression!=null) {
+					List<Symbol> symbols = expression.getSymbols();
+					int symbolCount = symbols.size();
+					currentSymbol = (currentSymbol+1+symbolCount)%symbolCount;
+					Symbol symbol = symbols.get(currentSymbol);
+					
+					symbolField.setText((currentSymbol+1) + "/" + symbolCount + ":" +symbol.getSymbolAsString());
+					observer.innerUpdate(expression);
+				}
 			}
 		});
 		
