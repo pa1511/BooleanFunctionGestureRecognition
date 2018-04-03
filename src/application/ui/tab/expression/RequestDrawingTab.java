@@ -10,6 +10,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Random;
 import java.util.stream.Collectors;
 
@@ -84,7 +85,7 @@ public class RequestDrawingTab extends AbstractApplicationTab{
 		symbolsMap = new HashMap<>();
 
 		// Loading symbols from database
-		try (final IDataSource dataSource = new H2Database("main", Application.getInstance().getProperties())) {
+		try (final IDataSource dataSource = new H2Database("example", Application.getInstance().getProperties())) {
 			Multiset<String> multiset = HashMultiset.create();
 			multiset.add("F", 10);
 			multiset.add("=", 10);			
@@ -113,12 +114,7 @@ public class RequestDrawingTab extends AbstractApplicationTab{
 		}
 		
 		//==============================================================================================
-		//TODO: it would be nice to read this from a properties file
-//		requestedSymbols = new String[]{"F=A","F=B","F=C","F=D","F=0"
-//				,"F=1","(A+B)","(B+C)","(C+D)","A(B+C)","B(C+D)","C(D+A)","D(A+B)"
-//				,"!A","!B","!C","!D","!F","!0","!1","A","B","C","D","F"
-//				};
-		requestedSymbols = new String[]{"A_B"};
+		requestedSymbols = loadRequestedExpressions();
 		requestedSymbolCounts = new int[requestedSymbols.length];
 		Arrays.fill(requestedSymbolCounts, 2);
 		remaining = Arrays.stream(requestedSymbolCounts).sum();
@@ -177,6 +173,15 @@ public class RequestDrawingTab extends AbstractApplicationTab{
 		registerKeyboardActions();
 	}
 	
+	private String[] loadRequestedExpressions() {
+		Properties properties = Application.getInstance().getProperties();
+		return Arrays.stream(properties.getProperty("requested.expressions")
+				.split(";"))
+				.map(String::trim)
+				.filter(s->!s.isEmpty())
+				.toArray(String[]::new);
+	}
+
 	private void registerKeyboardActions() {
 		registerKeyboardAction(storeExpressionAction, 
 				KeyStroke.getKeyStroke(KeyEvent.VK_S, KeyEvent.CTRL_DOWN_MASK), JComponent.WHEN_IN_FOCUSED_WINDOW);

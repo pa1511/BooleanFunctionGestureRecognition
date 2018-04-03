@@ -40,7 +40,6 @@ public class Main {
 				JOptionPane.showMessageDialog(null, "A critical error has occurred", "Error", JOptionPane.ERROR_MESSAGE);
 			} 
 		});
-		
 	}
 	
 }
