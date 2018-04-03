@@ -59,8 +59,11 @@ public class ExpressionManagementTable extends JTable implements AutoCloseable{
 					int expressionCount = model.expressionCount.getAsInt();
 					if(selectedRow==-1) 
 						selectedRow = expressionCount-1;
-					else if(selectedRow<=expressionCount)
-						observationManager.updateObservers(model.expressions.get().get(selectedRow));
+					else if(selectedRow<=expressionCount) {
+						List<Expression> list = model.expressions.get();
+						if(list.size()>selectedRow)
+							observationManager.updateObservers(list.get(selectedRow));
+					}
 			}
 		};
 		selectionModel.addListSelectionListener(selectionListener);
@@ -73,7 +76,7 @@ public class ExpressionManagementTable extends JTable implements AutoCloseable{
 					public void actionPerformed(@CheckForNull ActionEvent arg0) {
 						
 						Application.getInstance().workers.submit(()->{
-							if(model.expressions.isLoaded()){
+							if(model.expressions.isLoaded() || model.getRowCount()==0){
 								model.reset();
 								Log.addMessage("Reloaded expressions from db.", Log.Type.Plain);
 								model.fireTableDataChanged();
@@ -108,6 +111,7 @@ public class ExpressionManagementTable extends JTable implements AutoCloseable{
 							else{
 								observationManager.updateObservers(expressions.get(row));
 							}
+							model.reset();
 							Log.addMessage("Deleted expression: " + expression + " Id: " + expression.getId(), Log.Type.Plain);
 							
 							revalidate();

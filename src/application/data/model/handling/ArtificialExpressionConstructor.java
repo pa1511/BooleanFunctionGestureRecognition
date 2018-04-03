@@ -202,6 +202,9 @@ class ArtificialExpressionConstructor {
 			}
 			else if(node instanceof BracketsNode)
 				count+=2;
+			else if(node instanceof FunctionNode) {
+				count+=node.getSymbol().length();
+			}
 			else 
 				count++;
 		}

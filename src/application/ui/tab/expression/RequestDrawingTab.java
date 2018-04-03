@@ -61,6 +61,7 @@ public class RequestDrawingTab extends AbstractApplicationTab{
 
 	//Actions
 	private final @Nonnull StoreExpressionAction storeExpressionAction;
+	private final @Nonnull UndoAction undoAction;
 	private final @Nonnull ClearCanvasAction clearCanvasAction;
 	
 	//Listeners
@@ -139,6 +140,7 @@ public class RequestDrawingTab extends AbstractApplicationTab{
 		JLabel canvasInstruction = new JLabel("<html>Left click and drag for gesture input. <br>"
 				+ "Right click once to signal symbol end. <br>"
 				+ "CTRL+S save to database <br>"
+				+ "CTRL+Z undo last input (both left and right click are considered inputs)"
 				+ "CTRL+SHIFT+C clear</html>");
 		Font tipFont = canvasInstruction.getFont().deriveFont(Font.ITALIC).deriveFont(Font.BOLD);
 		canvasInstruction.setFont(tipFont);
@@ -153,10 +155,14 @@ public class RequestDrawingTab extends AbstractApplicationTab{
 		
 		//Control panel
 		clearCanvasAction = new ClearCanvasAction();
+		undoAction = new UndoAction();
 		storeExpressionAction = new StoreExpressionAction();
+		
+		undoAction.setEnabled(false);
 						
 		JPanel controlPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
 		controlPanel.add(new JButton(storeExpressionAction));
+		controlPanel.add(new JButton(undoAction));
 		controlPanel.add(new JButton(clearCanvasAction));
 		
 		JPanel lowerPanel = new JPanel(new BorderLayout());
@@ -183,6 +189,8 @@ public class RequestDrawingTab extends AbstractApplicationTab{
 	}
 
 	private void registerKeyboardActions() {
+		registerKeyboardAction(undoAction, 
+				KeyStroke.getKeyStroke(KeyEvent.VK_Z, KeyEvent.CTRL_DOWN_MASK), JComponent.WHEN_IN_FOCUSED_WINDOW);
 		registerKeyboardAction(storeExpressionAction, 
 				KeyStroke.getKeyStroke(KeyEvent.VK_S, KeyEvent.CTRL_DOWN_MASK), JComponent.WHEN_IN_FOCUSED_WINDOW);
 		registerKeyboardAction(clearCanvasAction, 
@@ -249,6 +257,9 @@ public class RequestDrawingTab extends AbstractApplicationTab{
 		public void clearUpdate() {
 			perGestureView.clear();
 			currentSy = 0;
+			
+			undoAction.setEnabled(false);
+
 			updateDemoCanvas(currentSy);						
 			forceRepaint();
 		}
@@ -267,6 +278,7 @@ public class RequestDrawingTab extends AbstractApplicationTab{
 				perGestureView.addGesture(Character.toString(symbols[currentSy]), new Gesture(points));
 			}
 			
+			undoAction.setEnabled(true);
 			forceRepaint();
 		}
 
@@ -281,6 +293,7 @@ public class RequestDrawingTab extends AbstractApplicationTab{
 				perGestureView.redo();
 			}
 			
+			undoAction.setEnabled(true);
 			forceRepaint();
 		}
 		
@@ -291,6 +304,7 @@ public class RequestDrawingTab extends AbstractApplicationTab{
 			
 			if(type==MouseClickType.RIGHT){
 				currentSy--;
+				updateDemoCanvas(currentSy);						
 			}
 			else{
 				perGestureView.undo();
@@ -313,6 +327,21 @@ public class RequestDrawingTab extends AbstractApplicationTab{
 			Log.addMessage("Clear action called", Log.Type.Plain);
 			drawingCanvas.clear();
 		}
+	}
+	
+	private final class UndoAction extends AbstractAction {
+		
+		public UndoAction() {
+			super("Undo");
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			// Expand as needed so that everything works as intended
+			Log.addMessage("Undo action called", Log.Type.Plain);
+			setEnabled(drawingCanvas.undo());
+		}
+		
 	}
 
 	private final class StoreExpressionAction extends AbstractAction {
