@@ -1,7 +1,7 @@
 package application.ui.tab.expression;
 
 import java.awt.BorderLayout;
-import java.awt.Dimension;
+import java.awt.GridLayout;
 import java.util.Properties;
 
 import javax.annotation.CheckForNull;
@@ -51,20 +51,22 @@ public class EvaluationTab extends AbstractApplicationTab{
 		expressionInputField.addActionListener(evaluateAction);
 		evaluateButton = new JButton(evaluateAction);
 		
-		functionTable = new JTable(new FunctionTableModel());
-		
 		//Upper panel content
 		JPanel upperPanel = new JPanel(new BorderLayout());
 		upperPanel.add(expressionInputField, BorderLayout.CENTER);
 		upperPanel.add(evaluateButton,BorderLayout.EAST);
-		JScrollPane functionScrollPane = new JScrollPane(functionTable);
-		functionScrollPane.setPreferredSize(new Dimension(100, 80));
-		upperPanel.add(functionScrollPane,BorderLayout.SOUTH);
 		add(upperPanel,BorderLayout.NORTH);
 
 		//Main panel content
+		functionTable = new JTable(new FunctionTableModel());
 		truthTable = new JTable();
-		add(new JScrollPane(truthTable),BorderLayout.CENTER);
+		
+		JPanel tableHolder = new JPanel(new GridLayout(2, 1));
+		tableHolder.add(new JScrollPane(functionTable));
+		tableHolder.add(new JScrollPane(truthTable));
+		
+		
+		add(tableHolder,BorderLayout.CENTER);
 	}
 	
 	private void setExpression(@Nonnull IBooleanExpressionNode expression) {
@@ -78,7 +80,9 @@ public class EvaluationTab extends AbstractApplicationTab{
 		if(variableValueProvider!=null && expression!=null) {
 			truthTable.setModel(new ExpressionEvaluationTableModel(variableValueProvider, expression));
 		}
-		
+		functionTable.revalidate();
+		functionTable.repaint();
+		repaint();
 	}
 
 }
