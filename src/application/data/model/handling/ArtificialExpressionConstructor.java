@@ -1,5 +1,6 @@
 package application.data.model.handling;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -135,7 +136,7 @@ class ArtificialExpressionConstructor {
 				int childCount = innerWorker.count;
 				//
 				leftX -= (width+space)*childCount;
-				topY -= (int)(height/2.0);
+				topY -= (int)(height/3.0)+2*space*innerWorker.getNotCount();
 				//
 				createArtificialSymbol(symbolAsString,(int)((width+space)*(childCount-0.2)),(int)(height/4.0),leftX,topY);
 				//
@@ -194,10 +195,14 @@ class ArtificialExpressionConstructor {
 	private static class NodeCountWorker extends AbstractNodeWorker{
 		
 		int count = 0;
+		int[] notCount = new int[20];//20 is max tree depth
+		int depth = 0;
 		
 		@Override
 		public void enterNode(IBooleanExpressionNode node) {
-			if(node instanceof BracketsNotVisibleNode || node instanceof AndNotVisibleNode) {
+			if(node instanceof NotNode)
+				notCount[depth] = notCount[depth] | 0x1;//set to 1 when seen at some depth
+			else if(node instanceof BracketsNotVisibleNode || node instanceof AndNotVisibleNode) {
 				//do nothing
 			}
 			else if(node instanceof BracketsNode)
@@ -207,6 +212,17 @@ class ArtificialExpressionConstructor {
 			}
 			else 
 				count++;
+			
+			depth++;
+		}
+		
+		@Override
+		public void exitNode(IBooleanExpressionNode node) {
+			depth--;
+		}
+		
+		public int getNotCount() {
+			return Arrays.stream(notCount).sum();
 		}
 	}
 
