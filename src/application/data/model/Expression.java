@@ -7,7 +7,7 @@ import javax.annotation.Nonnull;
 
 public class Expression extends AIdentifiable {
 	
-	private final @Nonnull String symbolicForm;
+	private @Nonnull String symbolicForm;
 	private final @Nonnull List<Symbol> symbols;
 
 	public Expression(@Nonnull String symbolicForm) {
@@ -40,6 +40,10 @@ public class Expression extends AIdentifiable {
 	
 	public @Nonnull List<Symbol> getSymbols() {
 		return symbols;
+	}
+	
+	public void setSymbolicForm(@Nonnull String symbolicForm) {
+		this.symbolicForm = symbolicForm;
 	}
 	
 	public String getSymbolicForm() {

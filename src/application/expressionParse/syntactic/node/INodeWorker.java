@@ -4,10 +4,6 @@ import javax.annotation.Nonnull;
 
 public interface INodeWorker {
 	
-	/**
-	 * Call to perform a analysis on a tree from the given node.
-	 */
-	public void analyze(@Nonnull IBooleanExpressionNode node);
 	
 	/**
 	 * Called when a node is entered.

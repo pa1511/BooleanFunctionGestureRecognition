@@ -5,6 +5,7 @@ import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -16,10 +17,12 @@ import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
 import javax.swing.AbstractAction;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.KeyStroke;
 
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Multiset;
@@ -29,8 +32,8 @@ import application.data.geometry.MouseClickType;
 import application.data.model.Expression;
 import application.data.model.Gesture;
 import application.data.model.RelativeSymbol;
+import application.data.model.handling.ArtificialExpressionDataPack;
 import application.data.model.handling.ExpressionFactory;
-import application.data.model.handling.ExpressionFactory.ExpressionNodeWorker;
 import application.data.model.handling.ExpressionTransformations;
 import application.data.model.handling.SymbolTransformations;
 import application.data.source.H2Database;
@@ -74,7 +77,6 @@ public class RequestDrawingTab extends AbstractApplicationTab{
 	private Map<String, List<RelativeSymbol>> symbolsMap;
 	private Expression artificialExpressions;
 	private String expressionOrder;
-	private String expressionSymbolicForm;
 	
 	public RequestDrawingTab() {
 		super("Drawing");
@@ -111,11 +113,12 @@ public class RequestDrawingTab extends AbstractApplicationTab{
 		}
 		
 		//==============================================================================================
+		//TODO: it would be nice to read this from a properties file
 //		requestedSymbols = new String[]{"F=A","F=B","F=C","F=D","F=0"
 //				,"F=1","(A+B)","(B+C)","(C+D)","A(B+C)","B(C+D)","C(D+A)","D(A+B)"
 //				,"!A","!B","!C","!D","!F","!0","!1","A","B","C","D","F"
 //				};
-		requestedSymbols = new String[]{"![C+D]+A_B"};
+		requestedSymbols = new String[]{"A_B"};
 		requestedSymbolCounts = new int[requestedSymbols.length];
 		Arrays.fill(requestedSymbolCounts, 2);
 		remaining = Arrays.stream(requestedSymbolCounts).sum();
@@ -139,7 +142,6 @@ public class RequestDrawingTab extends AbstractApplicationTab{
 		
 		JLabel canvasInstruction = new JLabel("<html>Left click and drag for gesture input. <br>"
 				+ "Right click once to signal symbol end. <br>"
-				// TODO: this needs to be re-added 
 				+ "CTRL+S save to database <br>"
 				+ "CTRL+SHIFT+C clear</html>");
 		Font tipFont = canvasInstruction.getFont().deriveFont(Font.ITALIC).deriveFont(Font.BOLD);
@@ -171,7 +173,17 @@ public class RequestDrawingTab extends AbstractApplicationTab{
 		drawingCanvas.observationManager.addObserver(canvasObserver);
 		
 		setupNewExpression();
+		
+		registerKeyboardActions();
 	}
+	
+	private void registerKeyboardActions() {
+		registerKeyboardAction(storeExpressionAction, 
+				KeyStroke.getKeyStroke(KeyEvent.VK_S, KeyEvent.CTRL_DOWN_MASK), JComponent.WHEN_IN_FOCUSED_WINDOW);
+		registerKeyboardAction(clearCanvasAction, 
+				KeyStroke.getKeyStroke(KeyEvent.VK_C, KeyEvent.CTRL_DOWN_MASK + KeyEvent.SHIFT_DOWN_MASK), JComponent.WHEN_IN_FOCUSED_WINDOW);
+	}
+
 	
 
 	private int selectRequest() {
@@ -194,10 +206,9 @@ public class RequestDrawingTab extends AbstractApplicationTab{
 		
 		
 		try {
-			ExpressionNodeWorker worker = ExpressionFactory.createExpression(symbolsMap, dimension, dimension, requestedExpression);
-			artificialExpressions = worker.getExpression();
-			expressionOrder = worker.getExpressionOrder();
-			expressionSymbolicForm = worker.getExpressionSymbolicForm();
+			ArtificialExpressionDataPack dataPack = ExpressionFactory.createExpression(symbolsMap, dimension, dimension, requestedExpression);
+			artificialExpressions = dataPack.getExpression();
+			expressionOrder = dataPack.getExpressionOrder();
 		} catch (Exception e) {
 			JOptionPane.showMessageDialog(null, "An error has occured while generating artificial expression.");
 			Log.addError(e);
@@ -308,6 +319,7 @@ public class RequestDrawingTab extends AbstractApplicationTab{
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			
+			String expressionSymbolicForm = artificialExpressions.getSymbolicForm();
 			Log.addMessage("Storing expression: " + expressionSymbolicForm, Log.Type.Plain);
 			
 			try {

@@ -1,11 +1,6 @@
 package application.expressionParse.syntactic.node;
 
 public class AbstractNodeWorker implements INodeWorker {
-	
-	@Override
-	public void analyze(IBooleanExpressionNode node) {
-		node.walkNodeTree(this);
-	}
 
 	@Override
 	public void enterNode(IBooleanExpressionNode node) { }
