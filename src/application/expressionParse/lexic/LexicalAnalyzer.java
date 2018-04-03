@@ -27,6 +27,7 @@ public class LexicalAnalyzer implements ILexicalAnalyzer {
 		
 		List<LexicalToken> tokens = new ArrayList<>();
 		
+		LexicalToken.Type lastTokenType = null;
 		int start = 0;
 		int end = start;
 		int length = expression.length();
@@ -48,6 +49,18 @@ public class LexicalAnalyzer implements ILexicalAnalyzer {
 			
 			String tokenSubStr = expression.substring(start, end);
 			LexicalToken.Type tokenType = decodeTokenType(tokenSubStr);
+			
+			if(tokenType==LexicalToken.Type.VARIABLE
+					 || tokenType==LexicalToken.Type.TRUE || tokenType==LexicalToken.Type.FALSE
+					 || tokenType==LexicalToken.Type.LEFT_BRACKET || tokenType==LexicalToken.Type.NOT) {
+				if(lastTokenType==LexicalToken.Type.VARIABLE
+						 || lastTokenType==LexicalToken.Type.TRUE || lastTokenType==LexicalToken.Type.FALSE
+						 || lastTokenType==LexicalToken.Type.RIGHT_BRACKET) {
+					
+					tokens.add(new LexicalToken(LexicalToken.Type.AND_NOT_VISIBLE.getSymbolAsString(), LexicalToken.Type.AND_NOT_VISIBLE));
+				}
+			}
+			lastTokenType = tokenType;
 			
 			tokens.add(new LexicalToken(tokenSubStr, tokenType));
 			start = end;

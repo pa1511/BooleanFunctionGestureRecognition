@@ -197,7 +197,7 @@ class ArtificialExpressionConstructor {
 		
 		@Override
 		public void enterNode(IBooleanExpressionNode node) {
-			if(node instanceof BracketsNotVisibleNode) {
+			if(node instanceof BracketsNotVisibleNode || node instanceof AndNotVisibleNode) {
 				//do nothing
 			}
 			else if(node instanceof BracketsNode)
