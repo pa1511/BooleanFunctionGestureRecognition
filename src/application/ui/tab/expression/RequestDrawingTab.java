@@ -140,7 +140,7 @@ public class RequestDrawingTab extends AbstractApplicationTab{
 		JLabel canvasInstruction = new JLabel("<html>Left click and drag for gesture input. <br>"
 				+ "Right click once to signal symbol end. <br>"
 				+ "CTRL+S save to database <br>"
-				+ "CTRL+Z undo last input (both left and right click are considered inputs)"
+				+ "CTRL+Z undo last input (both left and right click are considered inputs) <br>"
 				+ "CTRL+SHIFT+C clear</html>");
 		Font tipFont = canvasInstruction.getFont().deriveFont(Font.ITALIC).deriveFont(Font.BOLD);
 		canvasInstruction.setFont(tipFont);
