@@ -21,6 +21,7 @@ import application.expressionParse.syntactic.node.leaf.AndNode;
 import application.expressionParse.syntactic.node.leaf.AndNotVisibleNode;
 import application.expressionParse.syntactic.node.leaf.BracketsNode;
 import application.expressionParse.syntactic.node.leaf.BracketsNotVisibleNode;
+import application.expressionParse.syntactic.node.leaf.EqualsNode;
 import application.expressionParse.syntactic.node.leaf.FalseNode;
 import application.expressionParse.syntactic.node.leaf.FunctionNode;
 import application.expressionParse.syntactic.node.leaf.NotNode;
@@ -73,8 +74,17 @@ class ArtificialExpressionConstructor {
 		@Override
 		public void enterNode(IBooleanExpressionNode node) {
 			
-			if(node instanceof TrueNode || node instanceof FalseNode || 
-					node instanceof VariableNode || node instanceof FunctionNode) {
+			if(node instanceof FunctionNode) {
+				String symbolAsString = node.getSymbol();
+				for(char sy:symbolAsString.toCharArray()) {
+					String singleSyString = Character.toString(sy);
+					expressionOrder.append(singleSyString);
+					createArtificialSymbol(singleSyString,width,height,leftX,topY);
+					moveXShort();
+				}
+			}
+			else if(node instanceof TrueNode || node instanceof FalseNode || 
+					node instanceof VariableNode) {
 				
 				String symbolAsString = node.getSymbol();
 				expressionOrder.append(symbolAsString);
@@ -101,6 +111,9 @@ class ArtificialExpressionConstructor {
 			expressionOrder.append(symbolAsString);
 			if(node instanceof AndNode) {
 				createArtificialSymbol(symbolAsString,width,height,leftX+width/2,topY+height/2);
+			}
+			else if(node instanceof EqualsNode) {
+				createArtificialSymbol(symbolAsString,width,height,leftX,topY+height/3);
 			}
 			else {
 				createArtificialSymbol(symbolAsString,width,height,leftX,topY);
@@ -129,7 +142,7 @@ class ArtificialExpressionConstructor {
 				leftX = oldLX;
 				topY = oldTY;
 			} 
-			else if(node instanceof BracketsNotVisibleNode || node instanceof AndNotVisibleNode) {
+			else if(node instanceof BracketsNotVisibleNode || node instanceof AndNotVisibleNode || node instanceof FunctionNode) {
 				//do nothing
 			}
 			else if(node instanceof BracketsNode) {
@@ -139,7 +152,7 @@ class ArtificialExpressionConstructor {
 				moveX();
 			}
 			else if(node instanceof TrueNode || node instanceof FalseNode || 
-					node instanceof VariableNode || node instanceof FunctionNode) {
+					node instanceof VariableNode) {
 				moveX();
 			}
 		}
@@ -164,6 +177,10 @@ class ArtificialExpressionConstructor {
 				}
 			}
 			expression.addSymbol(artificialSymbol);
+		}
+		
+		private void moveXShort() {
+			leftX+=width-space;
 		}
 		
 		private void moveX() {
