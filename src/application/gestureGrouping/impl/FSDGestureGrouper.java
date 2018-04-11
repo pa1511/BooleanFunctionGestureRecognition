@@ -12,7 +12,7 @@ import org.deeplearning4j.util.ModelSerializer;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.factory.Nd4j;
 
-import application.Application;
+import application.AApplication;
 import application.data.model.Gesture;
 import application.data.model.Symbol;
 import application.gestureGrouping.IGestureGrouper;
@@ -55,7 +55,7 @@ public class FSDGestureGrouper implements IGestureGrouper{
 		 });
 		 
 		 //Loading models in a different thread
-		 Application.getInstance().workers.submit(()->{
+		 AApplication.getInstance().workers.submit(()->{
 			 symbolModels.get();
 		 });
 	}

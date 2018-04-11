@@ -7,7 +7,7 @@ import java.util.Map;
 import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
 
-import application.Application;
+import application.AApplication;
 import application.data.model.Expression;
 import application.data.model.Gesture;
 import application.data.model.Relative2DPoint;
@@ -57,7 +57,7 @@ class ArtificialExpressionConstructor {
 	}
 
 	public void construct() throws Exception {
-		IBooleanTextParser parser = ParserSystem.getBooleanTextParser(Application.getInstance().getProperties());
+		IBooleanTextParser parser = ParserSystem.getBooleanTextParser(AApplication.getInstance().getProperties());
 		IBooleanExpressionNode node = parser.parse(expression.getSymbolicForm());
 		
 		ConstructionNodeWorker constructionNodeWorker = new ConstructionNodeWorker();
