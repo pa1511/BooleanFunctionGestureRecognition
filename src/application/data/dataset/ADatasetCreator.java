@@ -1,7 +1,7 @@
 package application.data.dataset;
 
 import java.io.File;
-import java.util.ArrayList;
+//import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -11,10 +11,10 @@ import java.util.Map;
 import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
 
-import application.Application;
+//import application.Application;
+//import application.data.source.IDataSource;
 import application.data.model.Gesture;
 import application.data.model.Symbol;
-import application.data.source.IDataSource;
 import dataset.ClassificationDataSet;
 import generalfactory.Factory;
 
@@ -31,37 +31,39 @@ public abstract class ADatasetCreator {
 	@SuppressWarnings("resource")
 	public @Nonnull ClassificationDataSet createSymbolClassificationDataset(@Nonnull Map<String, Integer> requestedSymbolMap,@Nonnegative int pointCount) throws Exception {
 			
-		IDataSource dataSource = Application.getInstance().getDataSource();
-		
-		int totalSampleCount = requestedSymbolMap.values().stream().mapToInt(Integer::intValue).sum();
-		int differentSymbolCount = requestedSymbolMap.keySet().size();
-		
-		LinkedHashMap<String, double[]> classToSampleOutput = new LinkedHashMap<>();
-		List<Symbol> symbols = new ArrayList<>();
-		
-		int symbolEntryId = 0;
-				
-		for(Map.Entry<String, Integer> symbolEntry:requestedSymbolMap.entrySet()){
-	
-			String symbol = symbolEntry.getKey();
-			double[] symbolOutput = new double[differentSymbolCount];
-			symbolOutput[symbolEntryId] = 1.0;
-			classToSampleOutput.put(symbol, symbolOutput);
-			
-			List<Symbol> symbolSamples = dataSource.getSymbols(symbol,symbolEntry.getValue().intValue());
-			symbols.addAll(symbolSamples);
-						
-			symbolEntryId++;
-		}
-		
-	
-		double[][] samples = new double[totalSampleCount][];
-		double[][] samplesOutput = new double[totalSampleCount][];
-	
-		createSamplesFrom(symbols, classToSampleOutput, samples, samplesOutput, pointCount);
-	
-				
-		return new ClassificationDataSet(samples, samplesOutput, classToSampleOutput);
+		//TODO: commented out due to direct acces to data source 
+//		IDataSource dataSource = Application.getInstance().getDataSource();
+//		
+//		int totalSampleCount = requestedSymbolMap.values().stream().mapToInt(Integer::intValue).sum();
+//		int differentSymbolCount = requestedSymbolMap.keySet().size();
+//		
+//		LinkedHashMap<String, double[]> classToSampleOutput = new LinkedHashMap<>();
+//		List<Symbol> symbols = new ArrayList<>();
+//		
+//		int symbolEntryId = 0;
+//				
+//		for(Map.Entry<String, Integer> symbolEntry:requestedSymbolMap.entrySet()){
+//	
+//			String symbol = symbolEntry.getKey();
+//			double[] symbolOutput = new double[differentSymbolCount];
+//			symbolOutput[symbolEntryId] = 1.0;
+//			classToSampleOutput.put(symbol, symbolOutput);
+//			
+//			List<Symbol> symbolSamples = dataSource.getSymbols(symbol,symbolEntry.getValue().intValue());
+//			symbols.addAll(symbolSamples);
+//						
+//			symbolEntryId++;
+//		}
+//		
+//	
+//		double[][] samples = new double[totalSampleCount][];
+//		double[][] samplesOutput = new double[totalSampleCount][];
+//	
+//		createSamplesFrom(symbols, classToSampleOutput, samples, samplesOutput, pointCount);
+//	
+//				
+//		return new ClassificationDataSet(samples, samplesOutput, classToSampleOutput);
+		return null;
 	}
 	
 	public @Nonnull double[] getRawFormForSymbolClassification(@Nonnull List<Gesture> gestures, @Nonnegative int precision){
@@ -91,9 +93,10 @@ public abstract class ADatasetCreator {
 		Map<String, Integer> requestInfo = new HashMap<>();
 
 		if(requestedSymbolAsString.equals("ALL")){
-			Application.getInstance().getDataSource().getSymbolSamplesInformation().forEach(ssi->{
-				requestInfo.put(ssi.symbol, ssi.simpleSampleCount);
-			});;
+			//TODO: commented out due to usage of data source. Needs to be refactored. 
+//			Application.getInstance().getDataSource().getSymbolSamplesInformation().forEach(ssi->{
+//				requestInfo.put(ssi.symbol, ssi.simpleSampleCount);
+//			});;
 			return requestInfo;
 		}
 
