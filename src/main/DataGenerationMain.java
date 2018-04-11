@@ -33,7 +33,7 @@ public class DataGenerationMain {
 				long start = System.nanoTime();
 				
 				frame = new ApplicationFrame();
-				AApplication.getInstance().registerApplicationFrame(frame);
+				DataGenerationApplication.getInstance().registerApplicationFrame(frame);
 				frame.setVisible(true);
 				
 				long end = System.nanoTime();

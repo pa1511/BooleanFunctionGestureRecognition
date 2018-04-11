@@ -31,7 +31,7 @@ public class Main {
 			try {
 				long start = System.nanoTime();
 				frame = new ApplicationFrame();
-				AApplication.getInstance().registerApplicationFrame(frame);
+				Application.getInstance().registerApplicationFrame(frame);
 				frame.setVisible(true);
 				long end = System.nanoTime();
 				Log.addMessage("Start up time: " + (end-start)*1e-6 + "ms",Log.Type.Plain);

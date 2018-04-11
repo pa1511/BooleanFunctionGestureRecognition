@@ -1,5 +1,7 @@
 package application;
 
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -8,9 +10,11 @@ import java.net.URISyntaxException;
 import java.nio.file.Paths;
 
 import javax.annotation.Nonnull;
+import javax.swing.JOptionPane;
 import javax.swing.UIManager;
 
 import application.data.source.IDataSource;
+import application.ui.AApplicationFrame;
 import generalfactory.Factory;
 import log.Log;
 import utilities.function.ExceptionMaskingSupplier;
@@ -21,7 +25,7 @@ import utilities.function.ExceptionMaskingSupplier;
  * @author paf
  *
  */
-public class Application extends AApplication {
+public class Application extends AApplication<AApplicationFrame> {
 	
 	
 	public static @Nonnull Application getInstance(){
@@ -124,11 +128,47 @@ public class Application extends AApplication {
 	protected void setApplicationLAF() throws Exception {
 		UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 	}
+	
+	@Override
+	public void registerApplicationFrame(@Nonnull AApplicationFrame frame){
+		applicationFrame.setInstance(frame);
+		//TODO: i never actually remove this
+		frame.addWindowListener(new WindowAdapter() {
+			
+			@Override
+			public void windowClosing(WindowEvent e) {
+				try {
+					Application.this.close();
+				} catch (Exception e1) {
+					try {
+						Log.addError(e1);
+					} catch (Exception e2) {
+						
+					}
+					displayErrorMessage("Error","An error occurred during application shutdown.");
+				}
+			}
+			
+		});
+	}
+	
+	@Override
+	protected void displayErrorMessage(String title, String msg) {
+		JOptionPane.showMessageDialog(null, msg, title, JOptionPane.ERROR_MESSAGE);
+	}
 
 	@Override
 	public IDataSource getDataSource() {
 		return (IDataSource) super.dataSource.get();
 	}
+	
+	@Override
+	public void quit() throws Exception{
+		@SuppressWarnings("resource")
+		AApplicationFrame frame = getFrame();
+		frame.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));
+	}
+
 
 	
 	@Override
