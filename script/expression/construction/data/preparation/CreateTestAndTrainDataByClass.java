@@ -68,7 +68,7 @@ public class CreateTestAndTrainDataByClass {
 		ClassificationDataSet dataSet = CreateTestAndTrainUtilities.createDataSet(expressions, classToSampleOutput, gestureInputCount, pointPerGesture);
 		//Storing created data set
 		String outputFolder = "./training/";
-		File outputFile = new File(outputFolder, ADatasetCreator.createCSVFileName("training_data", dataSet.getSampleSize(0), differentOutputCount));
+		File outputFile = new File(outputFolder, ADatasetCreator.createCSVFileName("train_other_data", dataSet.getSampleSize(0), differentOutputCount));
 		File metaOutputFile = new File(outputFolder,ADatasetCreator.getMetaFileName(outputFile.getName()));
 
 		try(PrintStream outputPrintStream = new PrintStream(new FileOutputStream(outputFile));
@@ -88,7 +88,7 @@ public class CreateTestAndTrainDataByClass {
 		dataSet = CreateTestAndTrainUtilities.createDataSet(expressions, classToSampleOutput, gestureInputCount, pointPerGesture);
 		
 		//Storing created data set
-		outputFile = new File(outputFolder, ADatasetCreator.createCSVFileName("test_simple_data", dataSet.getSampleSize(0), differentOutputCount));
+		outputFile = new File(outputFolder, ADatasetCreator.createCSVFileName("test_other_data", dataSet.getSampleSize(0), differentOutputCount));
 		metaOutputFile = new File(outputFolder,ADatasetCreator.getMetaFileName(outputFile.getName()));
 
 		try(PrintStream outputPrintStream = new PrintStream(new FileOutputStream(outputFile));

@@ -41,10 +41,10 @@ public class CreateCNNModel {
 	public static void main(String[] args) throws Exception {
 		Log.setDisabled(true);
 		
-		String fileNameTrain = "./training/training_data-78-2.csv";
-		String fileNameSimpleTest = "./training/test_simple_data-78-2.csv";
+		String fileNameTrain = "./training/train_other_data-78-2.csv";
+		String fileNameSimpleTest = "./training/test_other_data-78-2.csv";
 		//String fileNameComplexTest = "./training/test_complex_data-181-10.csv";
-		String modelName = "CNN-78-2-model1";
+		String modelName = "CNN-78-2-modelall1";
 		
 		File inputFile = new File(fileNameTrain);
 		
@@ -107,7 +107,7 @@ public class CreateCNNModel {
 			File outputFolder = new File("./training/model/");
 			Evaluation bestEvaluation = null;
 			MultiLayerNetwork bestNetwork = null;
-			int nEpochs = 250;
+			int nEpochs = 50;
 	        for ( int n = 0; n < nEpochs; n++) {
 	        	System.out.println("Epoch: " + n);
 	            model.fit(trainIter);

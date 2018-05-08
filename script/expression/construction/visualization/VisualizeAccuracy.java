@@ -14,8 +14,8 @@ public class VisualizeAccuracy {
 	public static void main(String[] args) throws IOException {
 		
 		
-		String listName = "FC-78-2-exp-model5-acc-list.csv";
-		List<String> lines = Files.readAllLines(Paths.get("./training/symbol-gesture-new/model/" + listName));
+		String listName = "FC-78-2-modelall1-acc-list.csv";
+		List<String> lines = Files.readAllLines(Paths.get("./training/model/" + listName));
 		
 		double[] testValues = Arrays.stream(lines.get(0).split(",")).mapToDouble(Double::parseDouble).toArray();
 		

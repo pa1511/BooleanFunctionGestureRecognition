@@ -37,13 +37,13 @@ public class CreateFCModel {
 	public static void main(String[] args) throws Exception {
 		Log.setDisabled(true);
 		
-		String fileNameTrainReal = "./training/training_data-78-2.csv";
-		String fileNameSimpleTest = "./training/test_simple_data-78-2.csv";
+//		String fileNameTrainReal = "./training/train_other_data-78-2.csv";
+//		String fileNameSimpleTest = "./training/test_other_data-78-2.csv";
 		
-//		String fileNameTrainReal = "./training/symbol-gesture-new/training_data_exp-180-14.csv";
-//		String fileNameSimpleTest = "./training/symbol-gesture-new/test_simple_data_exp-180-14.csv";
+		String fileNameTrainReal = "./training/train_other_data-180-14.csv";
+		String fileNameSimpleTest = "./training/test_other_data-180-14.csv";
 		//
-		String modelName = "FC-78-2-model1";
+		String modelName = "FC-180-14-modelall4";
 		
 		//File statOutputFolder = new File("./training/symbol-gesture-new/statistics/");
 		File inputFile = new File(fileNameTrainReal);
@@ -67,11 +67,11 @@ public class CreateFCModel {
 	                .learningRate(0.025).biasLearningRate(0.02)
 	                .updater(Updater.ADAM)
 	                .list()
-	                .layer(0, new DenseLayer.Builder().nIn(numInputs).nOut(numInputs*2)
+	                .layer(0, new DenseLayer.Builder().nIn(numInputs).nOut(numInputs/2)
 	                        .weightInit(WeightInit.XAVIER)
 	                        .activation(Activation.RELU)
 	                        .build())
-	                .layer(1, new DenseLayer.Builder().nIn(numInputs*2).nOut(width)
+	                .layer(1, new DenseLayer.Builder().nIn(numInputs/2).nOut(width)
 	                        .weightInit(WeightInit.XAVIER)
 	                        .activation(Activation.RELU)
 	                        .build())
@@ -87,7 +87,7 @@ public class CreateFCModel {
 	
 	        MultiLayerNetwork model = new MultiLayerNetwork(conf);
 	        model.init();
-	        model.setListeners(new ScoreIterationListener(100));
+	        model.setListeners(new ScoreIterationListener(200));
 
 	        double bestAccuracy = 0;
 			TDoubleArrayList testSimpleAccuracyList = new TDoubleArrayList();
@@ -98,7 +98,7 @@ public class CreateFCModel {
 			File outputFolder = new File("./training/model/");
 			Evaluation bestEvaluation = null;
 			MultiLayerNetwork bestNetwork = null;
-			int nEpochs = 50;
+			int nEpochs = 250;
 	        for ( int n = 0; n < nEpochs; n++) {
 	        	System.out.println("Epoch: " + n);
 	            model.fit(trainIterReal);

@@ -3,6 +3,7 @@ package application.gestureGrouping.impl;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 
 import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
@@ -24,33 +25,37 @@ public class TwoStepGestureGrouper implements IGestureGrouper{
 
 	//TODO: some of the arguments should be read from meta-data files. Like this they are hard-coded. 
 	
-	private final @Nonnegative int pointsPerGesture = 36;
-	private final @Nonnegative int pastAndPresentGestureCount = 4;
+	private final @Nonnegative int pointsPerGesture;
+	private final @Nonnegative int pastAndPresentGestureCount;
 
 	private final @Nonnull Lazy<MultiLayerNetwork[]> groupingModels;
 	private final @Nonnull char[] groupingOptions = new char[] {'S','T'};
 	
 	private final @Nonnull Lazy<MultiLayerNetwork[]> symbolModels;
-	//private final @Nonnull char[] symbolChar = new char[] {'!','(',')','*','+','0','1','A','B','?'};
+	
+	//TODO: this should be read from a file
 	private final @Nonnull char[] symbolChar = new char[] {'!','(',')','*','+','0','1','=','A','B','C','D','F','?'};
 
 
 	
 	public TwoStepGestureGrouper() throws Exception {
-		
-		String folder = "./training/model/";
+		Properties properties = AApplication.getInstance().getProperties();
+		String folder = properties.getProperty("gesture.grouping.impl.fsd.folder");
+		pointsPerGesture = Integer.parseInt(properties.getProperty("gesture.grouping.impl.fsd.points"));
+		pastAndPresentGestureCount = Integer.parseInt(properties.getProperty("gesture.grouping.impl.fsd.pAPGestureCount"));
 
 		//Loading grouping models
 		groupingModels = new Lazy<>(()->{
 			try {
-				String groupModelName_1 = "FC-78-2-model1";
-				MultiLayerNetwork groupNetwork_1 = ModelSerializer.restoreMultiLayerNetwork(new File(folder + groupModelName_1));
-//
-				String groupModelName_2 = "CNN-78-2-model1";
-				MultiLayerNetwork groupNetwork_2 = ModelSerializer.restoreMultiLayerNetwork(new File(folder + groupModelName_2));
-//
-				
-				return new MultiLayerNetwork[] {groupNetwork_1, groupNetwork_2};
+				List<MultiLayerNetwork> networks = new ArrayList<>();
+				for (String modelName : properties.getProperty("gesture.grouping.impl.fsd.groupingModels").split(";")) {
+					if (modelName != null && !modelName.isEmpty()) {
+						MultiLayerNetwork network = ModelSerializer
+								.restoreMultiLayerNetwork(new File(folder + modelName));
+						networks.add(network);
+					}
+				}
+				return networks.stream().toArray(MultiLayerNetwork[]::new);
 			}catch(Exception e) {
 				throw new RuntimeException(e);
 			}
@@ -59,19 +64,15 @@ public class TwoStepGestureGrouper implements IGestureGrouper{
 		//Loading symbol classifiers
 		 symbolModels = new Lazy<>(()->{
 			 try {
-//				String modelName_1 = "FC-180-14-model1";
-//				MultiLayerNetwork network_1 = ModelSerializer.restoreMultiLayerNetwork(new File(folder + modelName_1));
-//
-//				String modelName_2 = "FC-180-14-model2";
-//				MultiLayerNetwork network_2 = ModelSerializer.restoreMultiLayerNetwork(new File(folder + modelName_2));
-//				
-//				String modelName_3 = "FC-180-14-model3";
-//				MultiLayerNetwork network_3 = ModelSerializer.restoreMultiLayerNetwork(new File(folder + modelName_3));
-				
-				String modelName_4 = "FC-180-14-model4";
-				MultiLayerNetwork network_4 = ModelSerializer.restoreMultiLayerNetwork(new File(folder + modelName_4));
-				
-				return new MultiLayerNetwork[] {/*network_1, network_2, network_3,*/ network_4};
+				List<MultiLayerNetwork> networks = new ArrayList<>();
+				for (String modelName : properties.getProperty("gesture.grouping.impl.fsd.symbolModels").split(";")) {
+					if (modelName != null && !modelName.isEmpty()) {
+						MultiLayerNetwork network = ModelSerializer
+								.restoreMultiLayerNetwork(new File(folder + modelName));
+						networks.add(network);
+					}
+				}
+				return networks.stream().toArray(MultiLayerNetwork[]::new);
 			 }catch(Exception e) {
 				 throw new RuntimeException(e);
 			 }

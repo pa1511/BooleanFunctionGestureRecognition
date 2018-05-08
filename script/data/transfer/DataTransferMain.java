@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 import java.util.Properties;
+import java.util.Random;
 
 import application.data.model.Expression;
 import application.data.source.H2Database;
@@ -21,14 +22,32 @@ public class DataTransferMain {
 	public static void main(String[] args) throws Exception {
 		
 		Log.setDisabled(true);
+		Random random = new Random();
+		double trainChance = 0.7;
 		
-		try(H2Database newDb = createBasedOn("properties/transfer/h2-new.properties");
-				H2Database oldDb = createBasedOn("properties/transfer/h2-old.properties")){
+		try(H2Database trainDb = createBasedOn("db_train","properties/transfer/h2-new.properties");
+				H2Database testDb = createBasedOn("db_test","properties/transfer/h2-new.properties");
+				){
 			
+			Properties properties = loadProperties("properties/transfer/h2-old.properties");
+			String key = "db.data.source.location";
+			String location = properties.getProperty(key);
+			int length = new File(location).list().length;
 			
-			List<Expression> expressions = oldDb.getExpressions();
-			newDb.store(expressions);
-			
+			for(int i =0; i<length; i++){
+				properties.put(key, location+i+"/");
+				try(H2Database userDB = new H2Database("db", properties)){
+					List<Expression> expressions = userDB.getExpressions();
+					for(Expression expression:expressions) {
+						if(random.nextDouble()<=trainChance) {
+							trainDb.store(expression);
+						}
+						else {
+							testDb.store(expression);
+						}
+					}
+				}
+			}			
 			
 		}
 		catch (Exception e) {
@@ -38,14 +57,18 @@ public class DataTransferMain {
 		
 	}
 
-	private static H2Database createBasedOn(String propFile) throws IOException, FileNotFoundException {
+	private static H2Database createBasedOn(String dbId, String propFile) throws IOException, FileNotFoundException {
+		Properties properties = loadProperties(propFile);		
+		H2Database db = new H2Database(dbId,properties);
+		return db;
+	}
+
+	private static Properties loadProperties(String propFile) throws IOException, FileNotFoundException {
 		Properties properties = new Properties();
 		try(InputStream inStream = new FileInputStream(new File(System.getProperty("user.dir"),propFile))){
 			properties.load(inStream);
 		}
-		
-		H2Database db = new H2Database("db",properties);
-		return db;
+		return properties;
 	}
 	
 }
