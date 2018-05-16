@@ -23,28 +23,27 @@ public class TestMultipleModel {
 	public static void main(String[] args) throws IOException, InterruptedException {
 		String folder = "./training/model/";
 		
-		String modelName_1 = "CNN-78-2-model5";
-		MultiLayerNetwork network_1 = ModelSerializer.restoreMultiLayerNetwork(new File(folder + modelName_1));
-		String modelName_2 = "FC-78-2-exp-model1";
-		MultiLayerNetwork network_2 = ModelSerializer.restoreMultiLayerNetwork(new File(folder + modelName_2));
-//		String modelName_3 = "CNN-78-2-model3";
-//		MultiLayerNetwork network_3 = ModelSerializer.restoreMultiLayerNetwork(new File(folder + modelName_3));
+		MultiLayerNetwork[] networks = new MultiLayerNetwork[] {
+				ModelSerializer.restoreMultiLayerNetwork(new File(folder + "FC-78-2-modelall2")),
+				//ModelSerializer.restoreMultiLayerNetwork(new File(folder + "FC-78-2-modelall4"))
+		};
 		
-//		String modelName_1 = "FC-180-14-model1";
-//		MultiLayerNetwork network_1 = ModelSerializer.restoreMultiLayerNetwork(new File(folder + modelName_1));
-//		String modelName_2 = "FC-180-14-model2";
-//		MultiLayerNetwork network_2 = ModelSerializer.restoreMultiLayerNetwork(new File(folder + modelName_2));
-//		String modelName_3 = "FC-180-14-model3";
-//		MultiLayerNetwork network_3 = ModelSerializer.restoreMultiLayerNetwork(new File(folder + modelName_3));
-
-
+//		MultiLayerNetwork[] networks = new MultiLayerNetwork[] {
+//				ModelSerializer.restoreMultiLayerNetwork(new File(folder + "FC-180-14-modelall1")),
+//				ModelSerializer.restoreMultiLayerNetwork(new File(folder + "FC-180-14-modelall2")),
+//				ModelSerializer.restoreMultiLayerNetwork(new File(folder + "FC-180-14-modelall3")),
+//				ModelSerializer.restoreMultiLayerNetwork(new File(folder + "FC-180-14-modelall4")),
+//				ModelSerializer.restoreMultiLayerNetwork(new File(folder + "FC-180-14-modelall5"))
+//		};
+		
 		int batchSize = 512;
 		int numOutputs = 2;
+//		int numOutputs = 14;
 		long start = System.nanoTime();
-        evaluate("test_simple_data_exp-78-2.csv", batchSize, numOutputs, network_1, network_2/*, network_3*/);
+        evaluate("test_other_data-78-2.csv", batchSize, numOutputs, networks);
 		//
-        //evaluate("test_simple_data_exp-180-14.csv", batchSize, numOutputs, network_1, network_2, network_3);
-        //evaluate("test_complex_data_exp-180-14.csv", batchSize, numOutputs, network_1, network_2, network_3);
+//        evaluate("test_other_data-180-14.csv", batchSize, numOutputs, networks);
+//        evaluate("test_simple_data-180-14.csv", batchSize, numOutputs, networks);
         
         long end = System.nanoTime();
         System.out.println("Time: " + (end-start)*1e-6 + " ms");
@@ -55,7 +54,7 @@ public class TestMultipleModel {
 			throws IOException, InterruptedException {
 		System.out.println("Evaluate model....");
         try(RecordReader rrTest = new CSVRecordReader()){
-			String fileNameTest = "./training/symbol-gesture-new/" + testDataFile;
+			String fileNameTest = "./training/" + testDataFile;
 	        rrTest.initialize(new FileSplit(new File(fileNameTest)));
 			DataSetIterator testIter = new RecordReaderDataSetIterator(rrTest,batchSize ,0,numOutputs );
 	        

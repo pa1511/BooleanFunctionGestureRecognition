@@ -168,8 +168,12 @@ public class TwoStepGestureGrouper implements IGestureGrouper{
 			}
 		}
 		
-		//TODO: there should be more of a check if these models are used
-		return symbols.get(0).getSymbol();
+		if(symbols.size()>0)
+			return symbols.get(0).getSymbol();
+		
+		
+		//TODO: something needs to be returned here: another kind or recognition could be attempted here
+		return current.getSymbol();
 	}
 
 

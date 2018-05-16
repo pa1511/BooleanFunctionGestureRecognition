@@ -1,4 +1,4 @@
-package data.transfer;
+package expression.construction.data.preparation;
 
 
 import java.io.File;
@@ -6,49 +6,31 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.List;
 import java.util.Properties;
-import java.util.Random;
 
 import application.data.model.Expression;
+import application.data.model.Symbol;
 import application.data.source.H2Database;
 import log.Log;
 
-public class DataTransferMain {
+public class IncreaseDataMain {
 
-	private DataTransferMain() {}
+	private IncreaseDataMain() {}
 		
 	//If you need to use this again don't forget the old point storage adjustment
 	public static void main(String[] args) throws Exception {
 		
 		Log.setDisabled(true);
-		Random random = new Random();
-		double trainChance = 0.7;
 		
-		try(H2Database trainDb = createBasedOn("db_train","properties/transfer/h2-new.properties");
-				H2Database testDb = createBasedOn("db_test","properties/transfer/h2-new.properties");
-				){
+		try(H2Database trainDb = createBasedOn("db_train","properties/transfer/h2-new.properties")){
 			
-			Properties properties = loadProperties("properties/transfer/h2-old.properties");
-			String key = "db.data.source.location";
-			String location = properties.getProperty(key);
-			int length = new File(location).list().length;
-			
-			for(int i =0; i<length; i++){
-				properties.put(key, location+i+"/");
-				try(H2Database userDB = new H2Database("db", properties)){
-					List<Expression> expressions = userDB.getExpressions();
-					for(Expression expression:expressions) {
-						if(random.nextDouble()<=trainChance) {
-							trainDb.store(expression);
-						}
-						else {
-							testDb.store(expression);
-						}
-					}
+			for(Expression expression:trainDb.getExpressions()) {
+				for(Symbol symbol:expression.getSymbols()) {
+					Expression singleSymbolExpression = new Expression(symbol.getSymbolAsString());
+					singleSymbolExpression.addSymbol(symbol);
+					trainDb.store(singleSymbolExpression);
 				}
-			}			
-			
+			}
 		}
 		catch (Exception e) {
 			e.printStackTrace();

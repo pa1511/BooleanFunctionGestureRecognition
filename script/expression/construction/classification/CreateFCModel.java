@@ -37,32 +37,29 @@ public class CreateFCModel {
 	public static void main(String[] args) throws Exception {
 		Log.setDisabled(true);
 		
-//		String fileNameTrainReal = "./training/train_other_data-78-2.csv";
+//		String fileNameTrainReal = "./training/train_other_data_2-78-2.csv";
 //		String fileNameSimpleTest = "./training/test_other_data-78-2.csv";
 		
 		String fileNameTrainReal = "./training/train_other_data-180-14.csv";
 		String fileNameSimpleTest = "./training/test_other_data-180-14.csv";
 		//
-		String modelName = "FC-180-14-modelall4";
+		String modelName = "FC-180-14-modelall6";
 		
-		//File statOutputFolder = new File("./training/symbol-gesture-new/statistics/");
 		File inputFile = new File(fileNameTrainReal);
 		
 		int numInputs = ADatasetCreator.getNumberOfInputsFrom(inputFile);
 		int numOutputs = ADatasetCreator.getNumberOfOutputsFrom(inputFile);
 
         //Load the training data:
-        try(RecordReader rr1 = new CSVRecordReader();/*RecordReader rr2 = new CSVRecordReader()*/){
+        try(RecordReader rr1 = new CSVRecordReader();){
 	        rr1.initialize(new FileSplit(new File(fileNameTrainReal)));
-//	        rr2.initialize(new FileSplit(new File(fileNameTrainArtificial)));
 			int width = 32;
 			int batchSize = width;
 	        DataSetIterator trainIterReal = new RecordReaderDataSetIterator(rr1,batchSize,0,numOutputs);
-//	        DataSetIterator trainIterArtificial = new RecordReaderDataSetIterator(rr2,batchSize,0,numOutputs);
 	
 	        MultiLayerConfiguration conf = new NeuralNetConfiguration.Builder()
 	                .iterations(1)
-	                .regularization(true).l2(0.0005)
+	                .regularization(true).l2(0.0003)
 	                .optimizationAlgo(OptimizationAlgorithm.STOCHASTIC_GRADIENT_DESCENT)
 	                .learningRate(0.025).biasLearningRate(0.02)
 	                .updater(Updater.ADAM)
@@ -79,6 +76,10 @@ public class CreateFCModel {
 	                        .weightInit(WeightInit.XAVIER)
 	                        .activation(Activation.RELU)
 	                        .build())
+//	                .layer(2, new DenseLayer.Builder().nIn(width).nOut(width/2)
+//	                        .weightInit(WeightInit.XAVIER)
+//	                        .activation(Activation.RELU)
+//	                        .build())
 	                .layer(3, new OutputLayer.Builder(LossFunction.NEGATIVELOGLIKELIHOOD)
 	                        .weightInit(WeightInit.XAVIER)
 	                        .activation(Activation.SOFTMAX)
@@ -91,26 +92,20 @@ public class CreateFCModel {
 
 	        double bestAccuracy = 0;
 			TDoubleArrayList testSimpleAccuracyList = new TDoubleArrayList();
-//			TDoubleArrayList testComplexAccuracyList = new TDoubleArrayList();
 			TDoubleArrayList trainAccuracyList = new TDoubleArrayList();
 			
 	        //Store model
 			File outputFolder = new File("./training/model/");
 			Evaluation bestEvaluation = null;
 			MultiLayerNetwork bestNetwork = null;
-			int nEpochs = 250;
+			int nEpochs = 100;
 	        for ( int n = 0; n < nEpochs; n++) {
 	        	System.out.println("Epoch: " + n);
 	            model.fit(trainIterReal);
-	//            model.fit( trainIterArtificial);
 
 	            //test simple evaluation
 	            Evaluation testSimpleEvaluation = evaluate(fileNameSimpleTest, numOutputs, batchSize, model);
 	            testSimpleAccuracyList.add(testSimpleEvaluation.accuracy());
-	            	         
-	            //test complex evaluation
-//	            Evaluation testComplexEvaluation = evaluate(fileNameComplexTest, numOutputs, batchSize, model);
-//	            testComplexAccuracyList.add(testComplexEvaluation.accuracy());
 	            
 	            //train evaluation
 	            Evaluation trainEvaluation = evaluate(fileNameTrainReal, numOutputs, batchSize, model);
@@ -119,7 +114,7 @@ public class CreateFCModel {
 	            //update best model
 	            double accuracy = testSimpleEvaluation.accuracy();
 
-	            if(bestAccuracy<accuracy) {
+	            if(bestAccuracy<accuracy || bestEvaluation==null) {
 	            	bestAccuracy = accuracy;
 	            	bestEvaluation = testSimpleEvaluation;
 	            	bestNetwork = model.clone();
