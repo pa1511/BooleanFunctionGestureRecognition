@@ -28,14 +28,14 @@ public class CreateTestAndTrainDataByClass {
 		Log.setDisabled(true);
 		
 		//Load properties
-		Properties properties = new Properties();
-		try(InputStream inStream = new FileInputStream(new File("./properties/script-new/script.properties"))){
-			properties.load(inStream);
+		Properties trainProperties = new Properties();
+		try(InputStream inStream = new FileInputStream(new File("./properties/h2-db_master_train.properties"))){
+			trainProperties.load(inStream);
 		}
 		
 		//Connecting to data source and load expressions
 		List<Expression> expressions;
-		try(IDataSource ds = new H2Database("train",properties)){
+		try(IDataSource ds = new H2Database("db_master_train",trainProperties)){
 			expressions = ds.getExpressions();
 		}
 		Collections.shuffle(expressions);
@@ -68,7 +68,7 @@ public class CreateTestAndTrainDataByClass {
 		ClassificationDataSet dataSet = CreateTestAndTrainUtilities.createDataSet(expressions, classToSampleOutput, gestureInputCount, pointPerGesture);
 		//Storing created data set
 		String outputFolder = "./training/";
-		File outputFile = new File(outputFolder, ADatasetCreator.createCSVFileName("train_other_data", dataSet.getSampleSize(0), differentOutputCount));
+		File outputFile = new File(outputFolder, ADatasetCreator.createCSVFileName("train_master", dataSet.getSampleSize(0), differentOutputCount));
 		File metaOutputFile = new File(outputFolder,ADatasetCreator.getMetaFileName(outputFile.getName()));
 
 		try(PrintStream outputPrintStream = new PrintStream(new FileOutputStream(outputFile));
@@ -79,7 +79,11 @@ public class CreateTestAndTrainDataByClass {
 		
 		//==================================================================================================
 		//Create simple expression test data set
-		try(IDataSource ds = new H2Database("test",properties)){
+		Properties testProperties = new Properties();
+		try(InputStream inStream = new FileInputStream(new File("./properties/h2-db_test.properties"))){
+			testProperties.load(inStream);
+		}
+		try(IDataSource ds = new H2Database("db_test",testProperties)){
 			expressions = ds.getExpressions();
 		}
 		Collections.shuffle(expressions);

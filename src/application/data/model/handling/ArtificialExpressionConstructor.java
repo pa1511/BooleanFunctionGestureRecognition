@@ -110,6 +110,7 @@ class ArtificialExpressionConstructor {
 			
 			String symbolAsString = node.getSymbol();
 			expressionOrder.append(symbolAsString);
+			
 			if(node instanceof AndNode) {
 				createArtificialSymbol(symbolAsString,width,height,leftX+width/2,topY+height/2);
 			}

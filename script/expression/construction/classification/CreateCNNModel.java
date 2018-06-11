@@ -41,20 +41,21 @@ public class CreateCNNModel {
 	public static void main(String[] args) throws Exception {
 		Log.setDisabled(true);
 		
-		String fileNameTrain = "./training/train_other_data-78-2.csv";
-		String fileNameSimpleTest = "./training/test_other_data-78-2.csv";
+		String fileNameTrainReal = "./training/train_other_data_rot_til-180-14.csv";
+		String fileNameSimpleTest = "./training/test_other_data-180-14.csv";
+
 		//String fileNameComplexTest = "./training/test_complex_data-181-10.csv";
-		String modelName = "CNN-78-2-modelall1";
+		String modelName = "CNN-180-14-modelall2";
 		
-		File inputFile = new File(fileNameTrain);
+		File inputFile = new File(fileNameTrainReal);
 		
 		int numInputs = ADatasetCreator.getNumberOfInputsFrom(inputFile);
 		int numOutputs = ADatasetCreator.getNumberOfOutputsFrom(inputFile);
 
         //Load the training data:
         try(RecordReader rr = new CSVRecordReader()){
-	        rr.initialize(new FileSplit(new File(fileNameTrain)));
-			int batchSize = 16;
+	        rr.initialize(new FileSplit(new File(fileNameTrainReal)));
+			int batchSize = 256;
 	        DataSetIterator trainIter = new RecordReaderDataSetIterator(rr,batchSize,0,numOutputs);
 	
 			int nChannels = 1;
@@ -107,7 +108,7 @@ public class CreateCNNModel {
 			File outputFolder = new File("./training/model/");
 			Evaluation bestEvaluation = null;
 			MultiLayerNetwork bestNetwork = null;
-			int nEpochs = 50;
+			int nEpochs = 250;
 	        for ( int n = 0; n < nEpochs; n++) {
 	        	System.out.println("Epoch: " + n);
 	            model.fit(trainIter);
@@ -121,7 +122,7 @@ public class CreateCNNModel {
 //	            testComplexAccuracyList.add(testComplexEvaluation.accuracy());
 	            
 	            //train evaluation
-	            Evaluation trainEvaluation = evaluate(fileNameTrain, numOutputs, batchSize, model);
+	            Evaluation trainEvaluation = evaluate(fileNameTrainReal, numOutputs, batchSize, model);
 	            trainAccuracyList.add(trainEvaluation.accuracy());
 	            
 	            //update best model

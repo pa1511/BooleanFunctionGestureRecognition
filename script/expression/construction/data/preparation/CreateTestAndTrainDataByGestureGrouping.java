@@ -27,9 +27,9 @@ public class CreateTestAndTrainDataByGestureGrouping {
 		Log.setDisabled(true);
 		
 		//Load properties
-		Properties properties = new Properties();
-		try(InputStream inStream = new FileInputStream(new File("./properties/script-new/script.properties"))){
-			properties.load(inStream);
+		Properties trainProperties = new Properties();
+		try(InputStream inStream = new FileInputStream(new File("./properties/h2-db_master_train.properties"))){
+			trainProperties.load(inStream);
 		}
 
 		//Creating a classToSampleOutput map
@@ -47,7 +47,7 @@ public class CreateTestAndTrainDataByGestureGrouping {
 		//==================================================================================================
 		//Connecting to data source and load expressions
 		List<Expression> expressions;
-		try(IDataSource ds = new H2Database("train",properties)){
+		try(IDataSource ds = new H2Database("db_master_train",trainProperties)){
 			expressions = ds.getExpressions();
 		}
 		Collections.shuffle(expressions);
@@ -67,7 +67,11 @@ public class CreateTestAndTrainDataByGestureGrouping {
 		
 		//==================================================================================================
 		//Create simple expression test data set
-		try(IDataSource ds = new H2Database("test",properties)){
+		Properties testProperties = new Properties();
+		try(InputStream inStream = new FileInputStream(new File("./properties/h2-db_test.properties"))){
+			testProperties.load(inStream);
+		}
+		try(IDataSource ds = new H2Database("db_test",testProperties)){
 			expressions = ds.getExpressions();
 		}
 		Collections.shuffle(expressions);
