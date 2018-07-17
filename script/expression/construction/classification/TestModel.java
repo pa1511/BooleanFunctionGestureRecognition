@@ -3,6 +3,7 @@ package expression.construction.classification;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 
 import org.datavec.api.records.reader.RecordReader;
 import org.datavec.api.records.reader.impl.csv.CSVRecordReader;
@@ -22,10 +23,29 @@ public class TestModel {
 		String folder = 
 				"./training/model/";
 //		String modelName = "FC-78-2-modelall10";
-		String modelName = "FC-180-14-modelall13";
+//		String modelName = "FC-180-14-modelall13";
 		
-        int batchSize = 32;
-		int numOutputs = 14;
+		double[] results = new double[21];
+		int id = 0;
+
+		for(int i=26; i<=106; i+=4) {
+			
+			String testName = "test_other_data-"+i+"-2.csv";
+			String modelName = "FC-"+i+"-2-modelall";
+			
+	        double precision = runEvaluation(folder, modelName, testName);
+	        results[id++] = precision;
+		}
+		
+		System.out.println(Arrays.toString(results));
+
+        //
+	}
+
+	private static double runEvaluation(String folder, String modelName, String testName) throws IOException, InterruptedException {
+		int batchSize = 32;
+//		int numOutputs = 14;
+		int numOutputs = 2;
 		MultiLayerNetwork network = ModelSerializer.restoreMultiLayerNetwork(new File(folder + modelName));
 		System.out.println();
 		network.printConfiguration();
@@ -34,11 +54,10 @@ public class TestModel {
 //        evaluate("./training/", "test_other_data-78-2.csv", batchSize, numOutputs, network);
 //        evaluate("./training/", "test_simple_data-78-2.csv", batchSize, numOutputs, network);
 //
-        evaluate("./training/", "test_other_data-180-14.csv", batchSize, numOutputs, network);
-        //
+        return evaluate("./training/", testName, batchSize, numOutputs, network);
 	}
 
-	private static void evaluate(String folder, String testDataFile, int batchSize, int numOutputs, MultiLayerNetwork network)
+	private static double evaluate(String folder, String testDataFile, int batchSize, int numOutputs, MultiLayerNetwork network)
 			throws IOException, InterruptedException {
 		System.out.println("Evaluate model....");
         try(RecordReader rrTest = new CSVRecordReader()){
@@ -60,6 +79,7 @@ public class TestModel {
 
 	        //Print the evaluation statistics
 	        System.out.println(eval.stats());
+	        return eval.precision();
         }
 	}
 	

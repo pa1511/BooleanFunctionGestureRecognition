@@ -2,7 +2,9 @@ package expression.construction.data.preparation;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
 import java.util.Collections;
@@ -26,6 +28,12 @@ public class CreateTestAndTrainDataByGestureGrouping {
 		
 		Log.setDisabled(true);
 		
+		for(int pointPerGesture = 10; pointPerGesture<=50; pointPerGesture+=2)
+			creeateDataset(pointPerGesture);		
+		
+	}
+
+	private static void creeateDataset(int pointPerGesture) throws IOException, FileNotFoundException, Exception {
 		//Load properties
 		Properties trainProperties = new Properties();
 		try(InputStream inStream = new FileInputStream(new File("./properties/h2-db_master_train.properties"))){
@@ -41,7 +49,6 @@ public class CreateTestAndTrainDataByGestureGrouping {
 		int differentOutputCount = 2;
 
 		//
-		int pointPerGesture = 36;
 		String outputFolder = "./training/";
 
 		//==================================================================================================
@@ -87,8 +94,7 @@ public class CreateTestAndTrainDataByGestureGrouping {
 				PrintStream metaOutputPrintStream = new PrintStream(new FileOutputStream(metaOutputFile))){
 			DataSetDepositers.depositToCSV(dataSet, outputPrintStream, false);
 			DataSetDepositers.depositClassificationMeta(dataSet,metaOutputPrintStream, false);
-		}		
-		
+		}
 	}
 	
 }

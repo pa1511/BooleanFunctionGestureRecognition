@@ -1,5 +1,7 @@
 package application.expressionParse;
 
+import java.util.LinkedHashMap;
+
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 
@@ -17,10 +19,10 @@ public class MemoryTable {
 		return memoryTable;
 	}
 	
-	private final @Nonnull LinkedMap<String, FunctionNode> memory;
+	private final @Nonnull LinkedHashMap<String, FunctionNode> memory;
 	
 	private MemoryTable() {
-		memory = new LinkedMap<>();
+		memory = new LinkedHashMap<>();
 	}
 	
 	public void storeFunction(@Nonnull String functionId, @Nonnull FunctionNode node) {
@@ -35,7 +37,7 @@ public class MemoryTable {
 		return memory.get(functionId);
 	}
 	
-	public LinkedMap<String, FunctionNode> getMemory() {
+	public LinkedHashMap<String, FunctionNode> getMemory() {
 		return memory;
 	}
 	

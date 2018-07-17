@@ -1,6 +1,7 @@
 package expression.construction.classification;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintStream;
 
@@ -37,14 +38,22 @@ public class CreateFCModel {
 	public static void main(String[] args) throws Exception {
 		Log.setDisabled(true);
 		
-		String fileNameTrainReal = "./training/train_other_data-78-2.csv";
-		String fileNameSimpleTest = "./training/test_other_data-78-2.csv";
 //		
 //		String fileNameTrainReal = "./training/train_master-180-14.csv";
 //		String fileNameSimpleTest = "./training/test_other_data-180-14.csv";
 		//
-		String modelName = "FC-78-2-modelall7";
-		
+		for(int i=26; i<=106; i+=4) {
+			
+			String fileNameTrainReal = "./training/train_other_data-"+i+"-2.csv";
+			String fileNameSimpleTest = "./training/test_other_data-"+i+"-2.csv";
+			String modelName = "FC-"+i+"-2-modelall";
+			
+			runTrain(fileNameTrainReal, fileNameSimpleTest, modelName);		
+		}
+	}
+
+	private static void runTrain(String fileNameTrainReal, String fileNameSimpleTest, String modelName)
+			throws IOException, InterruptedException, FileNotFoundException {
 		File inputFile = new File(fileNameTrainReal);
 		
 		int numInputs = ADatasetCreator.getNumberOfInputsFrom(inputFile);
@@ -54,7 +63,7 @@ public class CreateFCModel {
         try(RecordReader rr1 = new CSVRecordReader();){
 	        rr1.initialize(new FileSplit(new File(fileNameTrainReal)));
 			int width = 32;
-			int batchSize = 4;
+			int batchSize = 256;
 	        DataSetIterator trainIterReal = new RecordReaderDataSetIterator(rr1,batchSize,0,numOutputs);
 	
 	        MultiLayerConfiguration conf = new NeuralNetConfiguration.Builder()
@@ -72,14 +81,6 @@ public class CreateFCModel {
 	                        .weightInit(WeightInit.XAVIER)
 	                        .activation(Activation.RELU)
 	                        .build())
-//	                .layer(2, new DenseLayer.Builder().nIn(width).nOut(width)
-//	                        .weightInit(WeightInit.XAVIER)
-//	                        .activation(Activation.RELU)
-//	                        .build())
-//	                .layer(3, new DenseLayer.Builder().nIn(width).nOut(width/2)
-//	                        .weightInit(WeightInit.XAVIER)
-//	                        .activation(Activation.RELU)
-//	                        .build())
 	                .layer(2, new OutputLayer.Builder(LossFunction.NEGATIVELOGLIKELIHOOD)
 	                        .weightInit(WeightInit.XAVIER)
 	                        .activation(Activation.SOFTMAX)
@@ -98,7 +99,7 @@ public class CreateFCModel {
 			File outputFolder = new File("./training/model/");
 			Evaluation bestEvaluation = null;
 			MultiLayerNetwork bestNetwork = null;
-			int nEpochs = 100;
+			int nEpochs = 25;
 	        for ( int n = 0; n < nEpochs; n++) {
 	        	System.out.println("Epoch: " + n);
 	        	model.fit(trainIterReal);
@@ -138,8 +139,6 @@ public class CreateFCModel {
 		    	output.println(trainAccuracyListStr);
 		    }
         }
-
-		
 	}
 
 	/**

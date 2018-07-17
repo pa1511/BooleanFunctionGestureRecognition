@@ -28,7 +28,7 @@ import dataModels.Pair;
 import dataModels.Rectangle;
 import log.Log;
 
-class BooleanSpatialParser implements IBooleanSpatialParser {
+public class BooleanSpatialParser implements IBooleanSpatialParser {
 
 	private final @Nonnull ILexicalAnalyzer lexicalAnalizer;
 	private final @Nonnull Comparator<Pair<IBooleanExpressionNode,Rectangle>> leftToRight = (c1,c2)->{

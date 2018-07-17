@@ -39,7 +39,10 @@ public class TwoStepGestureGrouper implements IGestureGrouper{
 
 	
 	public TwoStepGestureGrouper() throws Exception {
-		Properties properties = AApplication.getInstance().getProperties();
+		this(AApplication.getInstance().getProperties());
+	}
+	
+	public TwoStepGestureGrouper(Properties properties) {
 		String folder = properties.getProperty("gesture.grouping.impl.fsd.folder");
 		pointsPerGesture = Integer.parseInt(properties.getProperty("gesture.grouping.impl.fsd.points"));
 		pastAndPresentGestureCount = Integer.parseInt(properties.getProperty("gesture.grouping.impl.fsd.pAPGestureCount"));
@@ -78,11 +81,6 @@ public class TwoStepGestureGrouper implements IGestureGrouper{
 			 }
 		 });
 		 
-		 //Loading models in a different thread
-		 AApplication.getInstance().workers.execute(()->{
-			groupingModels.get();
-			symbolModels.get();
-		 });
 	}
 	
 	@Override
