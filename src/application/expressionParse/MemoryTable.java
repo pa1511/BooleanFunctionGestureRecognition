@@ -5,7 +5,6 @@ import java.util.LinkedHashMap;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 
-import com.twelvemonkeys.util.LinkedMap;
 
 import application.expressionParse.syntactic.node.leaf.FunctionNode;
 
